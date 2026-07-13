@@ -4,6 +4,9 @@ export const metadata = {
   title: "TournamentWala.com — Find. Play. Win.",
   description:
     "India's tournament marketplace. Discover cricket, badminton, football, kabaddi and esports tournaments near you. Register in minutes, play for real prize pools.",
+  icons: {
+    icon: "/images/favicon.png",
+  },
 };
 
 export default function RootLayout({ children }) {
