@@ -118,6 +118,7 @@ button {
   width: 40px;
   height: 40px;
   flex: none;
+  object-fit: contain;
 }
 
 .brand-word {
@@ -140,6 +141,7 @@ button {
   color: var(--steel);
   display: block;
   margin-top: 3px;
+  text-transform: uppercase;
 }
 
 .nav-links {
