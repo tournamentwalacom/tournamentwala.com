@@ -7,14 +7,16 @@ import HowItWorks from "@/components/HowItWorks";
 import OrganizerCTA from "@/components/OrganizerCTA";
 import Footer from "@/components/Footer";
 
-export default function Home() {
+export default async function Home({ searchParams }) {
+  const params = await searchParams;
+
   return (
     <>
       <Navbar />
       <main>
         <Hero />
         <LiveTicker />
-        <Tournaments />
+        <Tournaments sport={params?.sport} city={params?.city} />
         <SportsMarquee />
         <HowItWorks />
         <OrganizerCTA />

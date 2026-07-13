@@ -1,10 +1,14 @@
 import Image from "next/image";
+import { getFilterFacets } from "@/lib/tournaments";
+import NavMenu from "@/components/NavMenu";
 
-export default function Navbar() {
+export default async function Navbar() {
+  const { sports, cities } = await getFilterFacets();
+
   return (
     <header className="nav">
       <div className="container nav-inner">
-        <a href="#" className="brand" aria-label="TournamentWala home">
+        <a href="/" className="brand" aria-label="TournamentWala home">
           <Image
             className="brand-mark"
             src="/images/favicon.png"
@@ -19,13 +23,7 @@ export default function Navbar() {
           </span>
         </a>
 
-        <nav className="nav-links" aria-label="Main">
-          <a href="#tournaments">Tournaments</a>
-          <a href="#how">How it works</a>
-          <a href="#organizers">For organizers</a>
-        </nav>
-
-        <button className="btn btn-primary">List your tournament</button>
+        <NavMenu sports={sports} cities={cities} />
       </div>
     </header>
   );
