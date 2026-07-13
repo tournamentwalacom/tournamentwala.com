@@ -6,7 +6,9 @@ export default function Hero() {
           <div className="hero-col-left">
             <span className="hero-kicker">
               <span className="pulse-dot" aria-hidden="true" />
-              2,300+ tournaments live across 40 Indian cities
+              <span className="hero-kicker-text">
+                2,300+ tournaments live across 40 Indian cities
+              </span>
             </span>
 
             <h1 className="hero-title" aria-label="Find. Play. Win.">
@@ -57,7 +59,7 @@ export default function Hero() {
                   <b>₹4.2 Cr</b> prizes paid out
                 </span>
                 <span>
-                  <b>1.8 lakh</b> registered players
+                  <b>1.8 lakh</b> Players
                 </span>
               </div>
             </div>

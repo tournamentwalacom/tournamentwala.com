@@ -110,7 +110,7 @@ export default function NavMenu({ sports, cities }) {
       {/* ---------------- Desktop ---------------- */}
       <nav className="nav-links" aria-label="Main">
         <Link href="/">Home</Link>
-        <a href="/#tournaments">Explore</a>
+        <Link href="/explore-tournaments">Explore</Link>
 
         <div className="nav-dd">
           <button
@@ -230,15 +230,17 @@ export default function NavMenu({ sports, cities }) {
             <span className="idx">01</span>
             <span>Home</span>
           </Link>
-          <a
-            href="/#tournaments"
-            className="nav-drawer-link"
+          <Link
+            href="/explore-tournaments"
+            className={`nav-drawer-link${
+              pathname === "/explore-tournaments" ? " active" : ""
+            }`}
             style={{ "--i": 1 }}
             onClick={closeAll}
           >
             <span className="idx">02</span>
             <span>Explore</span>
-          </a>
+          </Link>
 
           <div className="nav-accordion" style={{ "--i": 2 }}>
             <button

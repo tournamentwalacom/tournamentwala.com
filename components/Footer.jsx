@@ -1,12 +1,25 @@
+import Image from "next/image";
+
 export default function Footer() {
   return (
     <footer className="footer">
       <div className="container">
         <div className="footer-grid">
           <div>
-            <span className="brand-word" style={{ color: "#fff" }}>
-              tournament<em>wala</em>.com
-            </span>
+            <div className="footer-brand">
+              <span className="footer-logo-crop">
+                <Image
+                  className="brand-mark"
+                  src="/images/logo.png"
+                  alt=""
+                  width={56}
+                  height={56}
+                />
+              </span>
+              <span className="brand-word" style={{ color: "#fff" }}>
+                tournament<em>wala</em>.com
+              </span>
+            </div>
             <p className="footer-tagline">
               Find. Play. <em>Win.</em>
             </p>
