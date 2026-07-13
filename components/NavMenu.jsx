@@ -1,8 +1,9 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import Image from "next/image";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
+import { useRouter, usePathname } from "next/navigation";
 
 function FilterList({ items, search, onSearchChange, emptyLabel, onPick }) {
   const filtered = items.filter((item) =>
@@ -44,6 +45,7 @@ function FilterList({ items, search, onSearchChange, emptyLabel, onPick }) {
 
 export default function NavMenu({ sports, cities }) {
   const router = useRouter();
+  const pathname = usePathname();
   const [mobileOpen, setMobileOpen] = useState(false);
   const [openDropdown, setOpenDropdown] = useState(null); // 'sports' | 'cities' | null
   const [sportSearch, setSportSearch] = useState("");
@@ -71,6 +73,16 @@ export default function NavMenu({ sports, cities }) {
   }, []);
 
   useEffect(() => {
+    function handleResize() {
+      if (window.innerWidth > 1040) {
+        setMobileOpen(false);
+      }
+    }
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
+
+  useEffect(() => {
     document.documentElement.style.overflow = mobileOpen ? "hidden" : "";
     return () => {
       document.documentElement.style.overflow = "";
@@ -79,13 +91,19 @@ export default function NavMenu({ sports, cities }) {
 
   function goToFilter(param, value) {
     router.push(`/?${param}=${encodeURIComponent(value)}#tournaments`);
-    setOpenDropdown(null);
-    setMobileOpen(false);
+    closeAll();
   }
 
   function toggleDropdown(name) {
     setOpenDropdown((current) => (current === name ? null : name));
   }
+
+  function closeAll() {
+    setMobileOpen(false);
+    setOpenDropdown(null);
+  }
+
+  const isHome = pathname === "/";
 
   return (
     <div className="nav-menu" ref={navRef}>
@@ -147,79 +165,157 @@ export default function NavMenu({ sports, cities }) {
       {/* ---------------- Mobile ---------------- */}
       <button
         type="button"
-        className="nav-toggle"
+        className={`nav-toggle${mobileOpen ? " open" : ""}`}
         aria-label={mobileOpen ? "Close menu" : "Open menu"}
         aria-expanded={mobileOpen}
+        aria-controls="mobile-nav-drawer"
         onClick={() => setMobileOpen((v) => !v)}
       >
-        <span className={`nav-toggle-bar${mobileOpen ? " open" : ""}`} />
+        <span className="nav-toggle-bars" aria-hidden="true">
+          <span className="bar bar-1" />
+          <span className="bar bar-2" />
+          <span className="bar bar-3" />
+        </span>
       </button>
 
-      <div className={`nav-drawer${mobileOpen ? " open" : ""}`}>
-        <Link href="/" onClick={() => setMobileOpen(false)}>
-          Home
-        </Link>
-        <a href="/#tournaments" onClick={() => setMobileOpen(false)}>
-          Explore
-        </a>
+      <div
+        className={`nav-overlay${mobileOpen ? " open" : ""}`}
+        onClick={closeAll}
+        aria-hidden="true"
+      />
 
-        <div className="nav-accordion">
+      <aside
+        id="mobile-nav-drawer"
+        className={`nav-drawer${mobileOpen ? " open" : ""}`}
+        aria-hidden={!mobileOpen}
+      >
+        <div className="nav-drawer-head">
+          <a href="/" className="brand" onClick={closeAll} aria-label="TournamentWala home">
+            <Image
+              className="brand-mark"
+              src="/images/favicon.png"
+              alt=""
+              width={32}
+              height={32}
+            />
+            <span className="brand-word">
+              tournament<em>wala</em>
+            </span>
+          </a>
           <button
             type="button"
-            className={`nav-accordion-trigger${
-              openDropdown === "sports" ? " open" : ""
-            }`}
-            onClick={() => toggleDropdown("sports")}
-            aria-expanded={openDropdown === "sports"}
+            className="nav-drawer-close"
+            aria-label="Close menu"
+            onClick={closeAll}
           >
-            Sports <span className="caret" aria-hidden="true">▾</span>
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+              <path
+                d="M1 1L15 15M15 1L1 15"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+              />
+            </svg>
           </button>
-          {openDropdown === "sports" && (
-            <FilterList
-              items={sports}
-              search={sportSearch}
-              onSearchChange={setSportSearch}
-              onPick={(name) => goToFilter("sport", name)}
-            />
-          )}
         </div>
 
-        <div className="nav-accordion">
-          <button
-            type="button"
-            className={`nav-accordion-trigger${
-              openDropdown === "cities" ? " open" : ""
-            }`}
-            onClick={() => toggleDropdown("cities")}
-            aria-expanded={openDropdown === "cities"}
+        <nav className="nav-drawer-links" aria-label="Mobile">
+          <Link
+            href="/"
+            className={`nav-drawer-link${isHome ? " active" : ""}`}
+            style={{ "--i": 0 }}
+            onClick={closeAll}
           >
-            Cities <span className="caret" aria-hidden="true">▾</span>
-          </button>
-          {openDropdown === "cities" && (
-            <FilterList
-              items={cities}
-              search={citySearch}
-              onSearchChange={setCitySearch}
-              onPick={(name) => goToFilter("city", name)}
-            />
-          )}
+            <span className="idx">01</span>
+            <span>Home</span>
+          </Link>
+          <a
+            href="/#tournaments"
+            className="nav-drawer-link"
+            style={{ "--i": 1 }}
+            onClick={closeAll}
+          >
+            <span className="idx">02</span>
+            <span>Explore</span>
+          </a>
+
+          <div className="nav-accordion" style={{ "--i": 2 }}>
+            <button
+              type="button"
+              className={`nav-accordion-trigger${
+                openDropdown === "sports" ? " open" : ""
+              }`}
+              onClick={() => toggleDropdown("sports")}
+              aria-expanded={openDropdown === "sports"}
+            >
+              <span><span className="idx">03</span> Sports</span>
+              <span className="caret" aria-hidden="true">▾</span>
+            </button>
+            {openDropdown === "sports" && (
+              <FilterList
+                items={sports}
+                search={sportSearch}
+                onSearchChange={setSportSearch}
+                onPick={(name) => goToFilter("sport", name)}
+              />
+            )}
+          </div>
+
+          <div className="nav-accordion" style={{ "--i": 3 }}>
+            <button
+              type="button"
+              className={`nav-accordion-trigger${
+                openDropdown === "cities" ? " open" : ""
+              }`}
+              onClick={() => toggleDropdown("cities")}
+              aria-expanded={openDropdown === "cities"}
+            >
+              <span><span className="idx">04</span> Cities</span>
+              <span className="caret" aria-hidden="true">▾</span>
+            </button>
+            {openDropdown === "cities" && (
+              <FilterList
+                items={cities}
+                search={citySearch}
+                onSearchChange={setCitySearch}
+                onPick={(name) => goToFilter("city", name)}
+              />
+            )}
+          </div>
+
+          <Link
+            href="/about"
+            className={`nav-drawer-link${pathname === "/about" ? " active" : ""}`}
+            style={{ "--i": 4 }}
+            onClick={closeAll}
+          >
+            <span className="idx">05</span>
+            <span>About</span>
+          </Link>
+          <Link
+            href="/contact"
+            className={`nav-drawer-link${pathname === "/contact" ? " active" : ""}`}
+            style={{ "--i": 5 }}
+            onClick={closeAll}
+          >
+            <span className="idx">06</span>
+            <span>Contact Us</span>
+          </Link>
+        </nav>
+
+        <div className="nav-drawer-foot">
+          <Link
+            href="/post-tournament"
+            className="btn btn-primary nav-cta"
+            onClick={closeAll}
+          >
+            + Post Tournament
+          </Link>
+          <p className="nav-drawer-tag">
+            Find. Play. <em>Win.</em>
+          </p>
         </div>
-
-        <Link href="/about" onClick={() => setMobileOpen(false)}>
-          About
-        </Link>
-        <Link href="/contact" onClick={() => setMobileOpen(false)}>
-          Contact Us
-        </Link>
-
-        <Link
-          href="/post-tournament"
-          className="btn btn-primary nav-cta"
-          onClick={() => setMobileOpen(false)}
-        >
-          + Post Tournament
-        </Link>
-      </div>
+      </aside>
     </div>
   );
 }
