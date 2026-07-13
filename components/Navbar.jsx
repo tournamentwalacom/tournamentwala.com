@@ -11,10 +11,10 @@ export default async function Navbar() {
         <a href="/" className="brand" aria-label="TournamentWala home">
           <Image
             className="brand-mark"
-            src="/images/favicon.png"
+            src="/images/logo.png"
             alt="TournamentWala logo"
-            width={40}
-            height={40}
+            width={52}
+            height={52}
             priority
           />
           <span className="brand-word">

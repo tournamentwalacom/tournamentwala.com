@@ -159,7 +159,8 @@ export default function NavMenu({ sports, cities }) {
       </nav>
 
       <Link href="/post-tournament" className="btn btn-primary nav-cta">
-        + Post Tournament
+        <span className="nav-cta-icon" aria-hidden="true">+</span>
+        Post Tournament
       </Link>
 
       {/* ---------------- Mobile ---------------- */}
@@ -193,10 +194,10 @@ export default function NavMenu({ sports, cities }) {
           <a href="/" className="brand" onClick={closeAll} aria-label="TournamentWala home">
             <Image
               className="brand-mark"
-              src="/images/favicon.png"
+              src="/images/logo.png"
               alt=""
-              width={32}
-              height={32}
+              width={42}
+              height={42}
             />
             <span className="brand-word">
               tournament<em>wala</em>
@@ -309,7 +310,8 @@ export default function NavMenu({ sports, cities }) {
             className="btn btn-primary nav-cta"
             onClick={closeAll}
           >
-            + Post Tournament
+            <span className="nav-cta-icon" aria-hidden="true">+</span>
+            Post Tournament
           </Link>
           <p className="nav-drawer-tag">
             Find. Play. <em>Win.</em>
