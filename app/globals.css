@@ -1024,6 +1024,7 @@ button {
   --notch: 14px;
   position: relative;
   background: var(--chalk);
+  border: 1.5px solid var(--crimson);
   border-radius: var(--radius);
   box-shadow: var(--shadow-card);
   display: flex;
