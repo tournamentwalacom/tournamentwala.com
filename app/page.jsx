@@ -24,6 +24,7 @@ export default async function Home({ searchParams }) {
           title="Get Onto the Pitch."
           sectionId="football-tournaments"
           showActiveFilter={false}
+          alt
         />
         <Tournaments
           sport="Esports (BGMI / Valorant / Free Fire)"
@@ -40,6 +41,7 @@ export default async function Home({ searchParams }) {
           title="Book Your Court."
           sectionId="pickleball-tournaments"
           showActiveFilter={false}
+          alt
         />
         <SportsMarquee />
         <HowItWorks />

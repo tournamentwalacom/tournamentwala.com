@@ -11,11 +11,20 @@ const initialForm = {
   venue: "",
   start_date: "",
   end_date: "",
+  start_time: "",
   format: "",
   tag: "",
+  image_url: "",
+  description: "",
   entry_fee_amount: "",
   entry_fee_unit: "team",
+  advance_amount: "",
   prize_pool: "",
+  first_prize: "",
+  second_prize: "",
+  rules: "",
+  trophy_details: "",
+  other_contact: "",
   organizer_name: "",
   organizer_email: "",
   organizer_phone: "",
@@ -186,6 +195,15 @@ export default function PostTournamentForm() {
         </label>
 
         <label className="post-field">
+          Start time <span>(optional)</span>
+          <input
+            type="time"
+            value={form.start_time}
+            onChange={(e) => update("start_time", e.target.value)}
+          />
+        </label>
+
+        <label className="post-field">
           Format <span>(optional)</span>
           <input
             type="text"
@@ -204,6 +222,39 @@ export default function PostTournamentForm() {
             placeholder="e.g. Filling fast"
             value={form.tag}
             onChange={(e) => update("tag", e.target.value)}
+          />
+        </label>
+
+        <label className="post-field post-field-wide">
+          Cover image URL <span>(optional)</span>
+          <input
+            type="url"
+            maxLength={500}
+            placeholder="https://…"
+            value={form.image_url}
+            onChange={(e) => update("image_url", e.target.value)}
+          />
+        </label>
+
+        <label className="post-field post-field-wide">
+          Description <span>(optional)</span>
+          <textarea
+            rows={4}
+            maxLength={1000}
+            placeholder="Tell players what to expect — format, rules, who can join…"
+            value={form.description}
+            onChange={(e) => update("description", e.target.value)}
+          />
+        </label>
+
+        <label className="post-field post-field-wide">
+          Rules <span>(optional, one per line)</span>
+          <textarea
+            rows={4}
+            maxLength={1000}
+            placeholder={"e.g.\n16 teams, single elimination\nSquad of 11 + 3 substitutes"}
+            value={form.rules}
+            onChange={(e) => update("rules", e.target.value)}
           />
         </label>
 
@@ -234,6 +285,17 @@ export default function PostTournamentForm() {
         </label>
 
         <label className="post-field">
+          Advance to book (₹) <span>(optional)</span>
+          <input
+            type="number"
+            min="0"
+            step="1"
+            value={form.advance_amount}
+            onChange={(e) => update("advance_amount", e.target.value)}
+          />
+        </label>
+
+        <label className="post-field">
           Prize pool (₹)
           <input
             type="number"
@@ -242,6 +304,50 @@ export default function PostTournamentForm() {
             step="1"
             value={form.prize_pool}
             onChange={(e) => update("prize_pool", e.target.value)}
+          />
+        </label>
+
+        <label className="post-field">
+          1st prize (₹) <span>(optional)</span>
+          <input
+            type="number"
+            min="0"
+            step="1"
+            value={form.first_prize}
+            onChange={(e) => update("first_prize", e.target.value)}
+          />
+        </label>
+
+        <label className="post-field">
+          2nd prize (₹) <span>(optional)</span>
+          <input
+            type="number"
+            min="0"
+            step="1"
+            value={form.second_prize}
+            onChange={(e) => update("second_prize", e.target.value)}
+          />
+        </label>
+
+        <label className="post-field post-field-wide">
+          Trophy / medal details <span>(optional)</span>
+          <textarea
+            rows={2}
+            maxLength={400}
+            placeholder="e.g. Winner trophy + 11 medals, runners-up mini-cup"
+            value={form.trophy_details}
+            onChange={(e) => update("trophy_details", e.target.value)}
+          />
+        </label>
+
+        <label className="post-field post-field-wide">
+          Other contact details <span>(optional)</span>
+          <textarea
+            rows={2}
+            maxLength={400}
+            placeholder="e.g. Ground manager (matchday only): +91…"
+            value={form.other_contact}
+            onChange={(e) => update("other_contact", e.target.value)}
           />
         </label>
 

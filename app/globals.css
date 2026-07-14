@@ -910,6 +910,11 @@ button {
   padding-bottom: 40px;
 }
 
+.tournaments-section--alt {
+  background: var(--chalk);
+  box-shadow: inset 0 1px 0 var(--line), inset 0 -1px 0 var(--line);
+}
+
 .section-head {
   margin-bottom: 44px;
 }
@@ -1873,6 +1878,22 @@ button {
   padding: 16px 0;
 }
 
+.explore-frozen-search {
+  position: relative;
+  max-height: 0;
+  opacity: 0;
+  overflow: hidden;
+  pointer-events: none;
+  transition: max-height 0.28s ease, opacity 0.2s ease, margin-bottom 0.28s ease;
+}
+
+.explore-filter-bar.frozen .explore-frozen-search {
+  max-height: 80px;
+  opacity: 1;
+  margin-bottom: 14px;
+  pointer-events: auto;
+}
+
 .explore-chip-row {
   display: flex;
   gap: 10px;
@@ -1968,6 +1989,9 @@ button {
   }
   .explore-filter-bar {
     padding: 12px 0;
+  }
+  .explore-filter-bar.frozen .explore-frozen-search {
+    max-height: 64px;
   }
   .explore-chip {
     padding: 8px 14px;
@@ -2138,7 +2162,7 @@ button {
   }
 }
 
-@media (max-width: 900px) {
+@media (min-width: 621px) and (max-width: 900px) {
   .pricing-grid {
     grid-template-columns: repeat(2, 1fr);
   }
@@ -2157,5 +2181,404 @@ button {
   .ticker-track,
   .sports-track {
     animation: none;
+  }
+}
+
+/* ================= TOURNAMENT DETAIL PAGE ================= */
+.tdp-hero {
+  position: relative;
+  min-height: 300px;
+  display: flex;
+  align-items: flex-end;
+  overflow: hidden;
+  background: var(--ink);
+}
+
+.tdp-hero-img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.tdp-hero--generated {
+  background: radial-gradient(
+      120% 140% at 15% 0%,
+      var(--crimson-deep) 0%,
+      transparent 55%
+    ),
+    linear-gradient(155deg, var(--ink) 0%, var(--ink-soft) 55%, #10203f 100%);
+}
+
+.tdp-hero-icon {
+  position: absolute;
+  right: -4%;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: min(28vw, 260px);
+  line-height: 1;
+  opacity: 0.16;
+  filter: saturate(0) brightness(3);
+  pointer-events: none;
+  user-select: none;
+}
+
+.tdp-hero-scrim {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    180deg,
+    rgba(14, 27, 51, 0.2) 0%,
+    rgba(14, 27, 51, 0.6) 55%,
+    rgba(14, 27, 51, 0.92) 100%
+  );
+}
+
+.tdp-hero-inner {
+  position: relative;
+  padding: 88px 0 20px;
+  color: var(--chalk);
+}
+
+.tdp-back {
+  display: inline-block;
+  font-family: var(--font-fixture), monospace;
+  font-size: 0.78rem;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  color: var(--chalk);
+  opacity: 0.8;
+  margin-bottom: 10px;
+  transition: opacity 0.2s ease;
+}
+
+.tdp-back:hover {
+  opacity: 1;
+}
+
+.tdp-hero-chips {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 10px;
+}
+
+.tdp-title {
+  font-family: var(--font-display), Impact, sans-serif;
+  font-size: clamp(1.9rem, 4.6vw, 3.4rem);
+  line-height: 1.02;
+  text-transform: uppercase;
+  letter-spacing: 0.01em;
+  max-width: 24ch;
+  margin-bottom: 10px;
+}
+
+.tdp-hero-facts {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 24px;
+  font-size: 0.92rem;
+  opacity: 0.92;
+}
+
+.tdp-hero-facts b {
+  font-weight: 700;
+}
+
+.tdp-body {
+  padding: 48px 0 64px;
+}
+
+.tdp-grid {
+  display: grid;
+  grid-template-columns: 1fr 380px;
+  gap: 48px;
+  align-items: start;
+}
+
+.tdp-section-title {
+  font-family: var(--font-display), Impact, sans-serif;
+  font-size: 1.5rem;
+  text-transform: uppercase;
+  letter-spacing: 0.01em;
+  margin-bottom: 14px;
+}
+
+.tdp-main .tdp-section-title:not(:first-child) {
+  margin-top: 40px;
+}
+
+.tdp-description {
+  font-size: 1.05rem;
+  line-height: 1.7;
+  color: var(--ink-soft);
+  max-width: 68ch;
+}
+
+.tdp-facts-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 14px;
+}
+
+.tdp-fact {
+  background: var(--chalk);
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  padding: 14px 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.tdp-fact small {
+  font-family: var(--font-fixture), monospace;
+  font-size: 0.68rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--steel);
+}
+
+.tdp-fact span {
+  font-weight: 600;
+  font-size: 0.98rem;
+}
+
+.tdp-organizer {
+  font-size: 1.02rem;
+  font-weight: 600;
+}
+
+.tdp-prose {
+  font-size: 0.98rem;
+  line-height: 1.7;
+  color: var(--ink-soft);
+  max-width: 68ch;
+  white-space: pre-line;
+}
+
+.tdp-rules-list {
+  display: grid;
+  gap: 10px;
+  list-style: none;
+  max-width: 68ch;
+}
+
+.tdp-rules-list li {
+  position: relative;
+  padding-left: 22px;
+  font-size: 0.98rem;
+  line-height: 1.5;
+  color: var(--ink-soft);
+}
+
+.tdp-rules-list li::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 9px;
+  width: 10px;
+  height: 3px;
+  background: var(--crimson);
+}
+
+.tdp-media {
+  position: sticky;
+  top: 96px;
+  width: 100%;
+}
+
+.tdp-portrait {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 1080 / 1350;
+  border-radius: var(--radius);
+  overflow: hidden;
+  box-shadow: var(--shadow-card);
+  background: var(--ink);
+}
+
+.tdp-portrait img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.tdp-banner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 24px;
+  background: var(--chalk);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow-card);
+  padding: 26px 30px;
+  margin: 44px 0;
+}
+
+.tdp-banner-prize {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.tdp-banner-prize small {
+  font-family: var(--font-fixture), monospace;
+  font-size: 0.7rem;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--steel);
+}
+
+.tdp-banner-prize .amt {
+  font-family: var(--font-fixture), monospace;
+  font-weight: 700;
+  font-size: 2rem;
+  background: linear-gradient(180deg, var(--floodlight), #f0a500);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+.tdp-banner-facts {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 22px 32px;
+}
+
+.tdp-banner-fact {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.tdp-banner-fact small {
+  font-family: var(--font-fixture), monospace;
+  font-size: 0.66rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--steel);
+}
+
+.tdp-banner-fact b {
+  font-size: 0.95rem;
+  color: var(--ink);
+}
+
+.tdp-banner-register {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+}
+
+.tdp-register {
+  justify-content: center;
+  font-size: 0.95rem;
+  padding: 15px 26px;
+  white-space: nowrap;
+}
+
+.tdp-register-note {
+  font-size: 0.78rem;
+  color: var(--steel);
+  text-align: center;
+  max-width: 32ch;
+}
+
+.tdp-sticky-bar {
+  display: none;
+}
+
+@media (max-width: 900px) {
+  .tdp-grid {
+    grid-template-columns: 1fr;
+  }
+  .tdp-media {
+    position: static;
+    max-width: 380px;
+  }
+  .tdp-facts-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  .tdp-banner {
+    flex-direction: column;
+    align-items: stretch;
+    text-align: center;
+  }
+  .tdp-banner-prize,
+  .tdp-banner-register {
+    align-items: center;
+  }
+  .tdp-banner-facts {
+    justify-content: center;
+    text-align: center;
+  }
+  .tdp-banner-fact {
+    align-items: center;
+  }
+}
+
+@media (max-width: 620px) {
+  .tdp-hero {
+    min-height: 260px;
+  }
+  .tdp-hero-inner {
+    padding: 80px 0 18px;
+  }
+  .tdp-media {
+    max-width: 260px;
+    margin: 0 auto;
+  }
+  .tdp-facts-grid {
+    grid-template-columns: 1fr;
+  }
+  .tdp-body {
+    padding-bottom: 110px;
+  }
+  .tdp-banner-register {
+    display: none;
+  }
+  .tdp-sticky-bar {
+    position: fixed;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 60;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    background: var(--chalk);
+    border-top: 1px solid var(--line);
+    box-shadow: 0 -10px 30px rgba(14, 27, 51, 0.12);
+    padding: 12px 18px;
+    padding-bottom: max(12px, env(safe-area-inset-bottom));
+  }
+  .tdp-sticky-info {
+    display: flex;
+    flex-direction: column;
+  }
+  .tdp-sticky-info small {
+    font-family: var(--font-fixture), monospace;
+    font-size: 0.62rem;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--steel);
+  }
+  .tdp-sticky-info .amt {
+    font-family: var(--font-fixture), monospace;
+    font-weight: 700;
+    font-size: 1.2rem;
+    color: var(--ink);
+  }
+  .tdp-sticky-bar .tdp-register {
+    width: auto;
+    margin-top: 0;
+    padding: 13px 22px;
   }
 }

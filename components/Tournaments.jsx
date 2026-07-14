@@ -14,6 +14,7 @@ export default async function Tournaments({
   title = "Grab your Spot.",
   sectionId = "tournaments",
   showActiveFilter = true,
+  alt = false,
 }) {
   const liveTournaments = await getLiveTournaments({ sport, city });
   const tournaments = liveTournaments.length
@@ -38,32 +39,37 @@ export default async function Tournaments({
   }));
 
   return (
-    <section className="section tournaments-section container" id={sectionId}>
-      <div className="section-head">
-        <span className="eyebrow">{eyebrow}</span>
-        <div className="section-title-row">
-          <h2 className="section-title">{title}</h2>
-          <a href="#" className="btn btn-ghost browse-all">
-            Browse all
-          </a>
+    <section
+      className={`section tournaments-section${alt ? " tournaments-section--alt" : ""}`}
+      id={sectionId}
+    >
+      <div className="container">
+        <div className="section-head">
+          <span className="eyebrow">{eyebrow}</span>
+          <div className="section-title-row">
+            <h2 className="section-title">{title}</h2>
+            <a href="#" className="btn btn-ghost browse-all">
+              Browse all
+            </a>
+          </div>
+          {showActiveFilter && filterLabel && (
+            <p className="active-filter">
+              Showing <b>{filterLabel}</b> ·{" "}
+              <a href="/#tournaments">Clear filter ×</a>
+            </p>
+          )}
         </div>
-        {showActiveFilter && filterLabel && (
-          <p className="active-filter">
-            Showing <b>{filterLabel}</b> ·{" "}
-            <a href="/#tournaments">Clear filter ×</a>
-          </p>
+
+        {tickets.length === 0 ? (
+          <div className="tickets-empty">
+            {filterLabel
+              ? `No live tournaments for ${filterLabel} yet — check back soon.`
+              : "No live tournaments yet — check back soon."}
+          </div>
+        ) : (
+          <TicketSlider tickets={tickets} />
         )}
       </div>
-
-      {tickets.length === 0 ? (
-        <div className="tickets-empty">
-          {filterLabel
-            ? `No live tournaments for ${filterLabel} yet — check back soon.`
-            : "No live tournaments yet — check back soon."}
-        </div>
-      ) : (
-        <TicketSlider tickets={tickets} />
-      )}
     </section>
   );
 }

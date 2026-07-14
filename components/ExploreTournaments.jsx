@@ -1,6 +1,7 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
+import Link from "next/link";
 
 const PAGE_SIZE = 9;
 
@@ -22,6 +23,19 @@ export default function ExploreTournaments({ tickets, sportFacets }) {
   const [search, setSearch] = useState("");
   const [activeSport, setActiveSport] = useState("All");
   const [visibleCount, setVisibleCount] = useState(PAGE_SIZE);
+  const [frozen, setFrozen] = useState(false);
+  const sentinelRef = useRef(null);
+
+  useEffect(() => {
+    const el = sentinelRef.current;
+    if (!el) return;
+    const observer = new IntersectionObserver(
+      ([entry]) => setFrozen(!entry.isIntersecting),
+      { rootMargin: "-72px 0px 0px 0px", threshold: 0 }
+    );
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, []);
 
   const filtered = useMemo(() => {
     return tickets.filter(
@@ -57,65 +71,103 @@ export default function ExploreTournaments({ tickets, sportFacets }) {
           </div>
 
           <div className="explore-search">
-          <svg
-            className="explore-search-icon"
-            viewBox="0 0 20 20"
-            fill="none"
-            aria-hidden="true"
-          >
-            <circle
-              cx="9"
-              cy="9"
-              r="6.5"
-              stroke="currentColor"
-              strokeWidth="1.8"
+            <svg
+              className="explore-search-icon"
+              viewBox="0 0 20 20"
+              fill="none"
+              aria-hidden="true"
+            >
+              <circle
+                cx="9"
+                cy="9"
+                r="6.5"
+                stroke="currentColor"
+                strokeWidth="1.8"
+              />
+              <path
+                d="M14 14l4.5 4.5"
+                stroke="currentColor"
+                strokeWidth="1.8"
+                strokeLinecap="round"
+              />
+            </svg>
+            <input
+              type="search"
+              className="explore-search-input"
+              placeholder="Search by tournament, organizer, venue or city…"
+              value={search}
+              onChange={(e) => handleSearchChange(e.target.value)}
+              aria-label="Search tournaments"
             />
-            <path
-              d="M14 14l4.5 4.5"
-              stroke="currentColor"
-              strokeWidth="1.8"
-              strokeLinecap="round"
-            />
-          </svg>
-          <input
-            type="search"
-            className="explore-search-input"
-            placeholder="Search by tournament, organizer, venue or city…"
-            value={search}
-            onChange={(e) => handleSearchChange(e.target.value)}
-            aria-label="Search tournaments"
-          />
           </div>
         </div>
       </section>
 
-      <div className="explore-filter-bar">
-        <div className="container explore-chip-row">
-          <button
-            type="button"
-            className={`explore-chip${activeSport === "All" ? " active" : ""}`}
-            onClick={() => handleSportPick("All")}
-          >
-            All Sports
-            <span className="explore-chip-count">
-              {tickets.length.toLocaleString("en-IN")}
-            </span>
-          </button>
-          {sportFacets.map((facet) => (
+      <div ref={sentinelRef} aria-hidden="true" />
+
+      <div className={`explore-filter-bar${frozen ? " frozen" : ""}`}>
+        <div className="container">
+          <div className="explore-frozen-search">
+            <svg
+              className="explore-search-icon"
+              viewBox="0 0 20 20"
+              fill="none"
+              aria-hidden="true"
+            >
+              <circle
+                cx="9"
+                cy="9"
+                r="6.5"
+                stroke="currentColor"
+                strokeWidth="1.8"
+              />
+              <path
+                d="M14 14l4.5 4.5"
+                stroke="currentColor"
+                strokeWidth="1.8"
+                strokeLinecap="round"
+              />
+            </svg>
+            <input
+              type="search"
+              className="explore-search-input"
+              placeholder="Search by tournament, organizer, venue or city…"
+              value={search}
+              onChange={(e) => handleSearchChange(e.target.value)}
+              aria-label="Search tournaments"
+              tabIndex={frozen ? 0 : -1}
+            />
+          </div>
+
+          <div className="explore-chip-row">
             <button
-              key={facet.name}
               type="button"
               className={`explore-chip${
-                activeSport === facet.name ? " active" : ""
+                activeSport === "All" ? " active" : ""
               }`}
-              onClick={() => handleSportPick(facet.name)}
+              onClick={() => handleSportPick("All")}
             >
-              {facet.name}
+              All Sports
               <span className="explore-chip-count">
-                {facet.count.toLocaleString("en-IN")}
+                {tickets.length.toLocaleString("en-IN")}
               </span>
             </button>
-          ))}
+            {sportFacets.map((facet) => (
+              <button
+                key={facet.name}
+                type="button"
+                className={`explore-chip${
+                  activeSport === facet.name ? " active" : ""
+                }`}
+                onClick={() => handleSportPick(facet.name)}
+              >
+                {facet.name}
+                <span className="explore-chip-count">
+                  {facet.count.toLocaleString("en-IN")}
+                </span>
+              </button>
+            ))}
+          </div>
         </div>
       </div>
 
@@ -130,7 +182,11 @@ export default function ExploreTournaments({ tickets, sportFacets }) {
           <>
             <div className="explore-grid">
               {visible.map((t) => (
-                <article className="ticket explore-card" key={t.id}>
+                <Link
+                  href={`/explore/${t.id}`}
+                  className="ticket explore-card"
+                  key={t.id}
+                >
                   <div className="ticket-top">
                     <div className="ticket-sport">
                       <span className="chip">{t.sport}</span>
@@ -168,9 +224,9 @@ export default function ExploreTournaments({ tickets, sportFacets }) {
                       <span className="amt">{t.prize}</span>
                     </div>
                     <span className="barcode" aria-hidden="true" />
-                    <button className="btn btn-stub">Register</button>
+                    <span className="btn btn-stub">Register</span>
                   </div>
-                </article>
+                </Link>
               ))}
             </div>
 

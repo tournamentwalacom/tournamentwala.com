@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef } from "react";
+import Link from "next/link";
 
 const AUTO_MS = 2500;
 
@@ -95,7 +96,11 @@ export default function TicketSlider({ tickets }) {
     <div className="tickets-slider-wrap">
       <div className="tickets-slider" ref={trackRef}>
         {tickets.map((t) => (
-          <article className="ticket ticket-slide" key={t.id}>
+          <Link
+            href={`/explore/${t.id}`}
+            className="ticket ticket-slide"
+            key={t.id}
+          >
             <div className="ticket-top">
               <div className="ticket-sport">
                 <span className="chip">{t.sport}</span>
@@ -127,9 +132,9 @@ export default function TicketSlider({ tickets }) {
                 <span className="amt">{t.prize}</span>
               </div>
               <span className="barcode" aria-hidden="true" />
-              <button className="btn btn-stub">Register</button>
+              <span className="btn btn-stub">Register</span>
             </div>
-          </article>
+          </Link>
         ))}
       </div>
 
