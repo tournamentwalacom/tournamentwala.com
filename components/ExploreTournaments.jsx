@@ -19,12 +19,52 @@ function matchesSearch(ticket, query) {
   return haystack.includes(query.toLowerCase());
 }
 
-export default function ExploreTournaments({ tickets, sportFacets }) {
+export default function ExploreTournaments({
+  tickets,
+  sportFacets,
+  cityFacets,
+  initialSport,
+  initialCity,
+}) {
   const [search, setSearch] = useState("");
-  const [activeSport, setActiveSport] = useState("All");
+  const [activeSport, setActiveSport] = useState(() =>
+    initialSport && sportFacets.some((f) => f.name === initialSport)
+      ? initialSport
+      : "All"
+  );
+  const [activeCity, setActiveCity] = useState(() =>
+    initialCity && cityFacets.some((f) => f.name === initialCity)
+      ? initialCity
+      : "All"
+  );
   const [visibleCount, setVisibleCount] = useState(PAGE_SIZE);
+  const [filterOpen, setFilterOpen] = useState(false);
+  const [panelQuery, setPanelQuery] = useState("");
   const [frozen, setFrozen] = useState(false);
+  const filterRef = useRef(null);
   const sentinelRef = useRef(null);
+
+  useEffect(() => {
+    if (!filterOpen) return;
+    function handleClick(e) {
+      if (filterRef.current && !filterRef.current.contains(e.target)) {
+        setFilterOpen(false);
+      }
+    }
+    function handleKey(e) {
+      if (e.key === "Escape") setFilterOpen(false);
+    }
+    document.addEventListener("mousedown", handleClick);
+    document.addEventListener("keydown", handleKey);
+    return () => {
+      document.removeEventListener("mousedown", handleClick);
+      document.removeEventListener("keydown", handleKey);
+    };
+  }, [filterOpen]);
+
+  useEffect(() => {
+    if (!filterOpen) setPanelQuery("");
+  }, [filterOpen]);
 
   useEffect(() => {
     const el = sentinelRef.current;
@@ -41,12 +81,30 @@ export default function ExploreTournaments({ tickets, sportFacets }) {
     return tickets.filter(
       (t) =>
         (activeSport === "All" || t.sport === activeSport) &&
+        (activeCity === "All" || t.city === activeCity) &&
         matchesSearch(t, search)
     );
-  }, [tickets, activeSport, search]);
+  }, [tickets, activeSport, activeCity, search]);
 
   const visible = filtered.slice(0, visibleCount);
   const hasMore = visibleCount < filtered.length;
+  const activeFilterCount =
+    (activeSport !== "All" ? 1 : 0) + (activeCity !== "All" ? 1 : 0);
+
+  const panelSportFacets = useMemo(
+    () =>
+      sportFacets.filter((f) =>
+        f.name.toLowerCase().includes(panelQuery.toLowerCase())
+      ),
+    [sportFacets, panelQuery]
+  );
+  const panelCityFacets = useMemo(
+    () =>
+      cityFacets.filter((f) =>
+        f.name.toLowerCase().includes(panelQuery.toLowerCase())
+      ),
+    [cityFacets, panelQuery]
+  );
 
   function handleSearchChange(value) {
     setSearch(value);
@@ -55,6 +113,11 @@ export default function ExploreTournaments({ tickets, sportFacets }) {
 
   function handleSportPick(name) {
     setActiveSport(name);
+    setVisibleCount(PAGE_SIZE);
+  }
+
+  function handleCityPick(name) {
+    setActiveCity(name);
     setVisibleCount(PAGE_SIZE);
   }
 
@@ -139,34 +202,195 @@ export default function ExploreTournaments({ tickets, sportFacets }) {
             />
           </div>
 
-          <div className="explore-chip-row">
-            <button
-              type="button"
-              className={`explore-chip${
-                activeSport === "All" ? " active" : ""
-              }`}
-              onClick={() => handleSportPick("All")}
-            >
-              All Sports
-              <span className="explore-chip-count">
-                {tickets.length.toLocaleString("en-IN")}
-              </span>
-            </button>
-            {sportFacets.map((facet) => (
+          <div className="explore-filter-wrap" ref={filterRef}>
+            <div className="explore-filter-row">
               <button
-                key={facet.name}
                 type="button"
-                className={`explore-chip${
-                  activeSport === facet.name ? " active" : ""
+                className={`explore-filter-toggle${
+                  filterOpen ? " open" : ""
                 }`}
-                onClick={() => handleSportPick(facet.name)}
+                onClick={() => setFilterOpen((v) => !v)}
+                aria-expanded={filterOpen}
               >
-                {facet.name}
-                <span className="explore-chip-count">
-                  {facet.count.toLocaleString("en-IN")}
-                </span>
+                <svg viewBox="0 0 20 20" fill="none" aria-hidden="true">
+                  <path
+                    d="M3 5.5h14M6 10h8M8.5 14.5h3"
+                    stroke="currentColor"
+                    strokeWidth="1.8"
+                    strokeLinecap="round"
+                  />
+                </svg>
+                Filters
+                {activeFilterCount > 0 && (
+                  <span className="explore-filter-badge">
+                    {activeFilterCount}
+                  </span>
+                )}
               </button>
-            ))}
+
+              {activeSport !== "All" && (
+                <button
+                  type="button"
+                  className="explore-active-pill"
+                  onClick={() => handleSportPick("All")}
+                >
+                  {activeSport}
+                  <svg viewBox="0 0 20 20" fill="none" aria-hidden="true">
+                    <path
+                      d="M6 6l8 8M14 6l-8 8"
+                      stroke="currentColor"
+                      strokeWidth="1.8"
+                      strokeLinecap="round"
+                    />
+                  </svg>
+                </button>
+              )}
+
+              {activeCity !== "All" && (
+                <button
+                  type="button"
+                  className="explore-active-pill"
+                  onClick={() => handleCityPick("All")}
+                >
+                  {activeCity}
+                  <svg viewBox="0 0 20 20" fill="none" aria-hidden="true">
+                    <path
+                      d="M6 6l8 8M14 6l-8 8"
+                      stroke="currentColor"
+                      strokeWidth="1.8"
+                      strokeLinecap="round"
+                    />
+                  </svg>
+                </button>
+              )}
+
+              {search && (
+                <button
+                  type="button"
+                  className="explore-active-pill"
+                  onClick={() => handleSearchChange("")}
+                >
+                  “{search}”
+                  <svg viewBox="0 0 20 20" fill="none" aria-hidden="true">
+                    <path
+                      d="M6 6l8 8M14 6l-8 8"
+                      stroke="currentColor"
+                      strokeWidth="1.8"
+                      strokeLinecap="round"
+                    />
+                  </svg>
+                </button>
+              )}
+            </div>
+
+            {filterOpen && (
+              <div className="explore-filter-panel">
+                <div className="explore-filter-panel-search">
+                  <svg viewBox="0 0 20 20" fill="none" aria-hidden="true">
+                    <circle
+                      cx="9"
+                      cy="9"
+                      r="6.5"
+                      stroke="currentColor"
+                      strokeWidth="1.8"
+                    />
+                    <path
+                      d="M14 14l4.5 4.5"
+                      stroke="currentColor"
+                      strokeWidth="1.8"
+                      strokeLinecap="round"
+                    />
+                  </svg>
+                  <input
+                    type="search"
+                    placeholder="Search sports or cities…"
+                    value={panelQuery}
+                    onChange={(e) => setPanelQuery(e.target.value)}
+                    aria-label="Search sports or cities"
+                  />
+                </div>
+
+                <div className="explore-filter-panel-group">
+                  <span className="explore-filter-panel-label">Sport</span>
+                  <div className="explore-filter-panel-options">
+                    {!panelQuery && (
+                      <button
+                        type="button"
+                        className={`explore-chip${
+                          activeSport === "All" ? " active" : ""
+                        }`}
+                        onClick={() => handleSportPick("All")}
+                      >
+                        All Sports
+                        <span className="explore-chip-count">
+                          {tickets.length.toLocaleString("en-IN")}
+                        </span>
+                      </button>
+                    )}
+                    {panelSportFacets.map((facet) => (
+                      <button
+                        key={facet.name}
+                        type="button"
+                        className={`explore-chip${
+                          activeSport === facet.name ? " active" : ""
+                        }`}
+                        onClick={() => handleSportPick(facet.name)}
+                      >
+                        {facet.name}
+                        <span className="explore-chip-count">
+                          {facet.count.toLocaleString("en-IN")}
+                        </span>
+                      </button>
+                    ))}
+                    {panelQuery && panelSportFacets.length === 0 && (
+                      <span className="explore-filter-panel-empty">
+                        No sports match “{panelQuery}”
+                      </span>
+                    )}
+                  </div>
+                </div>
+
+                <div className="explore-filter-panel-group">
+                  <span className="explore-filter-panel-label">City</span>
+                  <div className="explore-filter-panel-options">
+                    {!panelQuery && (
+                      <button
+                        type="button"
+                        className={`explore-chip${
+                          activeCity === "All" ? " active" : ""
+                        }`}
+                        onClick={() => handleCityPick("All")}
+                      >
+                        All Cities
+                        <span className="explore-chip-count">
+                          {tickets.length.toLocaleString("en-IN")}
+                        </span>
+                      </button>
+                    )}
+                    {panelCityFacets.map((facet) => (
+                      <button
+                        key={facet.name}
+                        type="button"
+                        className={`explore-chip${
+                          activeCity === facet.name ? " active" : ""
+                        }`}
+                        onClick={() => handleCityPick(facet.name)}
+                      >
+                        {facet.name}
+                        <span className="explore-chip-count">
+                          {facet.count.toLocaleString("en-IN")}
+                        </span>
+                      </button>
+                    ))}
+                    {panelQuery && panelCityFacets.length === 0 && (
+                      <span className="explore-filter-panel-empty">
+                        No cities match “{panelQuery}”
+                      </span>
+                    )}
+                  </div>
+                </div>
+              </div>
+            )}
           </div>
         </div>
       </div>
@@ -175,15 +399,18 @@ export default function ExploreTournaments({ tickets, sportFacets }) {
         {filtered.length === 0 ? (
           <div className="tickets-empty">
             No tournaments match{" "}
-            {search ? `“${search}”` : `${activeSport}`} yet — try a
-            different search or filter.
+            {search
+              ? `“${search}”`
+              : [activeSport, activeCity].filter((v) => v !== "All").join(" · ") ||
+                "your filters"}{" "}
+            yet — try a different search or filter.
           </div>
         ) : (
           <>
             <div className="explore-grid">
               {visible.map((t) => (
                 <Link
-                  href={`/explore/${t.id}`}
+                  href={`/explore/${t.slug}`}
                   className="ticket explore-card"
                   key={t.id}
                 >

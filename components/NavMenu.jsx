@@ -90,7 +90,7 @@ export default function NavMenu({ sports, cities }) {
   }, [mobileOpen]);
 
   function goToFilter(param, value) {
-    router.push(`/?${param}=${encodeURIComponent(value)}#tournaments`);
+    router.push(`/explore-tournaments?${param}=${encodeURIComponent(value)}`);
     closeAll();
   }
 
@@ -109,8 +109,15 @@ export default function NavMenu({ sports, cities }) {
     <div className="nav-menu" ref={navRef}>
       {/* ---------------- Desktop ---------------- */}
       <nav className="nav-links" aria-label="Main">
-        <Link href="/">Home</Link>
-        <Link href="/explore-tournaments">Explore</Link>
+        <Link href="/" className={isHome ? "active" : undefined}>
+          Home
+        </Link>
+        <Link
+          href="/explore-tournaments"
+          className={pathname === "/explore-tournaments" ? "active" : undefined}
+        >
+          Explore
+        </Link>
 
         <div className="nav-dd">
           <button
@@ -154,8 +161,12 @@ export default function NavMenu({ sports, cities }) {
           )}
         </div>
 
-        <Link href="/about">About</Link>
-        <Link href="/contact">Contact Us</Link>
+        <Link href="/about" className={pathname === "/about" ? "active" : undefined}>
+          About
+        </Link>
+        <Link href="/contact" className={pathname === "/contact" ? "active" : undefined}>
+          Contact Us
+        </Link>
       </nav>
 
       <Link href="/post-tournament" className="btn btn-primary nav-cta">

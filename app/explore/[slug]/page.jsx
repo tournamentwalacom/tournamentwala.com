@@ -1,8 +1,10 @@
 import { notFound } from "next/navigation";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
+import TournamentPoster from "@/components/TournamentPoster";
 import {
-  getTournamentById,
+  getTournamentBySeq,
+  getSeqFromSlug,
   formatDateRange,
   formatEntryFee,
   formatPrize,
@@ -17,8 +19,14 @@ import {
   PLACEHOLDER_TOURNAMENT_IMAGE,
 } from "@/lib/tournaments";
 
+async function loadTournament(slug) {
+  const seq = getSeqFromSlug(slug);
+  if (seq === null) return null;
+  return getTournamentBySeq(seq);
+}
+
 export async function generateMetadata({ params }) {
-  const tournament = await getTournamentById(params.id);
+  const tournament = await loadTournament(params.slug);
   if (!tournament) {
     return { title: "Tournament not found — TournamentWala.com" };
   }
@@ -29,7 +37,7 @@ export async function generateMetadata({ params }) {
 }
 
 export default async function TournamentDetailPage({ params }) {
-  const tournament = await getTournamentById(params.id);
+  const tournament = await loadTournament(params.slug);
   if (!tournament) notFound();
 
   const dateRange = formatDateRange(tournament);
@@ -49,15 +57,10 @@ export default async function TournamentDetailPage({ params }) {
     <>
       <Navbar />
       <main className="tdp">
-        <section className={`tdp-hero${tournament.image_url ? "" : " tdp-hero--generated"}`}>
-          {tournament.image_url ? (
-            // eslint-disable-next-line @next/next/no-img-element
-            <img className="tdp-hero-img" src={tournament.image_url} alt="" />
-          ) : (
-            <span className="tdp-hero-icon" aria-hidden="true">
-              {icon}
-            </span>
-          )}
+        <section className="tdp-hero tdp-hero--generated">
+          <span className="tdp-hero-icon" aria-hidden="true">
+            {icon}
+          </span>
           <div className="tdp-hero-scrim" aria-hidden="true" />
 
           <div className="container tdp-hero-inner">
@@ -184,10 +187,7 @@ export default async function TournamentDetailPage({ params }) {
             </div>
 
             <div className="tdp-media">
-              <div className="tdp-portrait">
-                {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img src={portraitSrc} alt={tournament.name} />
-              </div>
+              <TournamentPoster src={portraitSrc} alt={tournament.name} />
             </div>
           </div>
 
@@ -230,7 +230,7 @@ export default async function TournamentDetailPage({ params }) {
             <span className="amt">{prize}</span>
           </div>
           <a href={registerHref} className="btn btn-primary tdp-register">
-            📞 Register
+            Register
           </a>
         </div>
       </main>

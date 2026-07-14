@@ -5,10 +5,11 @@ import Link from "next/link";
 
 const AUTO_MS = 2500;
 
-export default function TicketSlider({ tickets }) {
+export default function TicketSlider({ tickets, browseAllHref }) {
   const trackRef = useRef(null);
   const timerRef = useRef(null);
   const resumeRef = useRef(null);
+  const totalSlides = tickets.length + (browseAllHref ? 1 : 0);
 
   function step() {
     const track = trackRef.current;
@@ -71,9 +72,7 @@ export default function TicketSlider({ tickets }) {
 
   useEffect(() => {
     const track = trackRef.current;
-    if (!track || tickets.length <= 1) return;
-
-    play();
+    if (!track || totalSlides <= 1) return;
 
     track.addEventListener("pointerdown", pause);
     track.addEventListener("touchstart", pause, { passive: true });
@@ -81,23 +80,40 @@ export default function TicketSlider({ tickets }) {
     track.addEventListener("touchend", scheduleResume);
     track.addEventListener("mouseleave", scheduleResume);
 
+    // Only start auto-scrolling once the slider has actually entered the
+    // viewport — starting on mount would advance sections the user hasn't
+    // scrolled to yet, so by the time they arrive it's mid-way (or wrapped
+    // back to the last card) instead of showing the first card.
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          play();
+        } else {
+          pause();
+        }
+      },
+      { threshold: 0.4 }
+    );
+    observer.observe(track);
+
     return () => {
       stop();
       clearTimeout(resumeRef.current);
+      observer.disconnect();
       track.removeEventListener("pointerdown", pause);
       track.removeEventListener("touchstart", pause);
       track.removeEventListener("pointerup", scheduleResume);
       track.removeEventListener("touchend", scheduleResume);
       track.removeEventListener("mouseleave", scheduleResume);
     };
-  }, [tickets.length]);
+  }, [totalSlides]);
 
   return (
     <div className="tickets-slider-wrap">
       <div className="tickets-slider" ref={trackRef}>
         {tickets.map((t) => (
           <Link
-            href={`/explore/${t.id}`}
+            href={`/explore/${t.slug}`}
             className="ticket ticket-slide"
             key={t.id}
           >
@@ -136,9 +152,29 @@ export default function TicketSlider({ tickets }) {
             </div>
           </Link>
         ))}
+
+        {browseAllHref && (
+          <Link
+            href={browseAllHref}
+            className="ticket ticket-slide ticket-browse-all"
+          >
+            <span className="ticket-browse-all-label">
+              Browse all
+              <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                <path
+                  d="M5 12h14M13 6l6 6-6 6"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                />
+              </svg>
+            </span>
+          </Link>
+        )}
       </div>
 
-      {tickets.length > 1 && (
+      {totalSlides > 1 && (
         <div className="slider-nav">
           <button
             type="button"

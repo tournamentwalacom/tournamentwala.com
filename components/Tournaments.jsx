@@ -3,7 +3,7 @@ import {
   formatDateRange,
   formatEntryFee,
   formatPrize,
-  FALLBACK_TOURNAMENTS,
+  getTournamentSlug,
 } from "@/lib/tournaments";
 import TicketSlider from "@/components/TicketSlider";
 
@@ -14,18 +14,17 @@ export default async function Tournaments({
   title = "Grab your Spot.",
   sectionId = "tournaments",
   showActiveFilter = true,
-  alt = false,
+  theme = "gray",
 }) {
-  const liveTournaments = await getLiveTournaments({ sport, city });
-  const tournaments = liveTournaments.length
-    ? liveTournaments
-    : FALLBACK_TOURNAMENTS.filter(
-        (t) => (!sport || t.sport === sport) && (!city || t.city === city)
-      );
+  const tournaments = await getLiveTournaments({ sport, city });
   const filterLabel = [sport, city].filter(Boolean).join(" · ");
+  const browseAllHref = sport
+    ? `/explore-tournaments?sport=${encodeURIComponent(sport)}`
+    : "/explore-tournaments";
 
-  const tickets = tournaments.map((t) => ({
+  const tickets = tournaments.slice(0, 5).map((t) => ({
     id: t.id,
+    slug: getTournamentSlug(t),
     sport: t.sport,
     tag: t.tag,
     hot: t.hot,
@@ -40,7 +39,7 @@ export default async function Tournaments({
 
   return (
     <section
-      className={`section tournaments-section${alt ? " tournaments-section--alt" : ""}`}
+      className={`section tournaments-section tournaments-section--${theme}`}
       id={sectionId}
     >
       <div className="container">
@@ -48,7 +47,7 @@ export default async function Tournaments({
           <span className="eyebrow">{eyebrow}</span>
           <div className="section-title-row">
             <h2 className="section-title">{title}</h2>
-            <a href="#" className="btn btn-ghost browse-all">
+            <a href={browseAllHref} className="btn btn-ghost browse-all">
               Browse all
             </a>
           </div>
@@ -67,7 +66,7 @@ export default async function Tournaments({
               : "No live tournaments yet — check back soon."}
           </div>
         ) : (
-          <TicketSlider tickets={tickets} />
+          <TicketSlider tickets={tickets} browseAllHref={browseAllHref} />
         )}
       </div>
     </section>

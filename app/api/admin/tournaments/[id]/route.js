@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
-import { cookies } from "next/headers";
-import { verifySessionToken, SESSION_COOKIE_NAME } from "@/lib/auth";
+import { requireAdminSession } from "@/lib/auth";
 import { supabaseAdmin } from "@/lib/supabase";
+import { parseTournamentInput } from "@/lib/tournamentValidation";
 
 /**
  * This route is NOT covered by middleware.js's admin host/session gate —
@@ -9,10 +9,6 @@ import { supabaseAdmin } from "@/lib/supabase";
  * here, the same way middleware.js does it, or this endpoint would be
  * callable by anyone on the public domain without logging in.
  */
-async function requireAdminSession() {
-  const token = cookies().get(SESSION_COOKIE_NAME)?.value;
-  return token ? await verifySessionToken(token) : null;
-}
 
 export async function PATCH(request, { params }) {
   const session = await requireAdminSession();
@@ -23,6 +19,25 @@ export async function PATCH(request, { params }) {
   const { id } = params;
   const body = await request.json().catch(() => null);
   const action = body?.action;
+
+  if (action === "update") {
+    const { data, error: validationError } = parseTournamentInput(body?.fields || {});
+    if (!data) {
+      return NextResponse.json({ error: validationError }, { status: 400 });
+    }
+
+    const status = data.status || "pending";
+    const { error } = await supabaseAdmin()
+      .from("tournaments")
+      .update({ ...data, status })
+      .eq("id", id);
+
+    if (error) {
+      return NextResponse.json({ error: "Update failed" }, { status: 500 });
+    }
+
+    return NextResponse.json({ ok: true });
+  }
 
   if (action !== "approve" && action !== "reject") {
     return NextResponse.json({ error: "Invalid action" }, { status: 400 });
@@ -47,6 +62,22 @@ export async function PATCH(request, { params }) {
 
   if (error) {
     return NextResponse.json({ error: "Update failed" }, { status: 500 });
+  }
+
+  return NextResponse.json({ ok: true });
+}
+
+export async function DELETE(request, { params }) {
+  const session = await requireAdminSession();
+  if (!session) {
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  }
+
+  const { id } = params;
+  const { error } = await supabaseAdmin().from("tournaments").delete().eq("id", id);
+
+  if (error) {
+    return NextResponse.json({ error: "Delete failed" }, { status: 500 });
   }
 
   return NextResponse.json({ ok: true });

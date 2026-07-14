@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 
 export default function TournamentReviewRow({ tournament }) {
@@ -33,12 +34,29 @@ export default function TournamentReviewRow({ tournament }) {
       <td>
         {tournament.organizer_name}
         <div className="admin-row-sub">
-          {tournament.organizer_email} · {tournament.organizer_phone}
+          {[tournament.organizer_email, tournament.organizer_phone]
+            .filter(Boolean)
+            .join(" · ")}
         </div>
+      </td>
+      <td>
+        {tournament.promotions?.length ? (
+          <>
+            {tournament.promotions.map((p) => p.name).join(", ")}
+            <div className="admin-row-sub">
+              ₹{Number(tournament.promotion_total || 0).toLocaleString("en-IN")}
+            </div>
+          </>
+        ) : (
+          "—"
+        )}
       </td>
       <td className="admin-row-actions">
         {!showReject ? (
           <>
+            <Link href={`/admin/tournaments/${tournament.id}/edit`} className="admin-btn">
+              Edit
+            </Link>
             <button
               type="button"
               className="admin-btn admin-btn-approve"

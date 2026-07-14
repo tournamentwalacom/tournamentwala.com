@@ -16,7 +16,12 @@ export default async function Home({ searchParams }) {
       <main>
         <Hero />
         <LiveTicker />
-        <Tournaments sport={params?.sport} city={params?.city} />
+        <Tournaments
+          sport="Cricket"
+          city={params?.city}
+          showActiveFilter={false}
+          theme="gray"
+        />
         <Tournaments
           sport="Football"
           city={params?.city}
@@ -24,7 +29,7 @@ export default async function Home({ searchParams }) {
           title="Get Onto the Pitch."
           sectionId="football-tournaments"
           showActiveFilter={false}
-          alt
+          theme="tint"
         />
         <Tournaments
           sport="Esports (BGMI / Valorant / Free Fire)"
@@ -33,6 +38,7 @@ export default async function Home({ searchParams }) {
           title="Squad Up & Drop In."
           sectionId="bgmi-tournaments"
           showActiveFilter={false}
+          theme="gray"
         />
         <Tournaments
           sport="Pickleball"
@@ -41,7 +47,7 @@ export default async function Home({ searchParams }) {
           title="Book Your Court."
           sectionId="pickleball-tournaments"
           showActiveFilter={false}
-          alt
+          theme="tint"
         />
         <SportsMarquee />
         <HowItWorks />

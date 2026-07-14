@@ -1,0 +1,8 @@
+{
+  "crons": [
+    {
+      "path": "/api/cron/complete-tournaments",
+      "schedule": "30 18 * * *"
+    }
+  ]
+}

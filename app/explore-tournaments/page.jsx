@@ -6,7 +6,7 @@ import {
   formatDateRange,
   formatEntryFee,
   formatPrize,
-  FALLBACK_TOURNAMENTS,
+  getTournamentSlug,
 } from "@/lib/tournaments";
 
 export const metadata = {
@@ -15,14 +15,13 @@ export const metadata = {
     "Search and filter live tournaments across cricket, football, badminton, volleyball, basketball and more — by sport, venue, city or organizer.",
 };
 
-export default async function ExploreTournamentsPage() {
-  const liveTournaments = await getLiveTournaments();
-  const tournaments = liveTournaments.length
-    ? liveTournaments
-    : FALLBACK_TOURNAMENTS;
+export default async function ExploreTournamentsPage({ searchParams }) {
+  const params = await searchParams;
+  const tournaments = await getLiveTournaments();
 
   const tickets = tournaments.map((t) => ({
     id: t.id,
+    slug: getTournamentSlug(t),
     sport: t.sport,
     tag: t.tag,
     hot: t.hot,
@@ -37,11 +36,19 @@ export default async function ExploreTournamentsPage() {
   }));
 
   const sportCounts = new Map();
+  const cityCounts = new Map();
   for (const ticket of tickets) {
-    if (!ticket.sport) continue;
-    sportCounts.set(ticket.sport, (sportCounts.get(ticket.sport) || 0) + 1);
+    if (ticket.sport) {
+      sportCounts.set(ticket.sport, (sportCounts.get(ticket.sport) || 0) + 1);
+    }
+    if (ticket.city) {
+      cityCounts.set(ticket.city, (cityCounts.get(ticket.city) || 0) + 1);
+    }
   }
   const sportFacets = [...sportCounts.entries()]
+    .map(([name, count]) => ({ name, count }))
+    .sort((a, b) => b.count - a.count || a.name.localeCompare(b.name));
+  const cityFacets = [...cityCounts.entries()]
     .map(([name, count]) => ({ name, count }))
     .sort((a, b) => b.count - a.count || a.name.localeCompare(b.name));
 
@@ -49,7 +56,13 @@ export default async function ExploreTournamentsPage() {
     <>
       <Navbar />
       <main>
-        <ExploreTournaments tickets={tickets} sportFacets={sportFacets} />
+        <ExploreTournaments
+          tickets={tickets}
+          sportFacets={sportFacets}
+          cityFacets={cityFacets}
+          initialSport={params?.sport}
+          initialCity={params?.city}
+        />
       </main>
       <Footer />
     </>

@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { supabaseAdmin } from "@/lib/supabase";
 import { formatEntryFee, formatPrize } from "@/lib/tournaments";
 import TournamentReviewRow from "@/components/admin/TournamentReviewRow";
@@ -5,22 +6,38 @@ import TournamentReviewRow from "@/components/admin/TournamentReviewRow";
 export default async function AdminTournamentsPage() {
   const db = supabaseAdmin();
 
-  const [{ data: pending }, { data: live }] = await Promise.all([
-    db
-      .from("tournaments")
-      .select("*")
-      .eq("status", "pending")
-      .order("created_at", { ascending: true }),
-    db
-      .from("tournaments")
-      .select("*")
-      .eq("status", "live")
-      .order("start_date", { ascending: true }),
-  ]);
+  const [{ data: pending }, { data: live }, { data: completed }, { data: other }] =
+    await Promise.all([
+      db
+        .from("tournaments")
+        .select("*")
+        .eq("status", "pending")
+        .order("created_at", { ascending: true }),
+      db
+        .from("tournaments")
+        .select("*")
+        .eq("status", "live")
+        .order("start_date", { ascending: true }),
+      db
+        .from("tournaments")
+        .select("*")
+        .eq("status", "completed")
+        .order("start_date", { ascending: false }),
+      db
+        .from("tournaments")
+        .select("*")
+        .in("status", ["rejected", "cancelled"])
+        .order("created_at", { ascending: false }),
+    ]);
 
   return (
     <>
-      <h1 className="admin-page-title">Tournaments</h1>
+      <div className="admin-page-header">
+        <h1 className="admin-page-title">Tournaments</h1>
+        <Link href="/admin/tournaments/new" className="btn btn-primary admin-add-btn">
+          + Add tournament
+        </Link>
+      </div>
 
       <h2 className="admin-section-title">
         Pending review {pending?.length ? `(${pending.length})` : ""}
@@ -35,6 +52,7 @@ export default async function AdminTournamentsPage() {
               <th>Venue</th>
               <th>Start date</th>
               <th>Organizer</th>
+              <th>Promotions</th>
               <th>Action</th>
             </tr>
           </thead>
@@ -60,6 +78,7 @@ export default async function AdminTournamentsPage() {
               <th>City</th>
               <th>Entry</th>
               <th>Prize pool</th>
+              <th>Action</th>
             </tr>
           </thead>
           <tbody>
@@ -70,6 +89,79 @@ export default async function AdminTournamentsPage() {
                 <td>{t.city}</td>
                 <td>{formatEntryFee(t)}</td>
                 <td>{formatPrize(t)}</td>
+                <td className="admin-row-actions">
+                  <Link href={`/admin/tournaments/${t.id}/edit`} className="admin-btn">
+                    Edit
+                  </Link>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      )}
+
+      <h2 className="admin-section-title admin-section-title-spaced">
+        Completed {completed?.length ? `(${completed.length})` : ""}
+      </h2>
+      {!completed?.length ? (
+        <div className="admin-placeholder">No completed tournaments yet.</div>
+      ) : (
+        <table className="admin-table">
+          <thead>
+            <tr>
+              <th>Tournament</th>
+              <th>Sport</th>
+              <th>City</th>
+              <th>Date</th>
+              <th>Action</th>
+            </tr>
+          </thead>
+          <tbody>
+            {completed.map((t) => (
+              <tr key={t.id}>
+                <td>{t.name}</td>
+                <td>{t.sport}</td>
+                <td>{t.city}</td>
+                <td>{t.start_date}</td>
+                <td className="admin-row-actions">
+                  <Link href={`/admin/tournaments/${t.id}/edit`} className="admin-btn">
+                    View
+                  </Link>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      )}
+
+      <h2 className="admin-section-title admin-section-title-spaced">
+        Rejected / cancelled {other?.length ? `(${other.length})` : ""}
+      </h2>
+      {!other?.length ? (
+        <div className="admin-placeholder">No rejected or cancelled tournaments.</div>
+      ) : (
+        <table className="admin-table">
+          <thead>
+            <tr>
+              <th>Tournament</th>
+              <th>Sport</th>
+              <th>City</th>
+              <th>Status</th>
+              <th>Action</th>
+            </tr>
+          </thead>
+          <tbody>
+            {other.map((t) => (
+              <tr key={t.id}>
+                <td>{t.name}</td>
+                <td>{t.sport}</td>
+                <td>{t.city}</td>
+                <td>{t.status}</td>
+                <td className="admin-row-actions">
+                  <Link href={`/admin/tournaments/${t.id}/edit`} className="admin-btn">
+                    Edit
+                  </Link>
+                </td>
               </tr>
             ))}
           </tbody>

@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import Image from "next/image";
 import { useRouter } from "next/navigation";
 
 export default function AdminLoginPage() {
@@ -36,7 +37,14 @@ export default function AdminLoginPage() {
     <div className="admin-login-shell">
       <form className="admin-login-card" onSubmit={handleSubmit}>
         <div className="admin-brand admin-login-brand">
-          <span className="admin-brand-mark">TW</span>
+          <Image
+            className="admin-brand-logo"
+            src="/images/logo.png"
+            alt="TournamentWala logo"
+            width={34}
+            height={34}
+            priority
+          />
           <span className="admin-brand-word">
             tournament<em>wala</em>
             <small>ADMIN</small>
