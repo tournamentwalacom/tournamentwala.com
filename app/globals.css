@@ -1567,6 +1567,18 @@ button {
   border-radius: var(--radius);
   background: var(--chalk);
   box-shadow: var(--shadow-card);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.about-card:hover {
+  transform: translateY(-4px);
+  box-shadow: var(--shadow-card-hover);
+}
+
+.about-card-icon {
+  display: inline-flex;
+  font-size: 1.5rem;
+  margin-bottom: 14px;
 }
 
 .about-card h4 {
@@ -1580,6 +1592,127 @@ button {
   line-height: 1.65;
 }
 
+/* ---- backed by ---- */
+.backer-section {
+  padding-top: 8px;
+  padding-bottom: 8px;
+}
+
+.backer-card {
+  display: flex;
+  align-items: center;
+  gap: 36px;
+  padding: 32px 36px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  background: var(--ink);
+  box-shadow: var(--shadow-card);
+}
+
+.backer-logo {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  flex: 0 0 auto;
+  width: 140px;
+  height: 100px;
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  border-radius: calc(var(--radius) - 4px);
+  background: rgba(255, 255, 255, 0.06);
+}
+
+.backer-logo span {
+  font-family: var(--font-display), Impact, sans-serif;
+  color: var(--chalk);
+  font-size: 1.1rem;
+  letter-spacing: 0.04em;
+  line-height: 1.3;
+}
+
+.backer-copy .eyebrow {
+  color: var(--floodlight);
+}
+
+.backer-copy .eyebrow::before {
+  background: var(--floodlight);
+}
+
+.backer-copy h3 {
+  font-family: var(--font-display), Impact, sans-serif;
+  text-transform: uppercase;
+  color: var(--chalk);
+  font-size: 1.6rem;
+  margin: 8px 0 10px;
+}
+
+.backer-copy p {
+  color: rgba(255, 255, 255, 0.75);
+  font-size: 0.98rem;
+  line-height: 1.65;
+  max-width: 640px;
+}
+
+/* ---- how it works ---- */
+.process-section {
+  padding-top: 64px;
+  padding-bottom: 32px;
+}
+
+.steps-row {
+  display: flex;
+  align-items: flex-start;
+  gap: 20px;
+  margin-top: 44px;
+}
+
+.step-card {
+  flex: 1;
+  padding: 26px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  background: var(--chalk);
+  box-shadow: var(--shadow-card);
+}
+
+.step-number {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  background: var(--crimson);
+  color: var(--chalk);
+  font-family: var(--font-fixture), monospace;
+  font-weight: 700;
+  margin-bottom: 14px;
+}
+
+.step-card h4 {
+  font-size: 1.1rem;
+  margin-bottom: 10px;
+}
+
+.step-card p {
+  color: var(--steel);
+  font-size: 0.95rem;
+  line-height: 1.6;
+}
+
+.step-connector {
+  flex: 0 0 auto;
+  align-self: center;
+  width: 32px;
+  height: 2px;
+  margin-top: -60px;
+  background: repeating-linear-gradient(
+    to right,
+    var(--crimson) 0 6px,
+    transparent 6px 12px
+  );
+}
+
 /* ---- pricing ---- */
 .pricing-section {
   padding-top: 32px;
@@ -1588,7 +1721,7 @@ button {
 
 .pricing-grid {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
   gap: 24px;
   margin-top: 44px;
 }
@@ -2801,6 +2934,20 @@ button {
   }
   .contact-layout {
     grid-template-columns: 1fr;
+  }
+  .backer-card {
+    flex-direction: column;
+    text-align: center;
+    gap: 20px;
+  }
+  .backer-copy p {
+    max-width: none;
+  }
+  .steps-row {
+    flex-direction: column;
+  }
+  .step-connector {
+    display: none;
   }
 }
 
