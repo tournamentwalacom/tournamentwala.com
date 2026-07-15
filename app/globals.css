@@ -3522,6 +3522,13 @@ button {
   justify-content: center;
   padding: 0 16px;
   pointer-events: none;
+  opacity: 1;
+  transition: opacity 0.2s ease;
+}
+
+html.nav-open .tdp-float-bar {
+  opacity: 0;
+  pointer-events: none;
 }
 
 .tdp-float-bar.is-docked {

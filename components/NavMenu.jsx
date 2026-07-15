@@ -94,8 +94,10 @@ export default function NavMenu({ sports, cities, organizerName }) {
 
   useEffect(() => {
     document.documentElement.style.overflow = mobileOpen ? "hidden" : "";
+    document.documentElement.classList.toggle("nav-open", mobileOpen);
     return () => {
       document.documentElement.style.overflow = "";
+      document.documentElement.classList.remove("nav-open");
     };
   }, [mobileOpen]);
 
