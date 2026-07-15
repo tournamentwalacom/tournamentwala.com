@@ -84,7 +84,7 @@ export default function NavMenu({ sports, cities, organizerName }) {
 
   useEffect(() => {
     function handleResize() {
-      if (window.innerWidth > 1040) {
+      if (window.innerWidth > 1120) {
         setMobileOpen(false);
       }
     }
