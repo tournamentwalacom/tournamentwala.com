@@ -200,7 +200,7 @@ button {
 .nav-menu {
   display: flex;
   align-items: center;
-  gap: 28px;
+  gap: 36px;
 }
 
 /* ---- Sports / Cities dropdowns (desktop) ---- */
@@ -332,16 +332,20 @@ button {
 .nav-account-trigger {
   display: inline-flex;
   align-items: center;
-  gap: 8px;
+  gap: 10px;
   background: var(--chalk);
   border: 1px solid var(--line);
   border-radius: 999px;
-  padding: 5px 14px 5px 5px;
+  padding: 6px 16px 6px 6px;
   font-family: inherit;
   font-weight: 600;
   font-size: 0.88rem;
   color: var(--ink);
   transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.nav-account-trigger .nav-account-name {
+  margin-right: 2px;
 }
 
 .nav-account-trigger:hover,
