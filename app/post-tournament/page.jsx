@@ -17,25 +17,36 @@ export default async function PostTournamentPage() {
     <>
       <Navbar />
       <main>
-        <section className="section container post-section">
-          <span className="eyebrow">For organizers</span>
-          <h1 className="section-title">
-            List your tournament.
-            <br />
-            We&rsquo;ll take it from here.
-          </h1>
-
+        <section
+          className={`section container post-section${
+            !session ? " post-section--auth" : ""
+          }`}
+        >
           {!session ? (
-            <>
-              <p className="post-intro">
-                Sign in or create a free account to post your tournament —
-                it only takes a moment, and we&rsquo;ll bring you right back
-                here.
-              </p>
+            <div className="post-hero">
+              <div className="post-hero-copy">
+                <span className="eyebrow">For organizers</span>
+                <h1 className="section-title">
+                  List your tournament.
+                  <br />
+                  We&rsquo;ll take it from here.
+                </h1>
+                <p className="post-intro">
+                  Sign in or create a free account to post your tournament —
+                  it only takes a moment, and we&rsquo;ll bring you right back
+                  here.
+                </p>
+              </div>
               <AuthForm next="/post-tournament" />
-            </>
+            </div>
           ) : (
             <>
+              <span className="eyebrow">For organizers</span>
+              <h1 className="section-title">
+                List your tournament.
+                <br />
+                We&rsquo;ll take it from here.
+              </h1>
               <p className="post-intro">
                 Fill in the details below — it&rsquo;s free. Our team reviews
                 every submission before it goes live, usually within 24–48 hrs.

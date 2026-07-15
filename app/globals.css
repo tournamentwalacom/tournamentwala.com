@@ -1565,6 +1565,10 @@ button {
   padding-bottom: 96px;
 }
 
+.post-section--auth {
+  max-width: none;
+}
+
 .post-intro {
   margin: 16px 0 36px;
   color: var(--steel);
@@ -1578,15 +1582,38 @@ button {
   gap: 28px;
 }
 
+.post-hero {
+  display: grid;
+  gap: 40px;
+  align-items: start;
+}
+
+.post-hero-copy .post-intro {
+  margin-bottom: 0;
+}
+
 .auth-card {
   display: flex;
   flex-direction: column;
   gap: 18px;
+  width: 100%;
   max-width: 420px;
   padding: 28px;
   border: 1px solid var(--line);
   border-radius: 16px;
   background: var(--chalk);
+}
+
+@media (min-width: 860px) {
+  .post-hero {
+    grid-template-columns: 1.15fr 0.85fr;
+    align-items: center;
+    gap: 64px;
+  }
+
+  .post-hero .auth-card {
+    margin-left: auto;
+  }
 }
 
 .auth-google-btn {

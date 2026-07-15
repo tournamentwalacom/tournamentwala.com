@@ -1,4 +1,5 @@
 import "./globals.css";
+import AuthCodeCatcher from "@/components/AuthCodeCatcher";
 
 export const metadata = {
   title: "TournamentWala.com — Find. Play. Win.",
@@ -24,7 +25,10 @@ export default function RootLayout({ children }) {
           rel="stylesheet"
         />
       </head>
-      <body>{children}</body>
+      <body>
+        <AuthCodeCatcher />
+        {children}
+      </body>
     </html>
   );
 }
