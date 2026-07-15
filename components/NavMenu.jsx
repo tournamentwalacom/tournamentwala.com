@@ -190,18 +190,61 @@ export default function NavMenu({ sports, cities, organizerName }) {
         <div className="nav-dd nav-account">
           <button
             type="button"
-            className={`nav-dd-trigger${openDropdown === "account" ? " open" : ""}`}
+            className={`nav-account-trigger${openDropdown === "account" ? " open" : ""}`}
             onClick={() => toggleDropdown("account")}
             aria-expanded={openDropdown === "account"}
+            aria-haspopup="true"
           >
-            {firstName} <span className="caret" aria-hidden="true">▾</span>
+            <span className="nav-avatar" aria-hidden="true">
+              {firstName.charAt(0).toUpperCase()}
+            </span>
+            <span className="nav-account-name">{firstName}</span>
+            <span className="caret" aria-hidden="true">▾</span>
           </button>
           {openDropdown === "account" && (
             <div className="nav-dd-panel nav-account-panel">
+              <div className="nav-account-header">
+                <span className="nav-avatar nav-avatar-lg" aria-hidden="true">
+                  {firstName.charAt(0).toUpperCase()}
+                </span>
+                <div>
+                  <p className="nav-account-greeting">Hi, {firstName}</p>
+                  <p className="nav-account-sub">Manage your account</p>
+                </div>
+              </div>
               <Link href="/profile" className="nav-dd-item" onClick={closeAll}>
+                <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+                  <circle cx="8" cy="5" r="3" stroke="currentColor" strokeWidth="1.6" />
+                  <path
+                    d="M2.5 14c.7-3 3-4.5 5.5-4.5s4.8 1.5 5.5 4.5"
+                    stroke="currentColor"
+                    strokeWidth="1.6"
+                    strokeLinecap="round"
+                  />
+                </svg>
                 Profile
               </Link>
-              <button type="button" className="nav-dd-item" onClick={handleLogOut}>
+              <button
+                type="button"
+                className="nav-dd-item nav-dd-item-danger"
+                onClick={handleLogOut}
+              >
+                <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+                  <path
+                    d="M6.5 14H3a1 1 0 0 1-1-1V3a1 1 0 0 1 1-1h3.5"
+                    stroke="currentColor"
+                    strokeWidth="1.6"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  />
+                  <path
+                    d="M10.5 11l3-3-3-3M13.2 8H6"
+                    stroke="currentColor"
+                    strokeWidth="1.6"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  />
+                </svg>
                 Log out
               </button>
             </div>
@@ -355,12 +398,52 @@ export default function NavMenu({ sports, cities, organizerName }) {
         <div className="nav-drawer-foot">
           {firstName && (
             <div className="nav-drawer-account">
-              <Link href="/profile" className="nav-drawer-link" onClick={closeAll}>
-                {firstName}&rsquo;s Profile
-              </Link>
-              <button type="button" className="nav-drawer-link nav-drawer-logout" onClick={handleLogOut}>
-                Log out
-              </button>
+              <div className="nav-drawer-account-info">
+                <span className="nav-avatar nav-avatar-lg" aria-hidden="true">
+                  {firstName.charAt(0).toUpperCase()}
+                </span>
+                <div>
+                  <p className="nav-drawer-account-name">{firstName}</p>
+                  <p className="nav-drawer-account-sub">View your profile</p>
+                </div>
+              </div>
+              <div className="nav-drawer-account-actions">
+                <Link href="/profile" className="nav-drawer-link" onClick={closeAll}>
+                  <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+                    <circle cx="8" cy="5" r="3" stroke="currentColor" strokeWidth="1.6" />
+                    <path
+                      d="M2.5 14c.7-3 3-4.5 5.5-4.5s4.8 1.5 5.5 4.5"
+                      stroke="currentColor"
+                      strokeWidth="1.6"
+                      strokeLinecap="round"
+                    />
+                  </svg>
+                  <span>Profile</span>
+                </Link>
+                <button
+                  type="button"
+                  className="nav-drawer-link nav-drawer-logout"
+                  onClick={handleLogOut}
+                >
+                  <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+                    <path
+                      d="M6.5 14H3a1 1 0 0 1-1-1V3a1 1 0 0 1 1-1h3.5"
+                      stroke="currentColor"
+                      strokeWidth="1.6"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                    />
+                    <path
+                      d="M10.5 11l3-3-3-3M13.2 8H6"
+                      stroke="currentColor"
+                      strokeWidth="1.6"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                    />
+                  </svg>
+                  <span>Log out</span>
+                </button>
+              </div>
             </div>
           )}
           <Link
