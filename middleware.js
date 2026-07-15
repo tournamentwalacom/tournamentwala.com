@@ -1,11 +1,13 @@
 import { NextResponse } from "next/server";
 import { verifySessionToken, SESSION_COOKIE_NAME } from "@/lib/auth";
+import { updateSupabaseSession } from "@/lib/supabaseMiddleware";
 
 /**
  * Routes admin.tournamentwala.com (and admin.localhost in dev) to the
  * /admin section of this same app, blocks the main domain from reaching
  * /admin directly, and gates everything under /admin behind a valid
- * signed session cookie (except the login page itself).
+ * signed session cookie (except the login page itself). On the main
+ * domain, also refreshes the separate organizer Supabase Auth session.
  */
 export async function middleware(request) {
   const url = request.nextUrl;
@@ -18,7 +20,7 @@ export async function middleware(request) {
       url.pathname = "/";
       return NextResponse.redirect(url);
     }
-    return NextResponse.next();
+    return updateSupabaseSession(request);
   }
 
   if (!url.pathname.startsWith("/admin")) {

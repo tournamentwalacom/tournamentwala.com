@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { requireAdminSession } from "@/lib/auth";
 import { supabaseAdmin } from "@/lib/supabase";
 import { parseTournamentInput } from "@/lib/tournamentValidation";
+import { geocodePincode } from "@/lib/geocode";
 
 /**
  * This route is NOT covered by middleware.js's admin host/session gate —
@@ -28,10 +29,16 @@ export async function POST(request) {
   // the form explicitly picked a different status.
   const status = data.status || "live";
 
+  // Cached once here so /explore-tournaments can sort by distance without
+  // geocoding on every page view. Never blocks the submission on failure.
+  const coords = await geocodePincode(data.pincode);
+
   const { error } = await supabaseAdmin()
     .from("tournaments")
     .insert({
       ...data,
+      latitude: coords?.latitude ?? null,
+      longitude: coords?.longitude ?? null,
       status,
       reviewed_at: status === "live" ? new Date().toISOString() : null,
     });

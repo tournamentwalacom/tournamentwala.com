@@ -2,6 +2,12 @@
 
 import { useEffect, useMemo, useRef, useState } from "react";
 import Link from "next/link";
+import { haversineDistanceKm } from "@/lib/geo";
+import {
+  LOCATION_CHOICE_KEY,
+  LOCATION_DISMISSED_KEY,
+  requestLocation,
+} from "@/lib/locationConsent";
 
 const PAGE_SIZE = 9;
 
@@ -41,6 +47,8 @@ export default function ExploreTournaments({
   const [filterOpen, setFilterOpen] = useState(false);
   const [panelQuery, setPanelQuery] = useState("");
   const [frozen, setFrozen] = useState(false);
+  const [userCoords, setUserCoords] = useState(null);
+  const [showLocationPrompt, setShowLocationPrompt] = useState(false);
   const filterRef = useRef(null);
   const sentinelRef = useRef(null);
 
@@ -77,14 +85,63 @@ export default function ExploreTournaments({
     return () => observer.disconnect();
   }, []);
 
+  // Nearest-first sorting needs the visitor's coordinates. We only ask
+  // once — a prior "granted" silently re-fetches position, a prior
+  // "denied" is respected, and a prior in-session "not now" isn't re-asked
+  // until the next visit.
+  useEffect(() => {
+    if (typeof navigator === "undefined" || !navigator.geolocation) return;
+
+    const choice = localStorage.getItem(LOCATION_CHOICE_KEY);
+    if (choice === "granted") {
+      requestLocation({ onSuccess: setUserCoords });
+      return;
+    }
+    if (choice === "denied") return;
+    if (sessionStorage.getItem(LOCATION_DISMISSED_KEY)) return;
+
+    setShowLocationPrompt(true);
+  }, []);
+
+  function handleAllowLocation() {
+    requestLocation({
+      onSuccess: (coords) => {
+        setUserCoords(coords);
+        setShowLocationPrompt(false);
+      },
+      onError: () => setShowLocationPrompt(false),
+    });
+  }
+
+  function handleDismissLocationPrompt() {
+    sessionStorage.setItem(LOCATION_DISMISSED_KEY, "1");
+    setShowLocationPrompt(false);
+  }
+
   const filtered = useMemo(() => {
-    return tickets.filter(
+    const matches = tickets.filter(
       (t) =>
         (activeSport === "All" || t.sport === activeSport) &&
         (activeCity === "All" || t.city === activeCity) &&
         matchesSearch(t, search)
     );
-  }, [tickets, activeSport, activeCity, search]);
+
+    if (!userCoords) return matches;
+
+    // Nearest first; tournaments without geocoded coordinates sink to the
+    // end but keep their relative (date-ascending) order — sort is stable.
+    return [...matches].sort((a, b) => {
+      const distanceA =
+        a.latitude != null && a.longitude != null
+          ? haversineDistanceKm(userCoords.lat, userCoords.lng, a.latitude, a.longitude)
+          : Infinity;
+      const distanceB =
+        b.latitude != null && b.longitude != null
+          ? haversineDistanceKm(userCoords.lat, userCoords.lng, b.latitude, b.longitude)
+          : Infinity;
+      return distanceA - distanceB;
+    });
+  }, [tickets, activeSport, activeCity, search, userCoords]);
 
   const visible = filtered.slice(0, visibleCount);
   const hasMore = visibleCount < filtered.length;
@@ -165,6 +222,30 @@ export default function ExploreTournaments({
           </div>
         </div>
       </section>
+
+      {showLocationPrompt && (
+        <div className="explore-location-banner container">
+          <span className="explore-location-banner-text">
+            📍 Show tournaments near you first?
+          </span>
+          <div className="explore-location-banner-actions">
+            <button
+              type="button"
+              className="explore-location-btn explore-location-btn-dismiss"
+              onClick={handleDismissLocationPrompt}
+            >
+              Not now
+            </button>
+            <button
+              type="button"
+              className="explore-location-btn explore-location-btn-allow"
+              onClick={handleAllowLocation}
+            >
+              Allow location
+            </button>
+          </div>
+        </div>
+      )}
 
       <div ref={sentinelRef} aria-hidden="true" />
 

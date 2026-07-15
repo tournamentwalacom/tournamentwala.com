@@ -1,4 +1,23 @@
+"use client";
+
+import { useState } from "react";
+import { requestAndBroadcastLocation } from "@/lib/locationConsent";
+
 export default function Hero() {
+  const [locationError, setLocationError] = useState(false);
+
+  function handleFindNearby() {
+    setLocationError(false);
+    requestAndBroadcastLocation({
+      onSuccess: () => {
+        document
+          .getElementById("nearby-tournaments")
+          ?.scrollIntoView({ behavior: "smooth", block: "start" });
+      },
+      onError: () => setLocationError(true),
+    });
+  }
+
   return (
     <section className="hero">
       <div className="container hero-grid">
@@ -29,11 +48,7 @@ export default function Hero() {
             </p>
 
             <div className="hero-actions">
-              <form
-                className="finder"
-                action="#tournaments"
-                aria-label="Find tournaments"
-              >
+              <div className="finder" aria-label="Find tournaments">
                 <select aria-label="Choose a sport" defaultValue="">
                   <option value="" disabled>
                     Pick a sport
@@ -46,10 +61,22 @@ export default function Hero() {
                   <option>Chess</option>
                   <option>BGMI / Esports</option>
                 </select>
-                <button type="submit" className="btn btn-primary">
+                <button
+                  type="button"
+                  className="btn btn-primary"
+                  onClick={handleFindNearby}
+                >
                   Find nearby tournament →
                 </button>
-              </form>
+              </div>
+
+              {locationError && (
+                <p className="hero-location-error">
+                  Couldn&rsquo;t get your location —{" "}
+                  <a href="/explore-tournaments">browse all tournaments</a>{" "}
+                  instead.
+                </p>
+              )}
 
               <div className="hero-meta">
                 <span>

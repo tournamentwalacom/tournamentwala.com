@@ -2,6 +2,7 @@ import Navbar from "@/components/Navbar";
 import Hero from "@/components/Hero";
 import LiveTicker from "@/components/LiveTicker";
 import Tournaments from "@/components/Tournaments";
+import NearbyTournaments from "@/components/NearbyTournaments";
 import SportsMarquee from "@/components/SportsMarquee";
 import HowItWorks from "@/components/HowItWorks";
 import OrganizerCTA from "@/components/OrganizerCTA";
@@ -16,6 +17,7 @@ export default async function Home({ searchParams }) {
       <main>
         <Hero />
         <LiveTicker />
+        <NearbyTournaments />
         <Tournaments
           sport="Cricket"
           city={params?.city}

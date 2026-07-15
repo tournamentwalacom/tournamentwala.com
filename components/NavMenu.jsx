@@ -4,6 +4,7 @@ import { useEffect, useRef, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { useRouter, usePathname } from "next/navigation";
+import { createBrowserSupabaseClient } from "@/lib/supabaseBrowser";
 
 function FilterList({ items, search, onSearchChange, emptyLabel, onPick }) {
   const filtered = items.filter((item) =>
@@ -43,14 +44,23 @@ function FilterList({ items, search, onSearchChange, emptyLabel, onPick }) {
   );
 }
 
-export default function NavMenu({ sports, cities }) {
+export default function NavMenu({ sports, cities, organizerName }) {
   const router = useRouter();
   const pathname = usePathname();
   const [mobileOpen, setMobileOpen] = useState(false);
-  const [openDropdown, setOpenDropdown] = useState(null); // 'sports' | 'cities' | null
+  const [openDropdown, setOpenDropdown] = useState(null); // 'sports' | 'cities' | 'account' | null
   const [sportSearch, setSportSearch] = useState("");
   const [citySearch, setCitySearch] = useState("");
   const navRef = useRef(null);
+
+  async function handleLogOut() {
+    const supabase = createBrowserSupabaseClient();
+    await supabase.auth.signOut();
+    closeAll();
+    router.refresh();
+  }
+
+  const firstName = organizerName ? organizerName.split(" ")[0] : null;
 
   useEffect(() => {
     function handleClickOutside(e) {
@@ -173,6 +183,29 @@ export default function NavMenu({ sports, cities }) {
         <span className="nav-cta-icon" aria-hidden="true">+</span>
         Post Tournament
       </Link>
+
+      {firstName && (
+        <div className="nav-dd nav-account">
+          <button
+            type="button"
+            className={`nav-dd-trigger${openDropdown === "account" ? " open" : ""}`}
+            onClick={() => toggleDropdown("account")}
+            aria-expanded={openDropdown === "account"}
+          >
+            {firstName} <span className="caret" aria-hidden="true">▾</span>
+          </button>
+          {openDropdown === "account" && (
+            <div className="nav-dd-panel nav-account-panel">
+              <Link href="/profile" className="nav-dd-item" onClick={closeAll}>
+                Profile
+              </Link>
+              <button type="button" className="nav-dd-item" onClick={handleLogOut}>
+                Log out
+              </button>
+            </div>
+          )}
+        </div>
+      )}
 
       {/* ---------------- Mobile ---------------- */}
       <button
@@ -318,6 +351,16 @@ export default function NavMenu({ sports, cities }) {
         </nav>
 
         <div className="nav-drawer-foot">
+          {firstName && (
+            <div className="nav-drawer-account">
+              <Link href="/profile" className="nav-drawer-link" onClick={closeAll}>
+                {firstName}&rsquo;s Profile
+              </Link>
+              <button type="button" className="nav-drawer-link nav-drawer-logout" onClick={handleLogOut}>
+                Log out
+              </button>
+            </div>
+          )}
           <Link
             href="/post-tournament"
             className="btn btn-primary nav-cta"

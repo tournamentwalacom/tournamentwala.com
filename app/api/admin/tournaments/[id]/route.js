@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { requireAdminSession } from "@/lib/auth";
 import { supabaseAdmin } from "@/lib/supabase";
 import { parseTournamentInput } from "@/lib/tournamentValidation";
+import { geocodePincode } from "@/lib/geocode";
 
 /**
  * This route is NOT covered by middleware.js's admin host/session gate —
@@ -27,9 +28,19 @@ export async function PATCH(request, { params }) {
     }
 
     const status = data.status || "pending";
+
+    // Re-geocode on every edit — cheap since edits are rare, and keeps
+    // coordinates in sync if the organizer/admin changed the pincode.
+    const coords = await geocodePincode(data.pincode);
+
     const { error } = await supabaseAdmin()
       .from("tournaments")
-      .update({ ...data, status })
+      .update({
+        ...data,
+        latitude: coords?.latitude ?? null,
+        longitude: coords?.longitude ?? null,
+        status,
+      })
       .eq("id", id);
 
     if (error) {

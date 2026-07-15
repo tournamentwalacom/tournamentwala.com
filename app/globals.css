@@ -305,6 +305,34 @@ button {
   padding: 14px 4px;
 }
 
+.nav-account-panel {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  width: 160px;
+}
+
+.nav-account-panel .nav-dd-item {
+  justify-content: flex-start;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.nav-drawer-account {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  margin-bottom: 4px;
+}
+
+.nav-drawer-logout {
+  background: none;
+  border: none;
+  cursor: pointer;
+  text-align: left;
+  font: inherit;
+}
+
 .nav-cta {
   padding: 11px 20px;
   font-size: 0.85rem;
@@ -869,6 +897,17 @@ button {
   font-size: 0.85rem;
   color: var(--steel);
   flex: none;
+}
+
+.hero-location-error {
+  margin: -6px 0 0;
+  font-size: 0.88rem;
+  color: var(--steel);
+}
+
+.hero-location-error a {
+  color: var(--crimson);
+  font-weight: 600;
 }
 
 .hero-meta b {
@@ -1537,6 +1576,144 @@ button {
   display: flex;
   flex-direction: column;
   gap: 28px;
+}
+
+.auth-card {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  max-width: 420px;
+  padding: 28px;
+  border: 1px solid var(--line);
+  border-radius: 16px;
+  background: var(--chalk);
+}
+
+.auth-google-btn {
+  justify-content: center;
+  width: 100%;
+}
+
+.auth-divider {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  color: var(--steel);
+  font-size: 0.8rem;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+.auth-divider::before,
+.auth-divider::after {
+  content: "";
+  flex: 1;
+  height: 1px;
+  background: var(--line);
+}
+
+.auth-toggle {
+  display: flex;
+  gap: 8px;
+  border-bottom: 1px solid var(--line);
+}
+
+.auth-toggle button {
+  flex: 1;
+  padding: 10px 0;
+  border: none;
+  background: transparent;
+  font-weight: 700;
+  font-size: 0.9rem;
+  color: var(--steel);
+  cursor: pointer;
+  border-bottom: 2px solid transparent;
+}
+
+.auth-toggle button.is-active {
+  color: var(--ink);
+  border-bottom-color: var(--crimson);
+}
+
+.profile-section-title {
+  margin-top: 36px;
+}
+
+.profile-empty {
+  color: var(--steel);
+  margin-top: 8px;
+}
+
+.profile-empty a {
+  color: var(--crimson);
+  font-weight: 700;
+}
+
+.profile-tournament-list {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  margin-top: 16px;
+  list-style: none;
+  padding: 0;
+}
+
+.profile-tournament-card {
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  padding: 18px 20px;
+  background: var(--chalk);
+}
+
+.profile-tournament-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.profile-tournament-head h3 {
+  font-size: 1.02rem;
+  margin: 0;
+}
+
+.profile-tournament-head h3 a {
+  color: var(--ink);
+}
+
+.profile-tournament-meta {
+  margin: 6px 0 0;
+  color: var(--steel);
+  font-size: 0.88rem;
+}
+
+.profile-status {
+  flex-shrink: 0;
+  font-family: var(--font-fixture), monospace;
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  padding: 4px 10px;
+  border-radius: 999px;
+  background: var(--paper);
+  color: var(--steel);
+}
+
+.profile-status-live {
+  background: rgba(46, 160, 67, 0.15);
+  color: #2ea043;
+}
+
+.profile-status-pending {
+  background: rgba(232, 158, 40, 0.15);
+  color: #b8790a;
+}
+
+.profile-status-rejected,
+.profile-status-cancelled {
+  background: rgba(232, 40, 60, 0.12);
+  color: var(--crimson);
 }
 
 /* ================= ABOUT / CONTACT ================= */
@@ -2587,6 +2764,62 @@ button {
 .explore-active-pill:hover {
   border-color: var(--crimson);
   color: var(--crimson);
+}
+
+.explore-location-banner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 12px;
+  background: var(--chalk);
+  border: 1px solid var(--line);
+  border-radius: 16px;
+  box-shadow: var(--shadow-card);
+  padding: 14px 18px;
+  margin: 0 auto 20px;
+}
+
+.explore-location-banner-text {
+  font-weight: 600;
+  font-size: 0.92rem;
+  color: var(--ink);
+}
+
+.explore-location-banner-actions {
+  display: flex;
+  gap: 10px;
+  flex: none;
+}
+
+.explore-location-btn {
+  border-radius: 999px;
+  padding: 9px 16px;
+  font-weight: 700;
+  font-size: 0.85rem;
+  white-space: nowrap;
+  transition: background 0.2s ease, border-color 0.2s ease, color 0.2s ease;
+}
+
+.explore-location-btn-dismiss {
+  background: transparent;
+  border: 1px solid var(--line);
+  color: var(--steel);
+}
+
+.explore-location-btn-dismiss:hover {
+  border-color: var(--crimson);
+  color: var(--crimson);
+}
+
+.explore-location-btn-allow {
+  background: var(--crimson);
+  border: 1px solid var(--crimson);
+  color: var(--chalk);
+}
+
+.explore-location-btn-allow:hover {
+  opacity: 0.9;
 }
 
 .explore-filter-panel {

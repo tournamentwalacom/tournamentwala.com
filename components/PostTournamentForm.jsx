@@ -16,6 +16,15 @@ import Modal from "@/components/Modal";
 
 const TELEGRAM_HANDLE = "6374753084";
 
+function buildInitialForm(initialProfile) {
+  return {
+    ...initialForm,
+    organizer_name: initialProfile?.name || "",
+    organizer_phone: initialProfile?.phone || "",
+    organizer_email: initialProfile?.email || "",
+  };
+}
+
 const initialForm = {
   name: "",
   sport: "",
@@ -66,9 +75,9 @@ const initialForm = {
   website: "", // honeypot — real users never fill this in
 };
 
-export default function PostTournamentForm() {
+export default function PostTournamentForm({ initialProfile } = {}) {
   const formRef = useRef(null);
-  const [form, setForm] = useState(initialForm);
+  const [form, setForm] = useState(() => buildInitialForm(initialProfile));
   const [status, setStatus] = useState("idle"); // idle | submitting | success | error
   const [error, setError] = useState("");
   const [resetTick, setResetTick] = useState(0);
@@ -126,7 +135,7 @@ export default function PostTournamentForm() {
 
       setSubmittedWithTelegramPromo(hasTelegramPromo);
       setStatus("success");
-      setForm(initialForm);
+      setForm(buildInitialForm(initialProfile));
     } catch {
       fail("Network error. Please try again.");
     }

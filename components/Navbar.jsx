@@ -1,9 +1,13 @@
 import Image from "next/image";
 import { getFilterFacets } from "@/lib/tournaments";
+import { getCurrentUser } from "@/lib/supabaseServer";
 import NavMenu from "@/components/NavMenu";
 
 export default async function Navbar() {
-  const { sports, cities } = await getFilterFacets();
+  const [{ sports, cities }, session] = await Promise.all([
+    getFilterFacets(),
+    getCurrentUser(),
+  ]);
 
   return (
     <header className="nav">
@@ -23,7 +27,11 @@ export default async function Navbar() {
           </span>
         </a>
 
-        <NavMenu sports={sports} cities={cities} />
+        <NavMenu
+          sports={sports}
+          cities={cities}
+          organizerName={session?.profile?.full_name || session?.user?.email || null}
+        />
       </div>
     </header>
   );

@@ -1,6 +1,8 @@
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import PostTournamentForm from "@/components/PostTournamentForm";
+import AuthForm from "@/components/AuthForm";
+import { getCurrentUser } from "@/lib/supabaseServer";
 
 export const metadata = {
   title: "Post a tournament — TournamentWala.com",
@@ -8,7 +10,9 @@ export const metadata = {
     "List your tournament free on TournamentWala. Submit your details and go live once approved.",
 };
 
-export default function PostTournamentPage() {
+export default async function PostTournamentPage() {
+  const session = await getCurrentUser();
+
   return (
     <>
       <Navbar />
@@ -20,11 +24,31 @@ export default function PostTournamentPage() {
             <br />
             We&rsquo;ll take it from here.
           </h1>
-          <p className="post-intro">
-            Fill in the details below — it&rsquo;s free. Our team reviews
-            every submission before it goes live, usually within 24–48 hrs.
-          </p>
-          <PostTournamentForm />
+
+          {!session ? (
+            <>
+              <p className="post-intro">
+                Sign in or create a free account to post your tournament —
+                it only takes a moment, and we&rsquo;ll bring you right back
+                here.
+              </p>
+              <AuthForm next="/post-tournament" />
+            </>
+          ) : (
+            <>
+              <p className="post-intro">
+                Fill in the details below — it&rsquo;s free. Our team reviews
+                every submission before it goes live, usually within 24–48 hrs.
+              </p>
+              <PostTournamentForm
+                initialProfile={{
+                  name: session.profile?.full_name || "",
+                  phone: session.profile?.phone || "",
+                  email: session.profile?.email || session.user.email || "",
+                }}
+              />
+            </>
+          )}
         </section>
       </main>
       <Footer />

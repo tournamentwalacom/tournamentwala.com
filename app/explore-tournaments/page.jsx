@@ -33,6 +33,8 @@ export default async function ExploreTournamentsPage({ searchParams }) {
     dateRange: formatDateRange(t),
     entryFee: formatEntryFee(t),
     prize: formatPrize(t),
+    latitude: t.latitude,
+    longitude: t.longitude,
   }));
 
   const sportCounts = new Map();

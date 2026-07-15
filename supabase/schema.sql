@@ -222,6 +222,68 @@ begin
   end if;
 end $$;
 
+-- Organizer accounts (Supabase Auth: Google + email/password). One row per
+-- auth.users id, kept in sync automatically by the trigger below so both
+-- signup methods populate it the same way with no app code involved.
+create table if not exists profiles (
+  id uuid primary key references auth.users (id) on delete cascade,
+  email text,
+  full_name text,
+  phone text,
+  avatar_url text,
+  created_at timestamptz not null default now(),
+  updated_at timestamptz not null default now()
+);
+
+alter table profiles enable row level security;
+
+drop policy if exists "Users can view own profile" on profiles;
+create policy "Users can view own profile"
+  on profiles for select
+  using (auth.uid() = id);
+
+drop policy if exists "Users can update own profile" on profiles;
+create policy "Users can update own profile"
+  on profiles for update
+  using (auth.uid() = id);
+
+-- Auto-creates a profiles row whenever someone signs up, whether via Google
+-- (name/avatar come from raw_user_meta_data) or email+password (name comes
+-- from the "full_name" passed in signUp options.data). security definer so
+-- it can insert despite RLS above.
+create or replace function public.handle_new_profile()
+returns trigger as $$
+begin
+  insert into public.profiles (id, email, full_name, avatar_url)
+  values (
+    new.id,
+    new.email,
+    coalesce(new.raw_user_meta_data ->> 'full_name', new.raw_user_meta_data ->> 'name'),
+    new.raw_user_meta_data ->> 'avatar_url'
+  )
+  on conflict (id) do nothing;
+  return new;
+end;
+$$ language plpgsql security definer set search_path = public;
+
+drop trigger if exists on_auth_user_created on auth.users;
+create trigger on_auth_user_created
+  after insert on auth.users
+  for each row execute procedure public.handle_new_profile();
+
+-- Links a tournament back to the signed-in organizer who submitted it via
+-- /api/tournaments/submit. Nullable because tournaments created directly in
+-- the admin panel (/admin/tournaments/new) have no organizer account.
+alter table tournaments add column if not exists organizer_user_id uuid references auth.users (id);
+
+-- Additive to "Public can read live tournaments" below (permissive policies
+-- are OR'd) — lets a signed-in organizer see all their own submissions
+-- (pending/rejected/live) on their /profile page, not just live ones.
+drop policy if exists "Organizers can read own tournaments" on tournaments;
+create policy "Organizers can read own tournaments"
+  on tournaments for select
+  using (auth.uid() = organizer_user_id);
+
 create table if not exists contact_messages (
   id uuid primary key default gen_random_uuid(),
   name text not null,
@@ -241,3 +303,10 @@ alter table contact_messages enable row level security;
 -- /api/contact/submit route using the service_role key. Nothing is
 -- exposed to the anon key — only the admin panel (also service_role)
 -- reads these.
+
+-- Coordinates geocoded from a tournament's pincode (see lib/geocode.js),
+-- cached here so /explore-tournaments can sort by distance from the
+-- visitor without geocoding on every page view. Null until geocoding
+-- succeeds for that row.
+alter table tournaments add column if not exists latitude double precision;
+alter table tournaments add column if not exists longitude double precision;
