@@ -50,13 +50,15 @@ export async function PATCH(request, { params }) {
     return NextResponse.json({ ok: true });
   }
 
-  if (action !== "approve" && action !== "reject") {
+  if (action !== "approve" && action !== "reject" && action !== "unpublish") {
     return NextResponse.json({ error: "Invalid action" }, { status: 400 });
   }
 
   const update =
     action === "approve"
       ? { status: "live", reviewed_at: new Date().toISOString() }
+      : action === "unpublish"
+      ? { status: "pending", reviewed_at: null }
       : {
           status: "rejected",
           reviewed_at: new Date().toISOString(),

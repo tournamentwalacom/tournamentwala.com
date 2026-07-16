@@ -48,6 +48,16 @@ export default function TournamentReviewRow({ tournament }) {
     router.refresh();
   }
 
+  async function deleteTournament() {
+    if (!window.confirm(`Delete "${tournament.name}"? This cannot be undone.`)) {
+      return;
+    }
+    setBusy(true);
+    await fetch(`/api/admin/tournaments/${tournament.id}`, { method: "DELETE" });
+    setBusy(false);
+    router.refresh();
+  }
+
   return (
     <>
     <tr>
@@ -109,6 +119,14 @@ export default function TournamentReviewRow({ tournament }) {
               onClick={() => setShowReject(true)}
             >
               Reject
+            </button>
+            <button
+              type="button"
+              className="admin-btn admin-btn-reject"
+              disabled={busy}
+              onClick={deleteTournament}
+            >
+              Delete
             </button>
           </>
         ) : (

@@ -2,6 +2,7 @@ import Link from "next/link";
 import { supabaseAdmin } from "@/lib/supabase";
 import { formatEntryFee, formatPrize } from "@/lib/tournaments";
 import TournamentReviewRow from "@/components/admin/TournamentReviewRow";
+import TournamentRowActions from "@/components/admin/TournamentRowActions";
 
 export default async function AdminTournamentsPage() {
   const db = supabaseAdmin();
@@ -93,9 +94,7 @@ export default async function AdminTournamentsPage() {
                   <td>{formatEntryFee(t)}</td>
                   <td>{formatPrize(t)}</td>
                   <td className="admin-row-actions">
-                    <Link href={`/admin/tournaments/${t.id}/edit`} className="admin-btn">
-                      Edit
-                    </Link>
+                    <TournamentRowActions tournament={t} showUnpublish />
                   </td>
                 </tr>
               ))}
@@ -129,9 +128,7 @@ export default async function AdminTournamentsPage() {
                   <td>{t.city}</td>
                   <td>{t.start_date}</td>
                   <td className="admin-row-actions">
-                    <Link href={`/admin/tournaments/${t.id}/edit`} className="admin-btn">
-                      View
-                    </Link>
+                    <TournamentRowActions tournament={t} />
                   </td>
                 </tr>
               ))}
@@ -165,9 +162,7 @@ export default async function AdminTournamentsPage() {
                   <td>{t.city}</td>
                   <td>{t.status}</td>
                   <td className="admin-row-actions">
-                    <Link href={`/admin/tournaments/${t.id}/edit`} className="admin-btn">
-                      Edit
-                    </Link>
+                    <TournamentRowActions tournament={t} />
                   </td>
                 </tr>
               ))}
