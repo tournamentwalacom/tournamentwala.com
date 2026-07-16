@@ -536,6 +536,51 @@
   color: var(--chalk);
 }
 
+.admin-btn-link {
+  padding: 0;
+  margin: 4px 0 0;
+  border: none;
+  background: none;
+  color: var(--crimson);
+  font-size: 12px;
+  font-weight: 600;
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+.admin-row-brief td {
+  background: var(--paper);
+}
+
+.admin-brief-box {
+  font-size: 13px;
+}
+
+.admin-brief-text {
+  margin: 6px 0 0;
+  white-space: pre-wrap;
+  line-height: 1.5;
+}
+
+.admin-brief-fields {
+  margin: 8px 0 0;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 8px 20px;
+}
+
+.admin-brief-fields dt {
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  color: var(--steel);
+}
+
+.admin-brief-fields dd {
+  margin: 2px 0 0;
+  word-break: break-word;
+}
+
 .admin-reject-box {
   display: flex;
   align-items: center;

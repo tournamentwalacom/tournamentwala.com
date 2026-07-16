@@ -92,8 +92,8 @@ export default function SlideToSubmit({
         }}
       />
       <span
-        className="slide-submit-label"
-        style={{ opacity: Math.max(0, 1 - progress * 1.6) }}
+        className={`slide-submit-label${active ? " is-active" : ""}`}
+        style={{ opacity: active ? 1 : Math.max(0, 1 - progress * 1.6) }}
       >
         {active ? busyLabel : idleLabel}
       </span>

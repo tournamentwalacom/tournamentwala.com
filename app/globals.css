@@ -2754,6 +2754,10 @@ button {
   pointer-events: none;
 }
 
+.slide-submit-label.is-active {
+  color: var(--chalk);
+}
+
 .slide-submit-thumb {
   position: absolute;
   left: 4px;
