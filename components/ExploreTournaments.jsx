@@ -8,6 +8,7 @@ import {
   LOCATION_DISMISSED_KEY,
   requestLocation,
 } from "@/lib/locationConsent";
+import TicketLoader from "@/components/TicketLoader";
 
 const PAGE_SIZE = 9;
 
@@ -49,6 +50,7 @@ export default function ExploreTournaments({
   const [frozen, setFrozen] = useState(false);
   const [userCoords, setUserCoords] = useState(null);
   const [showLocationPrompt, setShowLocationPrompt] = useState(false);
+  const [locatingLocation, setLocatingLocation] = useState(false);
   const filterRef = useRef(null);
   const sentinelRef = useRef(null);
 
@@ -104,12 +106,17 @@ export default function ExploreTournaments({
   }, []);
 
   function handleAllowLocation() {
+    setLocatingLocation(true);
     requestLocation({
       onSuccess: (coords) => {
         setUserCoords(coords);
         setShowLocationPrompt(false);
+        setLocatingLocation(false);
       },
-      onError: () => setShowLocationPrompt(false),
+      onError: () => {
+        setShowLocationPrompt(false);
+        setLocatingLocation(false);
+      },
     });
   }
 
@@ -229,20 +236,26 @@ export default function ExploreTournaments({
             📍 Show tournaments near you first?
           </span>
           <div className="explore-location-banner-actions">
-            <button
-              type="button"
-              className="explore-location-btn explore-location-btn-dismiss"
-              onClick={handleDismissLocationPrompt}
-            >
-              Not now
-            </button>
-            <button
-              type="button"
-              className="explore-location-btn explore-location-btn-allow"
-              onClick={handleAllowLocation}
-            >
-              Allow location
-            </button>
+            {locatingLocation ? (
+              <TicketLoader iconOnly size="sm" label="Locating you" />
+            ) : (
+              <>
+                <button
+                  type="button"
+                  className="explore-location-btn explore-location-btn-dismiss"
+                  onClick={handleDismissLocationPrompt}
+                >
+                  Not now
+                </button>
+                <button
+                  type="button"
+                  className="explore-location-btn explore-location-btn-allow"
+                  onClick={handleAllowLocation}
+                >
+                  Allow location
+                </button>
+              </>
+            )}
           </div>
         </div>
       )}

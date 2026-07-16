@@ -3,19 +3,26 @@
 import { useState } from "react";
 import { requestAndBroadcastLocation } from "@/lib/locationConsent";
 import { formatPrizesPaidOut, formatTeamsCount } from "@/lib/tournaments";
+import TicketLoader from "@/components/TicketLoader";
 
 export default function Hero({ stats }) {
   const [locationError, setLocationError] = useState(false);
+  const [locating, setLocating] = useState(false);
 
   function handleFindNearby() {
     setLocationError(false);
+    setLocating(true);
     requestAndBroadcastLocation({
       onSuccess: () => {
+        setLocating(false);
         document
           .getElementById("nearby-tournaments")
           ?.scrollIntoView({ behavior: "smooth", block: "start" });
       },
-      onError: () => setLocationError(true),
+      onError: () => {
+        setLocating(false);
+        setLocationError(true);
+      },
     });
   }
 
@@ -66,8 +73,13 @@ export default function Hero({ stats }) {
                   type="button"
                   className="btn btn-primary"
                   onClick={handleFindNearby}
+                  disabled={locating}
                 >
-                  Find nearby tournament →
+                  {locating ? (
+                    <TicketLoader iconOnly size="sm" label="Locating you" />
+                  ) : (
+                    "Find nearby tournament →"
+                  )}
                 </button>
               </div>
 

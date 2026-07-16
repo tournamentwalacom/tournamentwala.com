@@ -8,18 +8,27 @@ import {
   requestLocation,
 } from "@/lib/locationConsent";
 import TicketSlider from "@/components/TicketSlider";
+import TicketLoader from "@/components/TicketLoader";
 
 const NEARBY_COUNT = 5;
 
 export default function NearbyTournamentsSlider({ tickets }) {
   const [userCoords, setUserCoords] = useState(null);
+  const [locating, setLocating] = useState(false);
   const sectionRef = useRef(null);
 
   // Restores silently on a return visit — no event needed, mirrors
   // ExploreTournaments.jsx's own on-mount restore.
   useEffect(() => {
     if (localStorage.getItem(LOCATION_CHOICE_KEY) === "granted") {
-      requestLocation({ onSuccess: setUserCoords });
+      setLocating(true);
+      requestLocation({
+        onSuccess: (coords) => {
+          setUserCoords(coords);
+          setLocating(false);
+        },
+        onError: () => setLocating(false),
+      });
     }
   }, []);
 
@@ -36,7 +45,24 @@ export default function NearbyTournamentsSlider({ tickets }) {
   }, []);
 
   if (!userCoords) {
-    return <section id="nearby-tournaments" ref={sectionRef} />;
+    if (!locating) {
+      return <section id="nearby-tournaments" ref={sectionRef} />;
+    }
+    return (
+      <section
+        className="section tournaments-section tournaments-section--tint"
+        id="nearby-tournaments"
+        ref={sectionRef}
+      >
+        <div className="container">
+          <div className="section-head">
+            <span className="eyebrow">Nearby Tournaments</span>
+            <h2 className="section-title">Find your Spot.</h2>
+          </div>
+          <TicketLoader label="Finding tournaments near you" size="md" />
+        </div>
+      </section>
+    );
   }
 
   const nearby = tickets
