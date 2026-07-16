@@ -2488,6 +2488,23 @@ button {
   color: var(--steel);
 }
 
+.promo-discount-banner {
+  background: var(--crimson);
+  color: var(--chalk);
+  border-radius: 12px;
+  padding: 12px 16px;
+  font-weight: 700;
+  font-size: 0.94rem;
+  margin: 0 0 14px;
+}
+
+.promo-card-price-original {
+  color: var(--steel);
+  text-decoration: line-through;
+  font-weight: 500;
+  margin-right: 6px;
+}
+
 .promo-free-note {
   background: var(--paper);
   border: 1px solid var(--line);

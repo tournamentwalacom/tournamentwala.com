@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { supabaseAdmin } from "@/lib/supabase";
+import DiscountBar from "@/components/admin/DiscountBar";
 
 function formatPrice(pkg) {
   if (pkg.is_free) return "Free";
@@ -8,18 +9,22 @@ function formatPrice(pkg) {
 }
 
 export default async function AdminPricingPage() {
-  const { data: packages } = await supabaseAdmin()
-    .from("promotion_packages")
-    .select("*")
-    .order("sort_order", { ascending: true });
+  const db = supabaseAdmin();
+  const [{ data: packages }, { data: discount }] = await Promise.all([
+    db.from("promotion_packages").select("*").order("sort_order", { ascending: true }),
+    db.from("promotion_discount").select("message, percentage, is_active").eq("id", 1).maybeSingle(),
+  ]);
 
   return (
     <>
       <div className="admin-page-header">
         <h1 className="admin-page-title">Pricing</h1>
-        <Link href="/admin/pricing/new" className="btn btn-primary admin-add-btn">
-          + Add package
-        </Link>
+        <div className="admin-page-header-actions">
+          <DiscountBar initial={discount || { message: null, percentage: 0, is_active: false }} />
+          <Link href="/admin/pricing/new" className="btn btn-primary admin-add-btn">
+            + Add package
+          </Link>
+        </div>
       </div>
 
       {!packages?.length ? (

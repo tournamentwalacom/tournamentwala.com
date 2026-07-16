@@ -21,6 +21,7 @@ export default function PromotionPackages({
   onBriefStateChange,
 }) {
   const [packages, setPackages] = useState(null);
+  const [discount, setDiscount] = useState(null);
   const [error, setError] = useState("");
 
   useEffect(() => {
@@ -29,7 +30,9 @@ export default function PromotionPackages({
     fetch("/api/promotion-packages")
       .then((res) => res.json())
       .then((data) => {
-        if (!cancelled) setPackages(data.packages || []);
+        if (cancelled) return;
+        setPackages(data.packages || []);
+        setDiscount(data.discount || null);
       })
       .catch(() => {
         if (!cancelled) setError("Couldn't load promotion packages. Please refresh the page.");
@@ -101,6 +104,10 @@ export default function PromotionPackages({
 
   return (
     <div className="post-field-wide">
+      {discount?.is_active && discount.message && (
+        <p className="promo-discount-banner">🔥 {discount.message}</p>
+      )}
+
       {freePackage && (
         <p className="promo-free-note">
           ✓ {freePackage.name} included free with every submission — {freePackage.description}
@@ -123,6 +130,11 @@ export default function PromotionPackages({
                 />
                 <span className="promo-card-name">{pkg.name}</span>
                 <span className="promo-card-price">
+                  {pkg.original_price != null && (
+                    <span className="promo-card-price-original">
+                      {formatPrice(pkg.original_price)}
+                    </span>
+                  )}
                   {formatPrice(pkg.price)}
                   {pkg.price_unit ? ` / ${pkg.price_unit}` : ""}
                 </span>

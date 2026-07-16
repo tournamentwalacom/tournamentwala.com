@@ -299,6 +299,84 @@
   white-space: nowrap;
 }
 
+.admin-page-header-actions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 20px;
+  flex-wrap: wrap;
+}
+
+.admin-page-header-actions .admin-add-btn {
+  margin-bottom: 0;
+}
+
+.admin-discount-trigger {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.admin-discount-btn {
+  background: var(--chalk);
+  border: 1px solid var(--line);
+  color: var(--ink);
+  white-space: nowrap;
+}
+
+.admin-discount-btn:hover {
+  background: var(--line);
+}
+
+.admin-discount-live-badge {
+  padding: 4px 10px;
+  border-radius: 999px;
+  background: #1a7f37;
+  color: var(--chalk);
+  font-size: 12px;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+/* Discount / announcement modal */
+.admin-modal-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(11, 12, 16, 0.55);
+  display: grid;
+  place-items: center;
+  z-index: 100;
+  padding: 20px;
+}
+
+.admin-modal {
+  width: 100%;
+  max-width: 480px;
+  max-height: 90vh;
+  overflow-y: auto;
+  background: var(--chalk);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow-card-hover);
+  padding: 28px;
+}
+
+.admin-modal-title {
+  font-family: var(--font-fixture), sans-serif;
+  font-size: 18px;
+  color: var(--ink);
+  margin-bottom: 8px;
+}
+
+.admin-modal-hint {
+  font-size: 13px;
+  color: var(--steel);
+  margin-bottom: 16px;
+}
+
+.admin-modal-actions {
+  margin-top: 4px;
+}
+
 .admin-card-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));

@@ -309,4 +309,29 @@ alter table contact_messages enable row level security;
 -- visitor without geocoding on every page view. Null until geocoding
 -- succeeds for that row.
 alter table tournaments add column if not exists latitude double precision;
+
+-- Single-row settings for a site-wide promotion discount, managed from
+-- /admin/pricing. When active, `percentage` is knocked off every paid
+-- promotion package's price (see lib/promotionPackages.js#applyDiscount)
+-- and `message` is shown as a highlighted banner on the package picker
+-- (components/PromotionPackages.jsx). Singleton enforced via fixed id.
+create table if not exists promotion_discount (
+  id integer primary key default 1,
+  message text,
+  percentage numeric not null default 0
+    check (percentage >= 0 and percentage <= 100),
+  is_active boolean not null default false,
+  updated_at timestamptz not null default now(),
+  constraint promotion_discount_singleton check (id = 1)
+);
+
+alter table promotion_discount enable row level security;
+
+-- No public policies here on purpose, same pattern as promotion_packages:
+-- reads happen through /api/promotion-packages and writes through
+-- /api/admin/discount, both using the service_role key.
+
+insert into promotion_discount (id, message, percentage, is_active)
+values (1, null, 0, false)
+on conflict (id) do nothing;
 alter table tournaments add column if not exists longitude double precision;
