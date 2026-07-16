@@ -30,19 +30,19 @@ export default function Footer() {
           </div>
 
           <div>
-            <h4>Players</h4>
+            <h4>Explore</h4>
             <ul>
               <li>
-                <a href="#tournaments">Browse tournaments</a>
+                <a href="/">Home</a>
               </li>
               <li>
-                <a href="#">Find a team</a>
+                <a href="/explore-tournaments">Explore tournaments</a>
               </li>
               <li>
-                <a href="#">Live scores</a>
+                <a href="/about">About</a>
               </li>
               <li>
-                <a href="#">Player rankings</a>
+                <a href="/contact">Contact us</a>
               </li>
             </ul>
           </div>
@@ -51,34 +51,51 @@ export default function Footer() {
             <h4>Organizers</h4>
             <ul>
               <li>
-                <a href="#organizers">List a tournament</a>
+                <a href="/post-tournament">Post a tournament</a>
               </li>
               <li>
-                <a href="#">Fixture generator</a>
+                <a href="/profile">My profile</a>
               </li>
               <li>
-                <a href="#">Payments &amp; payouts</a>
-              </li>
-              <li>
-                <a href="#">Organizer stories</a>
+                <a href="/contact">Organizer support</a>
               </li>
             </ul>
           </div>
 
           <div>
-            <h4>Company</h4>
+            <h4>Legal</h4>
             <ul>
               <li>
-                <a href="#">About us</a>
+                <a href="/refund-policy">Refund policy</a>
               </li>
               <li>
-                <a href="#">Contact</a>
+                <a href="/privacy-policy">Privacy policy</a>
               </li>
               <li>
-                <a href="#">Terms &amp; refunds</a>
+                <a href="/terms-and-conditions">Terms &amp; conditions</a>
+              </li>
+            </ul>
+          </div>
+
+          <div>
+            <h4>Get in touch</h4>
+            <ul>
+              <li>
+                <a href="mailto:tournamentwalacom@gmail.com">
+                  tournamentwalacom@gmail.com
+                </a>
               </li>
               <li>
-                <a href="#">Privacy</a>
+                <a href="tel:+916374753084">+91 63747 53084</a>
+              </li>
+              <li>
+                <a
+                  href="https://www.instagram.com/tournamentwalacom/?hl=en"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  Instagram
+                </a>
               </li>
             </ul>
           </div>
@@ -86,7 +103,6 @@ export default function Footer() {
 
         <div className="footer-bottom">
           <span>© 2026 TournamentWala.com — Made in India 🇮🇳</span>
-          <span>Instagram · YouTube · WhatsApp Channel</span>
         </div>
       </div>
     </footer>

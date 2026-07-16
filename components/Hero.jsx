@@ -2,8 +2,9 @@
 
 import { useState } from "react";
 import { requestAndBroadcastLocation } from "@/lib/locationConsent";
+import { formatPrizesPaidOut, formatTeamsCount } from "@/lib/tournaments";
 
-export default function Hero() {
+export default function Hero({ stats }) {
   const [locationError, setLocationError] = useState(false);
 
   function handleFindNearby() {
@@ -83,10 +84,10 @@ export default function Hero() {
                   <b>48 hrs</b> avg. slot sell-out
                 </span>
                 <span>
-                  <b>₹4.2 Cr</b> prizes paid out
+                  <b>{formatPrizesPaidOut(stats?.prizesPaidOut)}</b> prizes paid out
                 </span>
                 <span>
-                  <b>1.8 lakh</b> Players
+                  <b>{formatTeamsCount(stats?.totalTeams)}</b> Teams
                 </span>
               </div>
             </div>

@@ -8,6 +8,7 @@ import {
   getCitySuggestions,
 } from "@/lib/tournaments";
 import PosterUploadField from "@/components/PosterUploadField";
+import AdminPackagesField from "@/components/admin/AdminPackagesField";
 
 const STATUS_OPTIONS = [
   { value: "live", label: "Live" },
@@ -43,7 +44,10 @@ function buildInitialForm(initial) {
       image_url: "",
       entry_fee_amount: "",
       prize_pool: "",
+      total_teams: "",
       status: "live",
+      promotions: [],
+      promotion_total: 0,
     };
   }
 
@@ -70,7 +74,10 @@ function buildInitialForm(initial) {
     image_url: initial.image_url || "",
     entry_fee_amount: toFormValue(initial.entry_fee_amount),
     prize_pool: toFormValue(initial.prize_pool),
+    total_teams: toFormValue(initial.total_teams),
     status: initial.status || "pending",
+    promotions: initial.promotions || [],
+    promotion_total: initial.promotion_total ?? 0,
   };
 }
 
@@ -388,7 +395,28 @@ export default function TournamentForm({ mode, initial }) {
           />
         </label>
 
-        <h3 className="post-form-section">7. Upload poster ⭐</h3>
+        <label className="post-field">
+          Total teams that took part <span>(optional, fill in after the event)</span>
+          <input
+            type="number"
+            min="0"
+            step="1"
+            placeholder="e.g. 24"
+            value={form.total_teams}
+            onChange={(e) => update("total_teams", e.target.value)}
+          />
+        </label>
+
+        <h3 className="post-form-section">7. Packages &amp; pricing</h3>
+
+        <AdminPackagesField
+          value={{ promotions: form.promotions, promotion_total: form.promotion_total }}
+          onChange={({ promotions, promotion_total }) => {
+            setForm((f) => ({ ...f, promotions, promotion_total }));
+          }}
+        />
+
+        <h3 className="post-form-section">8. Upload poster ⭐</h3>
 
         <div className="post-field post-field-wide">
           Main tournament poster <span>(required)</span>

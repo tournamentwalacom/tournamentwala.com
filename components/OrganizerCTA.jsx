@@ -1,4 +1,6 @@
-export default function OrganizerCTA() {
+import { formatTournamentsHosted } from "@/lib/tournaments";
+
+export default function OrganizerCTA({ stats }) {
   return (
     <section className="section container" id="organizers">
       <div className="organizer">
@@ -27,7 +29,7 @@ export default function OrganizerCTA() {
 
         <div className="organizer-stats">
           <div className="stat-row">
-            <b>2,300+</b>
+            <b>{formatTournamentsHosted(stats?.tournamentsHosted)}</b>
             <span>Tournaments hosted</span>
           </div>
           <div className="stat-row">

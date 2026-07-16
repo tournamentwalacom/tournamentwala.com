@@ -62,6 +62,7 @@ const initialForm = {
   start_time: "",
   team_size: "",
   max_teams: "",
+  total_teams: "",
   ball_type: "",
   second_prize: "",
   third_prize: "",
@@ -601,6 +602,18 @@ export default function PostTournamentForm({ initialProfile } = {}) {
                     step="1"
                     value={form.max_teams}
                     onChange={(e) => update("max_teams", e.target.value)}
+                  />
+                </label>
+
+                <label className="post-field">
+                  Total teams that took part{" "}
+                  <span>(optional — fill in once the event is done)</span>
+                  <input
+                    type="number"
+                    min="0"
+                    step="1"
+                    value={form.total_teams}
+                    onChange={(e) => update("total_teams", e.target.value)}
                   />
                 </label>
 

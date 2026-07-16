@@ -3,7 +3,7 @@
 import { useEffect, useRef } from "react";
 import Link from "next/link";
 
-const AUTO_MS = 2500;
+const AUTO_MS = 6000;
 
 export default function TicketSlider({ tickets, browseAllHref }) {
   const trackRef = useRef(null);

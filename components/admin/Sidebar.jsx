@@ -99,6 +99,58 @@ function PricingIcon() {
   );
 }
 
+function AnalyticsIcon() {
+  return (
+    <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+      <path
+        d="M4 20V10M11 20V4M18 20v-7"
+        stroke="currentColor"
+        strokeWidth="1.6"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+    </svg>
+  );
+}
+
+function ExpensesIcon() {
+  return (
+    <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+      <path
+        d="M3 7a2 2 0 0 1 2-2h11l3 3v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V7Z"
+        stroke="currentColor"
+        strokeWidth="1.6"
+        strokeLinejoin="round"
+      />
+      <path
+        d="M16 11a2 2 0 1 0 0 4 2 2 0 0 0 0-4Z"
+        stroke="currentColor"
+        strokeWidth="1.6"
+      />
+    </svg>
+  );
+}
+
+function QueriesIcon() {
+  return (
+    <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+      <path
+        d="M4 5h16a1 1 0 0 1 1 1v11a1 1 0 0 1-1 1H8l-4 4V6a1 1 0 0 1 1-1Z"
+        stroke="currentColor"
+        strokeWidth="1.6"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+      <path
+        d="M8 10h8M8 14h5"
+        stroke="currentColor"
+        strokeWidth="1.6"
+        strokeLinecap="round"
+      />
+    </svg>
+  );
+}
+
 function SettingsIcon() {
   return (
     <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
@@ -116,11 +168,14 @@ function SettingsIcon() {
 
 const NAV_ITEMS = [
   { href: "/admin", label: "Dashboard", exact: true, icon: DashboardIcon },
+  { href: "/admin/analytics", label: "Analytics", icon: AnalyticsIcon },
   { href: "/admin/tournaments", label: "Tournaments", icon: TournamentsIcon },
   { href: "/admin/organizers", label: "Organizers", icon: OrganizersIcon },
   { href: "/admin/users", label: "Users", icon: UsersIcon },
   { href: "/admin/payments", label: "Payments", icon: PaymentsIcon },
   { href: "/admin/pricing", label: "Pricing", icon: PricingIcon },
+  { href: "/admin/expenses", label: "Expenses", icon: ExpensesIcon },
+  { href: "/admin/queries", label: "Queries", icon: QueriesIcon },
   { href: "/admin/settings", label: "Settings", icon: SettingsIcon },
 ];
 

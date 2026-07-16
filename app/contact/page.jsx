@@ -31,24 +31,29 @@ export default function ContactPage() {
           <div className="contact-layout">
             <div className="contact-grid">
               <div className="contact-card">
-                <h4>Players</h4>
-                <p>Registration, fixtures, refunds or anything else.</p>
-                <a href="mailto:hello@tournamentwala.com">
-                  hello@tournamentwala.com
+                <h4>Email</h4>
+                <p>Registration, fixtures, refunds, listings, payouts — anything.</p>
+                <a href="mailto:tournamentwalacom@gmail.com">
+                  tournamentwalacom@gmail.com
                 </a>
               </div>
 
               <div className="contact-card">
-                <h4>Organizers</h4>
-                <p>Listing a tournament, promotions, payouts, or account support.</p>
-                <a href="mailto:organizers@tournamentwala.com">
-                  organizers@tournamentwala.com
-                </a>
+                <h4>Call / WhatsApp</h4>
+                <p>Prefer to talk? Reach us directly.</p>
+                <a href="tel:+916374753084">+91 63747 53084</a>
               </div>
 
               <div className="contact-card">
                 <h4>Follow along</h4>
-                <p>Instagram · YouTube · WhatsApp Channel</p>
+                <p>Instagram</p>
+                <a
+                  href="https://www.instagram.com/tournamentwalacom/?hl=en"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  @tournamentwalacom
+                </a>
               </div>
             </div>
 

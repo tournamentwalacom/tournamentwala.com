@@ -7,15 +7,17 @@ import SportsMarquee from "@/components/SportsMarquee";
 import HowItWorks from "@/components/HowItWorks";
 import OrganizerCTA from "@/components/OrganizerCTA";
 import Footer from "@/components/Footer";
+import { getHomepageStats } from "@/lib/homepageStats";
 
 export default async function Home({ searchParams }) {
   const params = await searchParams;
+  const stats = await getHomepageStats();
 
   return (
     <>
       <Navbar />
       <main>
-        <Hero />
+        <Hero stats={stats} />
         <LiveTicker />
         <NearbyTournaments />
         <Tournaments
@@ -53,7 +55,7 @@ export default async function Home({ searchParams }) {
         />
         <SportsMarquee />
         <HowItWorks />
-        <OrganizerCTA />
+        <OrganizerCTA stats={stats} />
       </main>
       <Footer />
     </>

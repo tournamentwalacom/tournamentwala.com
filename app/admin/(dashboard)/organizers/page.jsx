@@ -33,45 +33,47 @@ export default async function AdminOrganizersPage() {
       {!profiles?.length ? (
         <div className="admin-placeholder">No organizer accounts yet.</div>
       ) : (
-        <table className="admin-table">
-          <thead>
-            <tr>
-              <th>Organizer</th>
-              <th>Phone</th>
-              <th>Signed up</th>
-              <th>Tournaments posted</th>
-            </tr>
-          </thead>
-          <tbody>
-            {profiles.map((p) => {
-              const posted = tournamentsByOrganizer.get(p.id) || [];
-              return (
-                <tr key={p.id}>
-                  <td>
-                    {p.full_name || "—"}
-                    <div className="admin-row-sub">{p.email}</div>
-                  </td>
-                  <td>{p.phone || "—"}</td>
-                  <td>{new Date(p.created_at).toLocaleDateString("en-IN")}</td>
-                  <td>
-                    {posted.length === 0 ? (
-                      "—"
-                    ) : (
-                      <>
-                        {posted.length}
-                        {posted.map((t) => (
-                          <div key={t.id} className="admin-row-sub">
-                            {t.name} — {STATUS_LABELS[t.status] || t.status}
-                          </div>
-                        ))}
-                      </>
-                    )}
-                  </td>
-                </tr>
-              );
-            })}
-          </tbody>
-        </table>
+        <div className="admin-table-scroll">
+          <table className="admin-table">
+            <thead>
+              <tr>
+                <th>Organizer</th>
+                <th>Phone</th>
+                <th>Signed up</th>
+                <th>Tournaments posted</th>
+              </tr>
+            </thead>
+            <tbody>
+              {profiles.map((p) => {
+                const posted = tournamentsByOrganizer.get(p.id) || [];
+                return (
+                  <tr key={p.id}>
+                    <td>
+                      {p.full_name || "—"}
+                      <div className="admin-row-sub">{p.email}</div>
+                    </td>
+                    <td>{p.phone || "—"}</td>
+                    <td>{new Date(p.created_at).toLocaleDateString("en-IN")}</td>
+                    <td>
+                      {posted.length === 0 ? (
+                        "—"
+                      ) : (
+                        <>
+                          {posted.length}
+                          {posted.map((t) => (
+                            <div key={t.id} className="admin-row-sub">
+                              {t.name} — {STATUS_LABELS[t.status] || t.status}
+                            </div>
+                          ))}
+                        </>
+                      )}
+                    </td>
+                  </tr>
+                );
+              })}
+            </tbody>
+          </table>
+        </div>
       )}
     </>
   );

@@ -30,41 +30,43 @@ export default async function AdminPricingPage() {
       {!packages?.length ? (
         <div className="admin-placeholder">No promotion packages yet.</div>
       ) : (
-        <table className="admin-table">
-          <thead>
-            <tr>
-              <th>Package</th>
-              <th>Price</th>
-              <th>Quantity?</th>
-              <th>Telegram?</th>
-              <th>Brief?</th>
-              <th>Active</th>
-              <th>Action</th>
-            </tr>
-          </thead>
-          <tbody>
-            {packages.map((pkg) => (
-              <tr key={pkg.id}>
-                <td>
-                  <strong>{pkg.name}</strong>
-                  {pkg.description && (
-                    <div className="admin-row-sub">{pkg.description}</div>
-                  )}
-                </td>
-                <td>{formatPrice(pkg)}</td>
-                <td>{pkg.allow_quantity ? "Yes" : "—"}</td>
-                <td>{pkg.requires_telegram_upload ? "Yes" : "—"}</td>
-                <td>{pkg.requires_brief ? "Yes" : "—"}</td>
-                <td>{pkg.is_active ? "Active" : "Hidden"}</td>
-                <td className="admin-row-actions">
-                  <Link href={`/admin/pricing/${pkg.id}/edit`} className="admin-btn">
-                    Edit
-                  </Link>
-                </td>
+        <div className="admin-table-scroll">
+          <table className="admin-table">
+            <thead>
+              <tr>
+                <th>Package</th>
+                <th>Price</th>
+                <th>Quantity?</th>
+                <th>Telegram?</th>
+                <th>Brief?</th>
+                <th>Active</th>
+                <th>Action</th>
               </tr>
-            ))}
-          </tbody>
-        </table>
+            </thead>
+            <tbody>
+              {packages.map((pkg) => (
+                <tr key={pkg.id}>
+                  <td>
+                    <strong>{pkg.name}</strong>
+                    {pkg.description && (
+                      <div className="admin-row-sub">{pkg.description}</div>
+                    )}
+                  </td>
+                  <td>{formatPrice(pkg)}</td>
+                  <td>{pkg.allow_quantity ? "Yes" : "—"}</td>
+                  <td>{pkg.requires_telegram_upload ? "Yes" : "—"}</td>
+                  <td>{pkg.requires_brief ? "Yes" : "—"}</td>
+                  <td>{pkg.is_active ? "Active" : "Hidden"}</td>
+                  <td className="admin-row-actions">
+                    <Link href={`/admin/pricing/${pkg.id}/edit`} className="admin-btn">
+                      Edit
+                    </Link>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
       )}
     </>
   );

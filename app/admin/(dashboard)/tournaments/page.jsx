@@ -45,23 +45,25 @@ export default async function AdminTournamentsPage() {
       {!pending?.length ? (
         <div className="admin-placeholder">Nothing waiting on review.</div>
       ) : (
-        <table className="admin-table">
-          <thead>
-            <tr>
-              <th>Tournament</th>
-              <th>Venue</th>
-              <th>Start date</th>
-              <th>Organizer</th>
-              <th>Promotions</th>
-              <th>Action</th>
-            </tr>
-          </thead>
-          <tbody>
-            {pending.map((t) => (
-              <TournamentReviewRow key={t.id} tournament={t} />
-            ))}
-          </tbody>
-        </table>
+        <div className="admin-table-scroll">
+          <table className="admin-table">
+            <thead>
+              <tr>
+                <th>Tournament</th>
+                <th>Venue</th>
+                <th>Start date</th>
+                <th>Organizer</th>
+                <th>Promotions</th>
+                <th>Action</th>
+              </tr>
+            </thead>
+            <tbody>
+              {pending.map((t) => (
+                <TournamentReviewRow key={t.id} tournament={t} />
+              ))}
+            </tbody>
+          </table>
+        </div>
       )}
 
       <h2 className="admin-section-title admin-section-title-spaced">
@@ -70,34 +72,36 @@ export default async function AdminTournamentsPage() {
       {!live?.length ? (
         <div className="admin-placeholder">No live tournaments yet.</div>
       ) : (
-        <table className="admin-table">
-          <thead>
-            <tr>
-              <th>Tournament</th>
-              <th>Sport</th>
-              <th>City</th>
-              <th>Entry</th>
-              <th>Prize pool</th>
-              <th>Action</th>
-            </tr>
-          </thead>
-          <tbody>
-            {live.map((t) => (
-              <tr key={t.id}>
-                <td>{t.name}</td>
-                <td>{t.sport}</td>
-                <td>{t.city}</td>
-                <td>{formatEntryFee(t)}</td>
-                <td>{formatPrize(t)}</td>
-                <td className="admin-row-actions">
-                  <Link href={`/admin/tournaments/${t.id}/edit`} className="admin-btn">
-                    Edit
-                  </Link>
-                </td>
+        <div className="admin-table-scroll">
+          <table className="admin-table">
+            <thead>
+              <tr>
+                <th>Tournament</th>
+                <th>Sport</th>
+                <th>City</th>
+                <th>Entry</th>
+                <th>Prize pool</th>
+                <th>Action</th>
               </tr>
-            ))}
-          </tbody>
-        </table>
+            </thead>
+            <tbody>
+              {live.map((t) => (
+                <tr key={t.id}>
+                  <td>{t.name}</td>
+                  <td>{t.sport}</td>
+                  <td>{t.city}</td>
+                  <td>{formatEntryFee(t)}</td>
+                  <td>{formatPrize(t)}</td>
+                  <td className="admin-row-actions">
+                    <Link href={`/admin/tournaments/${t.id}/edit`} className="admin-btn">
+                      Edit
+                    </Link>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
       )}
 
       <h2 className="admin-section-title admin-section-title-spaced">
@@ -106,32 +110,34 @@ export default async function AdminTournamentsPage() {
       {!completed?.length ? (
         <div className="admin-placeholder">No completed tournaments yet.</div>
       ) : (
-        <table className="admin-table">
-          <thead>
-            <tr>
-              <th>Tournament</th>
-              <th>Sport</th>
-              <th>City</th>
-              <th>Date</th>
-              <th>Action</th>
-            </tr>
-          </thead>
-          <tbody>
-            {completed.map((t) => (
-              <tr key={t.id}>
-                <td>{t.name}</td>
-                <td>{t.sport}</td>
-                <td>{t.city}</td>
-                <td>{t.start_date}</td>
-                <td className="admin-row-actions">
-                  <Link href={`/admin/tournaments/${t.id}/edit`} className="admin-btn">
-                    View
-                  </Link>
-                </td>
+        <div className="admin-table-scroll">
+          <table className="admin-table">
+            <thead>
+              <tr>
+                <th>Tournament</th>
+                <th>Sport</th>
+                <th>City</th>
+                <th>Date</th>
+                <th>Action</th>
               </tr>
-            ))}
-          </tbody>
-        </table>
+            </thead>
+            <tbody>
+              {completed.map((t) => (
+                <tr key={t.id}>
+                  <td>{t.name}</td>
+                  <td>{t.sport}</td>
+                  <td>{t.city}</td>
+                  <td>{t.start_date}</td>
+                  <td className="admin-row-actions">
+                    <Link href={`/admin/tournaments/${t.id}/edit`} className="admin-btn">
+                      View
+                    </Link>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
       )}
 
       <h2 className="admin-section-title admin-section-title-spaced">
@@ -140,32 +146,34 @@ export default async function AdminTournamentsPage() {
       {!other?.length ? (
         <div className="admin-placeholder">No rejected or cancelled tournaments.</div>
       ) : (
-        <table className="admin-table">
-          <thead>
-            <tr>
-              <th>Tournament</th>
-              <th>Sport</th>
-              <th>City</th>
-              <th>Status</th>
-              <th>Action</th>
-            </tr>
-          </thead>
-          <tbody>
-            {other.map((t) => (
-              <tr key={t.id}>
-                <td>{t.name}</td>
-                <td>{t.sport}</td>
-                <td>{t.city}</td>
-                <td>{t.status}</td>
-                <td className="admin-row-actions">
-                  <Link href={`/admin/tournaments/${t.id}/edit`} className="admin-btn">
-                    Edit
-                  </Link>
-                </td>
+        <div className="admin-table-scroll">
+          <table className="admin-table">
+            <thead>
+              <tr>
+                <th>Tournament</th>
+                <th>Sport</th>
+                <th>City</th>
+                <th>Status</th>
+                <th>Action</th>
               </tr>
-            ))}
-          </tbody>
-        </table>
+            </thead>
+            <tbody>
+              {other.map((t) => (
+                <tr key={t.id}>
+                  <td>{t.name}</td>
+                  <td>{t.sport}</td>
+                  <td>{t.city}</td>
+                  <td>{t.status}</td>
+                  <td className="admin-row-actions">
+                    <Link href={`/admin/tournaments/${t.id}/edit`} className="admin-btn">
+                      Edit
+                    </Link>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
       )}
     </>
   );

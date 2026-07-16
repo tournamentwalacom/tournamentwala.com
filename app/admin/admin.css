@@ -221,6 +221,36 @@
   .admin-topbar {
     padding: 14px 16px;
   }
+
+  .admin-topbar-user span:not(.admin-avatar) {
+    max-width: 140px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .admin-logout-btn {
+    margin-left: 0;
+    flex-shrink: 0;
+  }
+
+  .admin-chart-row {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 480px) {
+  .admin-topbar-title {
+    font-size: 14px;
+  }
+
+  .admin-topbar-user span:not(.admin-avatar) {
+    display: none;
+  }
+
+  .admin-card-grid {
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  }
 }
 
 /* Main column */
@@ -229,6 +259,7 @@
   display: flex;
   flex-direction: column;
   min-width: 0;
+  max-width: 100%;
 }
 
 .admin-topbar {
@@ -427,8 +458,16 @@
   margin-top: 32px;
 }
 
+.admin-table-scroll {
+  width: 100%;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  border-radius: var(--radius);
+}
+
 .admin-table {
   width: 100%;
+  min-width: 640px;
   border-collapse: collapse;
   background: var(--chalk);
   border: 1px solid var(--line);
@@ -640,4 +679,280 @@
 .admin-login-submit:disabled {
   opacity: 0.6;
   cursor: not-allowed;
+}
+
+/* Admin packages/pricing field (manual tournament form) */
+.admin-promo-line {
+  display: flex;
+  align-items: flex-end;
+  gap: 12px;
+  margin-top: 12px;
+  padding-top: 12px;
+  border-top: 1px dashed var(--line);
+  flex-wrap: wrap;
+  cursor: default;
+}
+
+.admin-promo-line-field {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  font-size: 0.78rem;
+  color: var(--steel);
+}
+
+.admin-promo-line-field input {
+  width: 90px;
+  padding: 6px 8px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  font: inherit;
+}
+
+.admin-promo-line-subtotal {
+  margin-left: auto;
+  font-family: var(--font-fixture), monospace;
+  font-weight: 700;
+  color: var(--crimson-deep);
+}
+
+.admin-promo-offer {
+  display: flex;
+  align-items: flex-end;
+  gap: 12px;
+  margin-top: 16px;
+  padding: 14px 16px;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  background: var(--paper);
+  flex-wrap: wrap;
+}
+
+.admin-promo-offer .admin-promo-line-field input {
+  width: 140px;
+}
+
+/* Stat-tile color variants (Expenses summary + Analytics KPIs) */
+.admin-card-income .stat {
+  color: #2a78d6;
+}
+
+.admin-card-expense .stat {
+  color: #e87ba4;
+}
+
+.admin-card-profit .stat {
+  color: #0ca30c;
+}
+
+.admin-card-loss .stat {
+  color: #d03b3b;
+}
+
+.admin-card-hint {
+  margin-top: 6px;
+  font-size: 12px;
+  color: var(--steel);
+}
+
+/* Analytics dashboard */
+.admin-analytics {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.admin-kpi-grid {
+  margin-bottom: 4px;
+}
+
+.admin-chart-row {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(360px, 1fr));
+  gap: 20px;
+}
+
+.admin-chart-card {
+  background: var(--chalk);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  padding: 20px;
+  box-shadow: var(--shadow-card);
+  min-width: 0;
+}
+
+.admin-chart-card-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+
+.admin-chart-card-head h3 {
+  font-family: var(--font-fixture), sans-serif;
+  font-size: 15px;
+  color: var(--ink);
+}
+
+.admin-chart-card-hint {
+  font-size: 12px;
+  color: var(--steel);
+  white-space: nowrap;
+}
+
+.admin-chart-scroll {
+  width: 100%;
+  overflow-x: auto;
+}
+
+/* Queries (contact form submissions) */
+.admin-query-wrap {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  margin-top: 20px;
+}
+
+.admin-query-filters {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.admin-query-filter-btn {
+  padding: 7px 14px;
+  border-radius: 999px;
+  border: 1px solid var(--line);
+  background: var(--chalk);
+  color: var(--steel);
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.admin-query-filter-btn:hover {
+  background: var(--line);
+}
+
+.admin-query-filter-btn.active {
+  background: var(--ink);
+  border-color: var(--ink);
+  color: var(--chalk);
+}
+
+.admin-query-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.admin-query-card {
+  background: var(--chalk);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  padding: 18px 20px;
+  box-shadow: var(--shadow-card);
+}
+
+.admin-query-card-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.admin-query-card-head-right {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.admin-query-date {
+  font-size: 12px;
+  color: var(--steel);
+  white-space: nowrap;
+}
+
+.admin-query-badge {
+  padding: 3px 10px;
+  border-radius: 999px;
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  white-space: nowrap;
+}
+
+.admin-query-badge-new {
+  background: var(--crimson);
+  color: var(--chalk);
+}
+
+.admin-query-badge-read {
+  background: #e4b83c;
+  color: var(--ink);
+}
+
+.admin-query-badge-replied {
+  background: #1a7f37;
+  color: var(--chalk);
+}
+
+.admin-query-reason {
+  display: inline-block;
+  margin-top: 10px;
+  padding: 2px 10px;
+  border-radius: 999px;
+  border: 1px solid var(--line);
+  background: var(--paper);
+  color: var(--steel);
+  font-size: 11px;
+  font-weight: 600;
+}
+
+.admin-query-card-message {
+  margin-top: 10px;
+  font-size: 14px;
+  line-height: 1.55;
+  color: var(--ink);
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+
+.admin-query-card-actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin-top: 14px;
+  padding-top: 14px;
+  border-top: 1px solid var(--line);
+}
+
+.admin-query-status-select {
+  padding: 7px 10px;
+  border-radius: 8px;
+  border: 1px solid var(--line);
+  background: var(--paper);
+  color: var(--ink);
+  font-size: 12px;
+  font-weight: 600;
+}
+
+@media (max-width: 480px) {
+  .admin-query-card {
+    padding: 14px 16px;
+  }
+
+  .admin-query-card-head {
+    flex-direction: column;
+  }
+
+  .admin-query-card-head-right {
+    justify-content: space-between;
+    width: 100%;
+  }
 }
