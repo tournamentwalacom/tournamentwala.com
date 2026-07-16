@@ -149,6 +149,7 @@ export default function PromotionPackages({
                     max="50"
                     value={selected.quantity}
                     onChange={(e) => setQuantity(pkg.id, Number(e.target.value) || 1)}
+                    onWheel={(e) => e.target.blur()}
                   />
                 </div>
               )}

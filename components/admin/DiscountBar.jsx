@@ -92,6 +92,7 @@ export default function DiscountBar({ initial }) {
                     step="1"
                     value={percentage}
                     onChange={(e) => setPercentage(e.target.value)}
+                    onWheel={(e) => e.target.blur()}
                   />
                 </label>
 

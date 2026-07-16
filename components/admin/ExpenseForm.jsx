@@ -137,6 +137,7 @@ export default function ExpenseForm({ mode, initial }) {
             step="1"
             value={form.amount}
             onChange={(e) => update("amount", e.target.value)}
+            onWheel={(e) => e.target.blur()}
           />
         </label>
 

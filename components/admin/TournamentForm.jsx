@@ -335,6 +335,7 @@ export default function TournamentForm({ mode, initial }) {
             step="1"
             value={form.entry_fee_amount}
             onChange={(e) => update("entry_fee_amount", e.target.value)}
+            onWheel={(e) => e.target.blur()}
           />
         </label>
 
@@ -377,6 +378,7 @@ export default function TournamentForm({ mode, initial }) {
               placeholder="e.g. 8"
               value={form.slots_left}
               onChange={(e) => update("slots_left", e.target.value)}
+              onWheel={(e) => e.target.blur()}
             />
           </label>
         )}
@@ -392,6 +394,7 @@ export default function TournamentForm({ mode, initial }) {
             step="1"
             value={form.prize_pool}
             onChange={(e) => update("prize_pool", e.target.value)}
+            onWheel={(e) => e.target.blur()}
           />
         </label>
 
@@ -404,6 +407,7 @@ export default function TournamentForm({ mode, initial }) {
             placeholder="e.g. 24"
             value={form.total_teams}
             onChange={(e) => update("total_teams", e.target.value)}
+            onWheel={(e) => e.target.blur()}
           />
         </label>
 

@@ -133,6 +133,7 @@ export default function PricingForm({ mode, initial }) {
             step="1"
             value={form.price}
             onChange={(e) => update("price", e.target.value)}
+            onWheel={(e) => e.target.blur()}
           />
         </label>
 
@@ -154,6 +155,7 @@ export default function PricingForm({ mode, initial }) {
             step="1"
             value={form.sort_order}
             onChange={(e) => update("sort_order", e.target.value)}
+            onWheel={(e) => e.target.blur()}
           />
         </label>
 

@@ -146,6 +146,7 @@ export default function AdminPackagesField({ value, onChange }) {
                         onChange={(e) =>
                           updateLine(pkg.id, { quantity: Math.max(1, Number(e.target.value) || 1) })
                         }
+                        onWheel={(e) => e.target.blur()}
                       />
                     </label>
                   )}
@@ -157,6 +158,7 @@ export default function AdminPackagesField({ value, onChange }) {
                       step="1"
                       value={selected.price}
                       onChange={(e) => updateLine(pkg.id, { price: Math.max(0, Number(e.target.value) || 0) })}
+                      onWheel={(e) => e.target.blur()}
                     />
                   </label>
                   <span className="admin-promo-line-subtotal">{formatPrice(selected.subtotal)}</span>
@@ -178,6 +180,7 @@ export default function AdminPackagesField({ value, onChange }) {
             placeholder="e.g. 50, or 100 for free"
             value={discountPct}
             onChange={(e) => setDiscountPct(e.target.value)}
+            onWheel={(e) => e.target.blur()}
           />
         </label>
         <button

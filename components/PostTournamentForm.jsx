@@ -401,6 +401,7 @@ export default function PostTournamentForm({ initialProfile } = {}) {
             step="1"
             value={form.entry_fee_amount}
             onChange={(e) => update("entry_fee_amount", e.target.value)}
+            onWheel={(e) => e.target.blur()}
           />
         </label>
 
@@ -415,6 +416,7 @@ export default function PostTournamentForm({ initialProfile } = {}) {
             step="1"
             value={form.prize_pool}
             onChange={(e) => update("prize_pool", e.target.value)}
+            onWheel={(e) => e.target.blur()}
           />
         </label>
 
@@ -602,6 +604,7 @@ export default function PostTournamentForm({ initialProfile } = {}) {
                     step="1"
                     value={form.max_teams}
                     onChange={(e) => update("max_teams", e.target.value)}
+                    onWheel={(e) => e.target.blur()}
                   />
                 </label>
 
@@ -614,6 +617,7 @@ export default function PostTournamentForm({ initialProfile } = {}) {
                     step="1"
                     value={form.total_teams}
                     onChange={(e) => update("total_teams", e.target.value)}
+                    onWheel={(e) => e.target.blur()}
                   />
                 </label>
 
@@ -635,6 +639,7 @@ export default function PostTournamentForm({ initialProfile } = {}) {
                     step="1"
                     value={form.second_prize}
                     onChange={(e) => update("second_prize", e.target.value)}
+                    onWheel={(e) => e.target.blur()}
                   />
                 </label>
 
@@ -646,6 +651,7 @@ export default function PostTournamentForm({ initialProfile } = {}) {
                     step="1"
                     value={form.third_prize}
                     onChange={(e) => update("third_prize", e.target.value)}
+                    onWheel={(e) => e.target.blur()}
                   />
                 </label>
 
