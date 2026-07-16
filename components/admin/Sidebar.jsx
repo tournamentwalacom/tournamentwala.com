@@ -131,6 +131,25 @@ function ExpensesIcon() {
   );
 }
 
+function BlogsIcon() {
+  return (
+    <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+      <path
+        d="M5 4h11l3 3v13a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V5a1 1 0 0 1 1-1Z"
+        stroke="currentColor"
+        strokeWidth="1.6"
+        strokeLinejoin="round"
+      />
+      <path
+        d="M8 9h8M8 13h8M8 17h5"
+        stroke="currentColor"
+        strokeWidth="1.6"
+        strokeLinecap="round"
+      />
+    </svg>
+  );
+}
+
 function QueriesIcon() {
   return (
     <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
@@ -175,6 +194,7 @@ const NAV_ITEMS = [
   { href: "/admin/payments", label: "Payments", icon: PaymentsIcon },
   { href: "/admin/pricing", label: "Pricing", icon: PricingIcon },
   { href: "/admin/expenses", label: "Expenses", icon: ExpensesIcon },
+  { href: "/admin/blogs", label: "Blogs", icon: BlogsIcon },
   { href: "/admin/queries", label: "Queries", icon: QueriesIcon },
   { href: "/admin/settings", label: "Settings", icon: SettingsIcon },
 ];

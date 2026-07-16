@@ -364,3 +364,34 @@ alter table expenses enable row level security;
 -- No public policies here on purpose, same pattern as promotion_packages/
 -- contact_messages: only the admin panel (service_role via supabaseAdmin())
 -- ever reads/writes this table.
+
+-- Blog posts, written and published from /admin/blogs. content is stored as
+-- a JSON array of paragraph strings (matches how the admin form edits it —
+-- one textarea per paragraph) rather than a single blob, so the public blog
+-- pages can render clean <p> tags without needing a markdown parser.
+create table if not exists blogs (
+  id uuid primary key default gen_random_uuid(),
+  title text not null,
+  slug text not null,
+  keywords text,
+  meta_description text,
+  cover_image_url text,
+  content jsonb not null default '[]'::jsonb,
+  status text not null default 'draft'
+    check (status in ('draft', 'published')),
+  published_at timestamptz,
+  created_at timestamptz not null default now(),
+  updated_at timestamptz not null default now()
+);
+
+create unique index if not exists blogs_slug_key on blogs (slug);
+
+alter table blogs enable row level security;
+
+-- Public site (anon key) can only read published posts. Admin panel uses
+-- the service_role key (supabaseAdmin()), which bypasses RLS entirely, so
+-- drafts stay invisible to everyone else.
+drop policy if exists "Public can read published blogs" on blogs;
+create policy "Public can read published blogs"
+  on blogs for select
+  using (status = 'published');
