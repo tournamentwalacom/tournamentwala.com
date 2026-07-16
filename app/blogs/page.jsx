@@ -50,9 +50,7 @@ export default async function BlogsPage() {
                         // eslint-disable-next-line @next/next/no-img-element
                         <img src={blog.cover_image_url} alt="" loading="lazy" />
                       ) : (
-                        <span className="blog-card-media-fallback" aria-hidden="true">
-                          🏆
-                        </span>
+                        <span className="blog-card-media-fallback">{blog.title}</span>
                       )}
                     </div>
                     <div className="blog-card-body">

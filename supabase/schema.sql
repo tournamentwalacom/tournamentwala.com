@@ -344,10 +344,14 @@ alter table tournaments add column if not exists longitude double precision;
 alter table tournaments add column if not exists total_teams integer;
 
 -- Manually-logged business costs (rent, salaries, ads, etc.), managed from
--- /admin/expenses. Razorpay charges are deliberately NOT a row in this table
--- — they're computed live as 2.5% of period income (see
+-- /admin/expenses. The admin Expenses/Analytics summary cards also show a
+-- Razorpay charges figure, computed live as 2.5% of period income (see
 -- lib/expenses.js#computeRazorpayCharge) so that figure can never drift out
--- of sync with actual order totals or be accidentally edited/deleted.
+-- of sync with actual order totals. Separately, /api/tournaments/submit
+-- auto-inserts one row per paid order here with category = 'Razorpay' (see
+-- lib/expenses.js#RAZORPAY_CATEGORY) purely as a visible per-order ledger
+-- entry — every sum over this table excludes that category so it isn't
+-- double-counted against the live figure above.
 create table if not exists expenses (
   id uuid primary key default gen_random_uuid(),
   title text not null,

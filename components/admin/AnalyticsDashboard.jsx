@@ -16,7 +16,7 @@ import {
   Tooltip,
   Legend,
 } from "recharts";
-import { computeRazorpayCharge, RAZORPAY_FEE_PERCENT } from "@/lib/expenses";
+import { computeRazorpayCharge, RAZORPAY_CATEGORY, RAZORPAY_FEE_PERCENT } from "@/lib/expenses";
 
 // Fixed hue order (validated for colorblind-safe adjacent separation) —
 // never cycled or reassigned by rank, see the dataviz skill's color-formula.
@@ -318,7 +318,9 @@ function computeStats(tournaments, expenses) {
 
   const incomeRows = tournaments.filter((t) => INCOME_STATUSES.has(t.status));
   const totalIncome = incomeRows.reduce((sum, t) => sum + Number(t.promotion_total || 0), 0);
-  const totalManualExpenses = expenses.reduce((sum, e) => sum + Number(e.amount || 0), 0);
+  const totalManualExpenses = expenses
+    .filter((e) => e.category !== RAZORPAY_CATEGORY)
+    .reduce((sum, e) => sum + Number(e.amount || 0), 0);
   const totalRazorpay = computeRazorpayCharge(totalIncome);
   const totalExpenses = totalManualExpenses + totalRazorpay;
   const netProfit = totalIncome - totalExpenses;
@@ -354,6 +356,7 @@ function computeStats(tournaments, expenses) {
     if (monthBuckets.has(key)) monthBuckets.get(key).income += Number(t.promotion_total || 0);
   }
   for (const e of expenses) {
+    if (e.category === RAZORPAY_CATEGORY) continue;
     const d = new Date(e.expense_date);
     const key = monthKey(d);
     if (monthBuckets.has(key)) monthBuckets.get(key).manual += Number(e.amount || 0);

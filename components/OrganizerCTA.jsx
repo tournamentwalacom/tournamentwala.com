@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { formatTournamentsHosted } from "@/lib/tournaments";
 
 export default function OrganizerCTA({ stats }) {
@@ -20,10 +21,12 @@ export default function OrganizerCTA({ stats }) {
             match day.
           </p>
           <div className="organizer-actions">
-            <button className="btn btn-light">List a tournament — free</button>
-            <button className="btn btn-outline-light">
+            <Link href="/post-tournament" className="btn btn-light">
+              List a tournament — free
+            </Link>
+            <Link href="/explore-tournaments" className="btn btn-outline-light">
               See organizer tools
-            </button>
+            </Link>
           </div>
         </div>
 

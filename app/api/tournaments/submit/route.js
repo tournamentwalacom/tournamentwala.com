@@ -4,6 +4,7 @@ import { parseTournamentInput } from "@/lib/tournamentValidation";
 import { resolvePromotionSelections } from "@/lib/promotionPackages";
 import { getCurrentUser } from "@/lib/supabaseServer";
 import { geocodePincode } from "@/lib/geocode";
+import { computeRazorpayCharge, RAZORPAY_CATEGORY } from "@/lib/expenses";
 
 export async function POST(request) {
   const session = await getCurrentUser();
@@ -66,6 +67,22 @@ export async function POST(request) {
       { error: "Couldn't save your submission. Please try again." },
       { status: 500 }
     );
+  }
+
+  // Log this order's Razorpay charge as its own expense row so it's visible
+  // in the ledger, not just folded into the live 2.5%-of-income figure.
+  // Best-effort — a logging failure shouldn't fail the submission itself.
+  if (total > 0) {
+    const { error: expenseError } = await db.from("expenses").insert({
+      title: `Razorpay charge — ${row.name}`,
+      category: RAZORPAY_CATEGORY,
+      amount: computeRazorpayCharge(total),
+      expense_date: new Date().toISOString().slice(0, 10),
+      notes: `Auto-logged for order by ${row.organizer_name} (₹${total} package total).`,
+    });
+    if (expenseError) {
+      console.error("Failed to log Razorpay expense row:", expenseError);
+    }
   }
 
   // Keep the organizer's profile in sync with whatever contact info they

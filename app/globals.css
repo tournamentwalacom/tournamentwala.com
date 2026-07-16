@@ -4305,7 +4305,19 @@ html.nav-open .tdp-float-bar {
 }
 
 .blog-card-media-fallback {
-  font-size: 2.6rem;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 28px;
+  text-align: center;
+  font-family: var(--font-display), Impact, sans-serif;
+  font-size: clamp(1.1rem, 2.4vw, 1.5rem);
+  line-height: 1.25;
+  text-transform: uppercase;
+  letter-spacing: 0.01em;
+  color: var(--chalk);
 }
 
 .blog-card-body {
