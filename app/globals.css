@@ -4086,6 +4086,11 @@ html.nav-open .tdp-float-bar {
   gap: 16px;
 }
 
+.ticket-loader-row {
+  flex-direction: row;
+  gap: 12px;
+}
+
 .ticket-loader-page {
   width: 100%;
   min-height: 100vh;

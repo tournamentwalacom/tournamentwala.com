@@ -59,7 +59,11 @@ export default function NearbyTournamentsSlider({ tickets }) {
             <span className="eyebrow">Nearby Tournaments</span>
             <h2 className="section-title">Find your Spot.</h2>
           </div>
-          <TicketLoader label="Finding tournaments near you" size="md" />
+          <TicketLoader
+            label="Finding tournaments near you"
+            size="md"
+            className="ticket-loader-row"
+          />
         </div>
       </section>
     );
