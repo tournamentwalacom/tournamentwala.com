@@ -3,7 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import SwipeToRegister from "./SwipeToRegister";
 
-export default function RegisterFloatBar({ prize, registerHref }) {
+export default function RegisterFloatBar({ prize, registerHref, tournamentId }) {
   const sentinelRef = useRef(null);
   const [docked, setDocked] = useState(false);
 
@@ -28,7 +28,11 @@ export default function RegisterFloatBar({ prize, registerHref }) {
             <span className="amt">{prize}</span>
           </div>
           <div className="tdp-float-cta">
-            <SwipeToRegister href={registerHref} idleLabel="Slide to Register" />
+            <SwipeToRegister
+              href={registerHref}
+              tournamentId={tournamentId}
+              idleLabel="Slide to Register"
+            />
           </div>
         </div>
       </div>

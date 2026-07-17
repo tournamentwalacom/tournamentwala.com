@@ -5,6 +5,7 @@ import { resolvePromotionSelections } from "@/lib/promotionPackages";
 import { getCurrentUser } from "@/lib/supabaseServer";
 import { geocodePincode } from "@/lib/geocode";
 import { computeRazorpayCharge, RAZORPAY_CATEGORY } from "@/lib/expenses";
+import { sendNotificationEmail, renderEmailLayout } from "@/lib/email";
 
 export async function POST(request) {
   const session = await getCurrentUser();
@@ -100,6 +101,19 @@ export async function POST(request) {
       updated_at: new Date().toISOString(),
     })
     .eq("id", session.user.id);
+
+  // Best-effort — a notification failure shouldn't fail the submission itself.
+  await sendNotificationEmail({
+    subject: `New tournament request awaiting review: ${row.name}`,
+    html: renderEmailLayout({
+      heading: "New tournament request awaiting review",
+      rows: [
+        { label: "Name", value: row.name },
+        { label: "Organizer", value: row.organizer_name },
+        { label: "Phone", value: row.organizer_phone },
+      ],
+    }),
+  });
 
   return NextResponse.json({ ok: true }, { status: 201 });
 }

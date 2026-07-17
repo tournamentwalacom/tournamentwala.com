@@ -3902,6 +3902,78 @@ html.nav-open .tdp-float-bar {
   outline-offset: 3px;
 }
 
+/* ---- register confirm modal (name/phone, shown after a completed slide) ---- */
+.register-confirm-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 60;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  background: rgba(14, 27, 51, 0.55);
+  padding: 16px;
+}
+
+.register-confirm-card {
+  width: 100%;
+  max-width: 420px;
+  background: var(--chalk);
+  border-radius: 20px;
+  padding: 24px;
+  margin-bottom: 96px;
+  box-shadow: 0 20px 48px rgba(14, 27, 51, 0.28);
+}
+
+.register-confirm-card h3 {
+  margin: 0 0 6px;
+  font-size: 1.15rem;
+  color: var(--ink);
+}
+
+.register-confirm-sub {
+  margin: 0 0 18px;
+  font-size: 0.85rem;
+  color: var(--steel);
+}
+
+.register-confirm-card .post-field {
+  margin-bottom: 14px;
+}
+
+.register-confirm-checkbox {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  font-size: 0.82rem;
+  color: var(--steel);
+  margin-bottom: 14px;
+  cursor: pointer;
+}
+
+.register-confirm-checkbox input {
+  margin-top: 2px;
+  accent-color: var(--crimson);
+}
+
+.register-confirm-actions {
+  display: flex;
+  gap: 10px;
+  margin-top: 6px;
+}
+
+.register-confirm-actions .btn {
+  flex: 1;
+}
+
+@media (min-width: 640px) {
+  .register-confirm-backdrop {
+    align-items: center;
+  }
+  .register-confirm-card {
+    margin-bottom: 0;
+  }
+}
+
 @media (max-width: 900px) {
   .tdp-grid {
     grid-template-columns: 1fr;

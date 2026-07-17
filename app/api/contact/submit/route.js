@@ -26,11 +26,11 @@ export async function POST(request) {
 
   const name = trimmed(body.name, 80);
   const email = trimmed(body.email, 120);
-  const phone = body.phone ? trimmed(body.phone, 20) : null;
+  const phone = trimmed(body.phone, 20);
   const message = trimmed(body.message, 2000);
   const reason = REASONS.has(body.reason) ? body.reason : "general";
 
-  if (!name || !email || !EMAIL_RE.test(email) || !message) {
+  if (!name || !email || !EMAIL_RE.test(email) || !phone || !message) {
     return NextResponse.json(
       { error: "Please fill in all required fields correctly." },
       { status: 400 }

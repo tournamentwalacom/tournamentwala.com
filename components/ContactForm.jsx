@@ -109,9 +109,10 @@ export default function ContactForm() {
         </label>
 
         <label className="post-field">
-          Phone <span>(optional)</span>
+          Phone
           <input
             type="tel"
+            required
             value={form.phone}
             onChange={(e) => update("phone", e.target.value)}
           />

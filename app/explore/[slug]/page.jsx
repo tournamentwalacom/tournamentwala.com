@@ -196,7 +196,11 @@ export default async function TournamentDetailPage({ params }) {
           </section>
         </main>
 
-        <RegisterFloatBar prize={prize} registerHref={registerHref} />
+        <RegisterFloatBar
+          prize={prize}
+          registerHref={registerHref}
+          tournamentId={tournament.id}
+        />
       </div>
       <Footer />
     </>

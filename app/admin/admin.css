@@ -987,6 +987,64 @@
   font-weight: 600;
 }
 
+.admin-btn-primary {
+  background: var(--ink);
+  border-color: var(--ink);
+  color: var(--chalk);
+}
+
+.admin-players-wrap {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  margin-top: 20px;
+}
+
+.admin-players-filters {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+}
+
+.admin-players-filters select,
+.admin-players-search,
+.admin-players-pincode {
+  padding: 7px 10px;
+  border-radius: 8px;
+  border: 1px solid var(--line);
+  background: var(--paper);
+  color: var(--ink);
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.admin-players-search {
+  flex: 1 1 220px;
+  min-width: 160px;
+  font-weight: 400;
+}
+
+.admin-players-pincode {
+  width: 120px;
+}
+
+.admin-players-filters .admin-btn {
+  margin-right: 0;
+  margin-left: auto;
+}
+
+@media (max-width: 480px) {
+  .admin-players-filters .admin-btn {
+    margin-left: 0;
+    width: 100%;
+  }
+  .admin-players-pincode {
+    width: 100%;
+    flex: 1 1 45%;
+  }
+}
+
 @media (max-width: 480px) {
   .admin-query-card {
     padding: 14px 16px;

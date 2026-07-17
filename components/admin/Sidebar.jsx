@@ -170,6 +170,21 @@ function QueriesIcon() {
   );
 }
 
+function PlayersIcon() {
+  return (
+    <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+      <circle cx="12" cy="8" r="3.2" stroke="currentColor" strokeWidth="1.6" />
+      <path
+        d="M5 20c0-3.3 3.13-6 7-6s7 2.7 7 6"
+        stroke="currentColor"
+        strokeWidth="1.6"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+    </svg>
+  );
+}
+
 function SettingsIcon() {
   return (
     <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
@@ -190,6 +205,7 @@ const NAV_ITEMS = [
   { href: "/admin/analytics", label: "Analytics", icon: AnalyticsIcon },
   { href: "/admin/tournaments", label: "Tournaments", icon: TournamentsIcon },
   { href: "/admin/organizers", label: "Organizers", icon: OrganizersIcon },
+  { href: "/admin/players", label: "Players", icon: PlayersIcon },
   { href: "/admin/users", label: "Users", icon: UsersIcon },
   { href: "/admin/payments", label: "Payments", icon: PaymentsIcon },
   { href: "/admin/pricing", label: "Pricing", icon: PricingIcon },

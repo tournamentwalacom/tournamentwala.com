@@ -399,3 +399,31 @@ drop policy if exists "Public can read published blogs" on blogs;
 create policy "Public can read published blogs"
   on blogs for select
   using (status = 'published');
+
+-- One row per player who slides-to-register on a tournament page and
+-- confirms their name/phone (see SwipeToRegister.jsx + /api/registrations/submit).
+-- tournament_name/sport/city/pincode are snapshotted at registration time
+-- (not a live join to tournaments) so the admin /admin/players table still
+-- shows correct context even if the tournament is later edited or deleted.
+create table if not exists registrations (
+  id uuid primary key default gen_random_uuid(),
+  tournament_id uuid references tournaments (id) on delete set null,
+  tournament_name text not null,
+  sport text not null,
+  city text not null,
+  pincode text,
+  player_name text not null,
+  player_phone text not null,
+  wants_updates boolean not null default true,
+  created_at timestamptz not null default now()
+);
+
+-- Safe to re-run if "registrations" already existed before wants_updates
+-- was added.
+alter table registrations add column if not exists wants_updates boolean not null default true;
+
+alter table registrations enable row level security;
+
+-- No public policies here on purpose, same pattern as contact_messages:
+-- inserts happen through /api/registrations/submit using the service_role
+-- key. Only the admin panel (also service_role) reads these.
