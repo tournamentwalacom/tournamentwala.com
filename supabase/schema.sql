@@ -7,7 +7,7 @@
 -- line below only if you're okay losing that data (there should be none
 -- yet, since nothing in the app has written to it so far).
 -- drop table if exists tournaments;
-
+-- checking
 create table if not exists tournaments (
   id uuid primary key default gen_random_uuid(),
   name text not null,
