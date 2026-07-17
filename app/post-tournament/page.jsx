@@ -2,6 +2,7 @@ import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import PostTournamentForm from "@/components/PostTournamentForm";
 import AuthForm from "@/components/AuthForm";
+import CompleteProfileForm from "@/components/CompleteProfileForm";
 import { getCurrentUser } from "@/lib/supabaseServer";
 
 export const metadata = {
@@ -12,6 +13,8 @@ export const metadata = {
 
 export default async function PostTournamentPage() {
   const session = await getCurrentUser();
+  const needsProfile =
+    session && (!session.profile?.full_name || !session.profile?.phone);
 
   return (
     <>
@@ -19,7 +22,7 @@ export default async function PostTournamentPage() {
       <main>
         <section
           className={`section container post-section${
-            !session ? " post-section--auth" : ""
+            !session || needsProfile ? " post-section--auth" : ""
           }`}
         >
           {!session ? (
@@ -38,6 +41,23 @@ export default async function PostTournamentPage() {
                 </p>
               </div>
               <AuthForm next="/post-tournament" />
+            </div>
+          ) : needsProfile ? (
+            <div className="post-hero">
+              <div className="post-hero-copy">
+                <span className="eyebrow">For organizers</span>
+                <h1 className="section-title">
+                  Almost there.
+                </h1>
+                <p className="post-intro">
+                  We just need your name and phone number before you can post
+                  a tournament.
+                </p>
+              </div>
+              <CompleteProfileForm
+                initialName={session.profile?.full_name || ""}
+                initialPhone={session.profile?.phone || ""}
+              />
             </div>
           ) : (
             <>

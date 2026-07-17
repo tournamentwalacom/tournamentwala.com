@@ -11,7 +11,7 @@ export default function RegisterFloatBar({ prize, registerHref }) {
     const el = sentinelRef.current;
     if (!el || typeof IntersectionObserver === "undefined") return;
     const observer = new IntersectionObserver(
-      ([entry]) => setDocked(entry.isIntersecting),
+      ([entry]) => setDocked(entry.boundingClientRect.top <= window.innerHeight),
       { threshold: 0 }
     );
     observer.observe(el);
