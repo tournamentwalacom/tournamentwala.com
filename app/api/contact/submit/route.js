@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { supabaseAdmin } from "@/lib/supabase";
+import { sendNotificationEmail, renderEmailLayout } from "@/lib/email";
 
 const REASONS = new Set(["general", "player", "organizer"]);
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -46,6 +47,21 @@ export async function POST(request) {
       { status: 500 }
     );
   }
+
+  // Best-effort — a notification failure shouldn't fail the submission itself.
+  await sendNotificationEmail({
+    subject: `New contact enquiry: ${reason}`,
+    html: renderEmailLayout({
+      heading: "New contact enquiry",
+      rows: [
+        { label: "Name", value: name },
+        { label: "Email", value: email },
+        { label: "Phone", value: phone },
+        { label: "Reason", value: reason },
+        { label: "Message", value: message, multiline: true },
+      ],
+    }),
+  });
 
   return NextResponse.json({ ok: true }, { status: 201 });
 }

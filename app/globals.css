@@ -750,8 +750,17 @@ button {
     transform: translateX(-18px);
   }
 
+  .nav-drawer-links .nav-drawer-cta {
+    display: flex;
+    justify-content: center;
+    margin-top: 8px;
+    opacity: 0;
+    transform: translateX(-18px);
+  }
+
   .nav-drawer.open .nav-drawer-link,
-  .nav-drawer.open .nav-accordion {
+  .nav-drawer.open .nav-accordion,
+  .nav-drawer.open .nav-drawer-cta {
     animation: drawerIn 0.45s ease forwards;
     animation-delay: calc(var(--i) * 0.05s + 0.05s);
   }

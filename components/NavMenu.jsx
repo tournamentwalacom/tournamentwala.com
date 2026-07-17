@@ -393,6 +393,15 @@ export default function NavMenu({ sports, cities, organizerName }) {
             <span className="idx">06</span>
             <span>Contact Us</span>
           </Link>
+          <Link
+            href="/post-tournament"
+            className="btn btn-primary nav-cta nav-drawer-cta"
+            style={{ "--i": 6 }}
+            onClick={closeAll}
+          >
+            <span className="nav-cta-icon" aria-hidden="true">+</span>
+            Post Tournament
+          </Link>
         </nav>
 
         <div className="nav-drawer-foot">
@@ -446,14 +455,6 @@ export default function NavMenu({ sports, cities, organizerName }) {
               </div>
             </div>
           )}
-          <Link
-            href="/post-tournament"
-            className="btn btn-primary nav-cta"
-            onClick={closeAll}
-          >
-            <span className="nav-cta-icon" aria-hidden="true">+</span>
-            Post Tournament
-          </Link>
           <p className="nav-drawer-tag">
             Find. Play. <em>Win.</em>
           </p>

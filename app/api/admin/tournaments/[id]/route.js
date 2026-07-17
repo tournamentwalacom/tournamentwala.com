@@ -3,6 +3,7 @@ import { requireAdminSession } from "@/lib/auth";
 import { supabaseAdmin } from "@/lib/supabase";
 import { parseTournamentInput } from "@/lib/tournamentValidation";
 import { geocodePincode } from "@/lib/geocode";
+import { sendNotificationEmail, renderEmailLayout } from "@/lib/email";
 
 /**
  * This route is NOT covered by middleware.js's admin host/session gate —
@@ -68,13 +69,29 @@ export async function PATCH(request, { params }) {
               : null,
         };
 
-  const { error } = await supabaseAdmin()
+  const { data: updated, error } = await supabaseAdmin()
     .from("tournaments")
     .update(update)
-    .eq("id", id);
+    .eq("id", id)
+    .select("name, organizer_name")
+    .single();
 
   if (error) {
     return NextResponse.json({ error: "Update failed" }, { status: 500 });
+  }
+
+  // Best-effort — a notification failure shouldn't fail the approval itself.
+  if (action === "approve") {
+    await sendNotificationEmail({
+      subject: `Tournament approved & live: ${updated.name}`,
+      html: renderEmailLayout({
+        heading: "Tournament approved & live",
+        rows: [
+          { label: "Name", value: updated.name },
+          { label: "Organizer", value: updated.organizer_name },
+        ],
+      }),
+    });
   }
 
   return NextResponse.json({ ok: true });
