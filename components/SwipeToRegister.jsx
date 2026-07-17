@@ -190,7 +190,6 @@ export default function SwipeToRegister({
           role="dialog"
           aria-modal="true"
           aria-label="Confirm your registration details"
-          onClick={() => !submitting && resetSlider()}
         >
           <form
             className="register-confirm-card"
