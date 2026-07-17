@@ -60,7 +60,7 @@ export default function NearbyTournamentsSlider({ tickets }) {
             <h2 className="section-title">Find your Spot.</h2>
           </div>
           <TicketLoader
-            label="Finding tournaments near you"
+            label="Finding your nearby tournament"
             size="md"
             className="ticket-loader-row"
           />
