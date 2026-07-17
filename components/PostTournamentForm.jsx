@@ -100,7 +100,7 @@ export default function PostTournamentForm({ initialProfile } = {}) {
   async function submitTournament() {
     setError("");
 
-    if (!form.image_url) {
+    if (!form.image_url && !needsBrief) {
       fail("Please upload the main tournament poster.");
       return;
     }
@@ -423,7 +423,12 @@ export default function PostTournamentForm({ initialProfile } = {}) {
         <h3 className="post-form-section">7. Upload poster ⭐</h3>
 
         <div className="post-field post-field-wide">
-          Main tournament poster <span>(required)</span>
+          Main tournament poster{" "}
+          <span>
+            {needsBrief
+              ? "(optional — our team will design this for you)"
+              : "(required)"}
+          </span>
           <PosterUploadField
             value={form.image_url}
             onChange={(url) => update("image_url", url)}

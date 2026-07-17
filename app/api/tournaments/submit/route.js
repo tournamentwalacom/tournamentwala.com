@@ -26,22 +26,26 @@ export async function POST(request) {
     return NextResponse.json({ ok: true }, { status: 201 });
   }
 
-  const { data, error: validationError } = parseTournamentInput(body);
-  if (!data) {
-    return NextResponse.json({ error: validationError }, { status: 400 });
-  }
-
   const db = supabaseAdmin();
 
   // The client only ever sends { package_id, quantity } — price/total are
   // always resolved here from the DB so a tampered request can't change
-  // what gets charged/recorded.
-  const { selections, total, error: promoError } = await resolvePromotionSelections(
+  // what gets charged/recorded. Resolved before validation because
+  // requiresBrief (Poster Design / Reel Creation selected) determines
+  // whether the main poster upload is actually required below.
+  const { selections, total, requiresBrief, error: promoError } = await resolvePromotionSelections(
     db,
     body.promotions
   );
   if (promoError) {
     return NextResponse.json({ error: promoError }, { status: 400 });
+  }
+
+  const { data, error: validationError } = parseTournamentInput(body, {
+    posterOptional: requiresBrief,
+  });
+  if (!data) {
+    return NextResponse.json({ error: validationError }, { status: 400 });
   }
 
   // Organizer submissions always start in the review queue — only the
