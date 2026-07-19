@@ -93,10 +93,14 @@ button {
 }
 
 /* ================= NAVBAR ================= */
-.nav {
+.site-header {
   position: sticky;
   top: 0;
   z-index: 50;
+}
+
+.nav {
+  position: relative;
   border-bottom: 1px solid var(--line);
 }
 
@@ -158,11 +162,6 @@ button {
 }
 
 .nav-links {
-  position: absolute;
-  left: 50%;
-  top: 0;
-  height: 100%;
-  transform: translateX(-50%);
   display: flex;
   align-items: center;
   gap: 30px;
@@ -200,7 +199,23 @@ button {
 .nav-menu {
   display: flex;
   align-items: center;
+  flex: 1;
+  min-width: 0;
   gap: 28px;
+}
+
+.nav-links-area {
+  display: flex;
+  justify-content: center;
+  flex: 1;
+  min-width: 0;
+}
+
+.nav-actions {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  flex: none;
 }
 
 /* ---- Sports / Cities dropdowns (desktop) ---- */
@@ -611,9 +626,8 @@ button {
 }
 
 @media (max-width: 1120px) {
-  .nav-links,
-  .nav-menu > .nav-cta,
-  .nav-account {
+  .nav-links-area,
+  .nav-actions {
     display: none;
   }
 

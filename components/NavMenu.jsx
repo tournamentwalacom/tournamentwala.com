@@ -120,137 +120,141 @@ export default function NavMenu({ sports, cities, organizerName }) {
   return (
     <div className="nav-menu" ref={navRef}>
       {/* ---------------- Desktop ---------------- */}
-      <nav className="nav-links" aria-label="Main">
-        <Link href="/" className={isHome ? "active" : undefined}>
-          Home
-        </Link>
-        <Link
-          href="/explore-tournaments"
-          className={pathname === "/explore-tournaments" ? "active" : undefined}
-        >
-          Explore
-        </Link>
-
-        <div className="nav-dd">
-          <button
-            type="button"
-            className={`nav-dd-trigger${openDropdown === "sports" ? " open" : ""}`}
-            onClick={() => toggleDropdown("sports")}
-            aria-expanded={openDropdown === "sports"}
+      <div className="nav-links-area">
+        <nav className="nav-links" aria-label="Main">
+          <Link href="/" className={isHome ? "active" : undefined}>
+            Home
+          </Link>
+          <Link
+            href="/explore-tournaments"
+            className={pathname === "/explore-tournaments" ? "active" : undefined}
           >
-            Sports <span className="caret" aria-hidden="true">▾</span>
-          </button>
-          {openDropdown === "sports" && (
-            <div className="nav-dd-panel">
-              <FilterList
-                items={sports}
-                search={sportSearch}
-                onSearchChange={setSportSearch}
-                onPick={(name) => goToFilter("sport", name)}
-              />
-            </div>
-          )}
-        </div>
+            Explore
+          </Link>
 
-        <div className="nav-dd">
-          <button
-            type="button"
-            className={`nav-dd-trigger${openDropdown === "cities" ? " open" : ""}`}
-            onClick={() => toggleDropdown("cities")}
-            aria-expanded={openDropdown === "cities"}
-          >
-            Cities <span className="caret" aria-hidden="true">▾</span>
-          </button>
-          {openDropdown === "cities" && (
-            <div className="nav-dd-panel">
-              <FilterList
-                items={cities}
-                search={citySearch}
-                onSearchChange={setCitySearch}
-                onPick={(name) => goToFilter("city", name)}
-              />
-            </div>
-          )}
-        </div>
-
-        <Link href="/about" className={pathname === "/about" ? "active" : undefined}>
-          About
-        </Link>
-        <Link href="/contact" className={pathname === "/contact" ? "active" : undefined}>
-          Contact Us
-        </Link>
-      </nav>
-
-      <Link href="/post-tournament" className="btn btn-primary nav-cta">
-        <span className="nav-cta-icon" aria-hidden="true">+</span>
-        Post Tournament
-      </Link>
-
-      {firstName && (
-        <div className="nav-dd nav-account">
-          <button
-            type="button"
-            className={`nav-account-trigger${openDropdown === "account" ? " open" : ""}`}
-            onClick={() => toggleDropdown("account")}
-            aria-expanded={openDropdown === "account"}
-            aria-haspopup="true"
-          >
-            <span className="nav-avatar" aria-hidden="true">
-              {firstName.charAt(0).toUpperCase()}
-            </span>
-            <span className="nav-account-name">{firstName}</span>
-            <span className="caret" aria-hidden="true">▾</span>
-          </button>
-          {openDropdown === "account" && (
-            <div className="nav-dd-panel nav-account-panel">
-              <div className="nav-account-header">
-                <span className="nav-avatar nav-avatar-lg" aria-hidden="true">
-                  {firstName.charAt(0).toUpperCase()}
-                </span>
-                <div>
-                  <p className="nav-account-greeting">Hi, {firstName}</p>
-                  <p className="nav-account-sub">Manage your account</p>
-                </div>
+          <div className="nav-dd">
+            <button
+              type="button"
+              className={`nav-dd-trigger${openDropdown === "sports" ? " open" : ""}`}
+              onClick={() => toggleDropdown("sports")}
+              aria-expanded={openDropdown === "sports"}
+            >
+              Sports <span className="caret" aria-hidden="true">▾</span>
+            </button>
+            {openDropdown === "sports" && (
+              <div className="nav-dd-panel">
+                <FilterList
+                  items={sports}
+                  search={sportSearch}
+                  onSearchChange={setSportSearch}
+                  onPick={(name) => goToFilter("sport", name)}
+                />
               </div>
-              <Link href="/profile" className="nav-dd-item" onClick={closeAll}>
-                <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true">
-                  <circle cx="8" cy="5" r="3" stroke="currentColor" strokeWidth="1.6" />
-                  <path
-                    d="M2.5 14c.7-3 3-4.5 5.5-4.5s4.8 1.5 5.5 4.5"
-                    stroke="currentColor"
-                    strokeWidth="1.6"
-                    strokeLinecap="round"
-                  />
-                </svg>
-                Profile
-              </Link>
-              <button
-                type="button"
-                className="nav-dd-item nav-dd-item-danger"
-                onClick={handleLogOut}
-              >
-                <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true">
-                  <path
-                    d="M6.5 14H3a1 1 0 0 1-1-1V3a1 1 0 0 1 1-1h3.5"
-                    stroke="currentColor"
-                    strokeWidth="1.6"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                  />
-                  <path
-                    d="M10.5 11l3-3-3-3M13.2 8H6"
-                    stroke="currentColor"
-                    strokeWidth="1.6"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                  />
-                </svg>
-                Log out
-              </button>
-            </div>
-          )}
-        </div>
-      )}
+            )}
+          </div>
+
+          <div className="nav-dd">
+            <button
+              type="button"
+              className={`nav-dd-trigger${openDropdown === "cities" ? " open" : ""}`}
+              onClick={() => toggleDropdown("cities")}
+              aria-expanded={openDropdown === "cities"}
+            >
+              Cities <span className="caret" aria-hidden="true">▾</span>
+            </button>
+            {openDropdown === "cities" && (
+              <div className="nav-dd-panel">
+                <FilterList
+                  items={cities}
+                  search={citySearch}
+                  onSearchChange={setCitySearch}
+                  onPick={(name) => goToFilter("city", name)}
+                />
+              </div>
+            )}
+          </div>
+
+          <Link href="/about" className={pathname === "/about" ? "active" : undefined}>
+            About
+          </Link>
+          <Link href="/contact" className={pathname === "/contact" ? "active" : undefined}>
+            Contact Us
+          </Link>
+        </nav>
+      </div>
+
+      <div className="nav-actions">
+        <Link href="/post-tournament" className="btn btn-primary nav-cta">
+          <span className="nav-cta-icon" aria-hidden="true">+</span>
+          Post Tournament
+        </Link>
+
+        {firstName && (
+          <div className="nav-dd nav-account">
+            <button
+              type="button"
+              className={`nav-account-trigger${openDropdown === "account" ? " open" : ""}`}
+              onClick={() => toggleDropdown("account")}
+              aria-expanded={openDropdown === "account"}
+              aria-haspopup="true"
+            >
+              <span className="nav-avatar" aria-hidden="true">
+                {firstName.charAt(0).toUpperCase()}
+              </span>
+              <span className="nav-account-name">{firstName}</span>
+              <span className="caret" aria-hidden="true">▾</span>
+            </button>
+            {openDropdown === "account" && (
+              <div className="nav-dd-panel nav-account-panel">
+                <div className="nav-account-header">
+                  <span className="nav-avatar nav-avatar-lg" aria-hidden="true">
+                    {firstName.charAt(0).toUpperCase()}
+                  </span>
+                  <div>
+                    <p className="nav-account-greeting">Hi, {firstName}</p>
+                    <p className="nav-account-sub">Manage your account</p>
+                  </div>
+                </div>
+                <Link href="/profile" className="nav-dd-item" onClick={closeAll}>
+                  <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+                    <circle cx="8" cy="5" r="3" stroke="currentColor" strokeWidth="1.6" />
+                    <path
+                      d="M2.5 14c.7-3 3-4.5 5.5-4.5s4.8 1.5 5.5 4.5"
+                      stroke="currentColor"
+                      strokeWidth="1.6"
+                      strokeLinecap="round"
+                    />
+                  </svg>
+                  Profile
+                </Link>
+                <button
+                  type="button"
+                  className="nav-dd-item nav-dd-item-danger"
+                  onClick={handleLogOut}
+                >
+                  <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+                    <path
+                      d="M6.5 14H3a1 1 0 0 1-1-1V3a1 1 0 0 1 1-1h3.5"
+                      stroke="currentColor"
+                      strokeWidth="1.6"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                    />
+                    <path
+                      d="M10.5 11l3-3-3-3M13.2 8H6"
+                      stroke="currentColor"
+                      strokeWidth="1.6"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                    />
+                  </svg>
+                  Log out
+                </button>
+              </div>
+            )}
+          </div>
+        )}
+      </div>
 
       {/* ---------------- Mobile ---------------- */}
       <button
