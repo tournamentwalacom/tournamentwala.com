@@ -1,6 +1,5 @@
 import Navbar from "@/components/Navbar";
 import Hero from "@/components/Hero";
-import LiveTicker from "@/components/LiveTicker";
 import Tournaments from "@/components/Tournaments";
 import NearbyTournaments from "@/components/NearbyTournaments";
 import SportsMarquee from "@/components/SportsMarquee";
@@ -18,7 +17,6 @@ export default async function Home({ searchParams }) {
       <Navbar />
       <main>
         <Hero stats={stats} />
-        <LiveTicker />
         <NearbyTournaments />
         <Tournaments
           sport="Cricket"
