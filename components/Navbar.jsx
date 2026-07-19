@@ -4,7 +4,7 @@ import { getCurrentUser } from "@/lib/supabaseServer";
 import NavMenu from "@/components/NavMenu";
 import LiveTicker from "@/components/LiveTicker";
 
-export default async function Navbar() {
+export default async function Navbar({ showTicker = true }) {
   const [{ sports, cities }, session] = await Promise.all([
     getFilterFacets(),
     getCurrentUser(),
@@ -12,7 +12,7 @@ export default async function Navbar() {
 
   return (
     <div className="site-header">
-      <LiveTicker />
+      {showTicker && <LiveTicker />}
       <header className="nav">
         <div className="container nav-inner">
           <a href="/" className="brand" aria-label="TournamentWala home">

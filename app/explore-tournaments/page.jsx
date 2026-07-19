@@ -56,7 +56,7 @@ export default async function ExploreTournamentsPage({ searchParams }) {
 
   return (
     <>
-      <Navbar />
+      <Navbar showTicker={false} />
       <main>
         <ExploreTournaments
           tickets={tickets}
