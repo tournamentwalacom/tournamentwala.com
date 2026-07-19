@@ -31,7 +31,7 @@ export default async function ProfilePage() {
   const { data: tournaments } = await supabase
     .from("tournaments")
     .select(
-      "id, seq, name, organizer_name, sport, city, venue, status, start_date, end_date, date_note, entry_fee_amount, entry_fee_unit, prize_pool, created_at"
+      "id, seq, name, organizer_name, sport, city, venue, status, start_date, end_date, date_note, entry_fee_amount, entry_fee_unit, prize_pool, prize_pool_is_trophy, created_at"
     )
     .eq("organizer_user_id", session.user.id)
     .order("created_at", { ascending: false });

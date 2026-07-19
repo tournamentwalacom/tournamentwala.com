@@ -21,6 +21,7 @@ create table if not exists tournaments (
   entry_fee_amount numeric not null,
   entry_fee_unit text not null default 'team',
   prize_pool numeric not null default 0,
+  prize_pool_is_trophy boolean not null default false,
   advance_amount numeric,
   first_prize numeric,
   second_prize numeric,
@@ -148,7 +149,7 @@ insert into promotion_packages
 select * from (values
   ('Instagram Post', 'Promote your tournament with one dedicated Instagram post.', 49::numeric, null::text, false, false, false, 10),
   ('Instagram Story', 'Get your tournament featured on our Instagram story for quick visibility.', 20::numeric, 'story', true, false, false, 20),
-  ('Instagram Reel', 'We''ll publish your reel on our Instagram page to maximize reach. Note: you must send your reel along with the payment screenshot.', 79::numeric, null::text, false, true, false, 30),
+  ('Instagram Reel', 'We''ll publish your reel on our Instagram page to maximize reach. Note: you must send your reel via Telegram after submitting.', 79::numeric, null::text, false, true, false, 30),
   ('HOT Listing', 'Your tournament will be marked with a HOT badge and shown in the Featured/Hot section of the TournamentWala website, giving it higher visibility than regular tournaments.', 30::numeric, null::text, false, false, false, 40),
   ('Announcement Bar', 'Your tournament will appear in the announcement bar at the top of the TournamentWala website, making it one of the first things every visitor sees.', 49::numeric, null::text, false, false, false, 50),
   ('Website Listing', 'Every approved tournament is published on TournamentWala with its own dedicated page.', 0::numeric, null::text, false, false, true, 60),
@@ -164,6 +165,13 @@ where not exists (select 1 from promotion_packages);
 alter table tournaments add column if not exists promotions jsonb not null default '[]'::jsonb;
 alter table tournaments add column if not exists promotion_total numeric not null default 0;
 
+-- Razorpay order/payment id for paid submissions (promotion_total > 0),
+-- verified server-side in /api/tournaments/submit before the row is ever
+-- inserted — see lib/razorpay.js. Null for free-only submissions, which
+-- never go through Razorpay Checkout at all.
+alter table tournaments add column if not exists razorpay_order_id text;
+alter table tournaments add column if not exists razorpay_payment_id text;
+
 -- Marks packages where our team designs/creates the asset from scratch
 -- (Poster Design, Reel Creation) rather than just publishing something the
 -- organizer already has (Instagram Post/Story/Reel). Selecting one of these
@@ -171,6 +179,14 @@ alter table tournaments add column if not exists promotion_total numeric not nul
 -- see requires_telegram_upload above for the same admin-toggle pattern.
 alter table promotion_packages add column if not exists requires_brief boolean not null default false;
 update promotion_packages set requires_brief = true where name in ('Poster Design', 'Reel Creation');
+
+-- Payment is now collected/verified through Razorpay Checkout at submission
+-- time (see /api/tournaments/submit), so the old "send a payment screenshot"
+-- instruction seeded above no longer applies — fix it on rows seeded before
+-- this change without touching descriptions an admin has since edited.
+update promotion_packages
+  set description = 'We''ll publish your reel on our Instagram page to maximize reach. Note: you must send your reel via Telegram after submitting.'
+  where name = 'Instagram Reel' and description like '%payment screenshot%';
 
 -- Extra creative-brief info collected only when the organizer selects
 -- Poster Design and/or Reel Creation, so our design team has what it needs.
@@ -189,6 +205,7 @@ alter table tournaments add column if not exists team_size text;
 alter table tournaments add column if not exists max_teams integer;
 alter table tournaments add column if not exists ball_type text;
 alter table tournaments add column if not exists third_prize numeric;
+alter table tournaments add column if not exists prize_pool_is_trophy boolean not null default false;
 alter table tournaments add column if not exists other_awards text;
 alter table tournaments add column if not exists registration_link text;
 alter table tournaments add column if not exists registration_qr_url text;
@@ -427,3 +444,49 @@ alter table registrations enable row level security;
 -- No public policies here on purpose, same pattern as contact_messages:
 -- inserts happen through /api/registrations/submit using the service_role
 -- key. Only the admin panel (also service_role) reads these.
+
+-- Backs lib/rateLimit.js — a small fixed-window rate limiter for public POST
+-- routes (admin login, tournament/registration/contact submit, poster
+-- upload). Vercel functions are stateless/serverless, so an in-memory
+-- counter wouldn't be reliable across invocations; this table + the
+-- function below give every route a shared, atomic counter instead.
+create table if not exists rate_limits (
+  key text primary key,
+  window_start timestamptz not null,
+  count integer not null default 1
+);
+
+-- No RLS policies here on purpose, same pattern as contact_messages/
+-- promotion_packages: only ever touched via service_role (supabaseAdmin()),
+-- never exposed to the anon key.
+alter table rate_limits enable row level security;
+
+-- Atomic "check and increment" for a fixed window: starts a fresh window
+-- (count = 1) if this key has never been seen or its window has expired,
+-- otherwise increments and returns false once count exceeds p_limit. Done
+-- as a single upsert (not a select-then-update from the app) so concurrent
+-- requests for the same key can't both read the same count before either
+-- writes back, which would let more requests through than the limit allows.
+create or replace function rate_limit_hit(p_key text, p_limit int, p_window_seconds int)
+returns boolean as $$
+declare
+  current_count int;
+begin
+  insert into rate_limits (key, window_start, count)
+  values (p_key, now(), 1)
+  on conflict (key) do update
+    set count = case
+        when rate_limits.window_start < now() - make_interval(secs => p_window_seconds)
+          then 1
+        else rate_limits.count + 1
+      end,
+      window_start = case
+        when rate_limits.window_start < now() - make_interval(secs => p_window_seconds)
+          then now()
+        else rate_limits.window_start
+      end
+  returning count into current_count;
+
+  return current_count <= p_limit;
+end;
+$$ language plpgsql security definer set search_path = public;

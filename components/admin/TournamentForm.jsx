@@ -44,6 +44,7 @@ function buildInitialForm(initial) {
       image_url: "",
       entry_fee_amount: "",
       prize_pool: "",
+      prize_pool_is_trophy: false,
       total_teams: "",
       status: "live",
       promotions: [],
@@ -74,6 +75,7 @@ function buildInitialForm(initial) {
     image_url: initial.image_url || "",
     entry_fee_amount: toFormValue(initial.entry_fee_amount),
     prize_pool: toFormValue(initial.prize_pool),
+    prize_pool_is_trophy: Boolean(initial.prize_pool_is_trophy),
     total_teams: toFormValue(initial.total_teams),
     status: initial.status || "pending",
     promotions: initial.promotions || [],
@@ -385,18 +387,41 @@ export default function TournamentForm({ mode, initial }) {
 
         <h3 className="post-form-section">6. Prize pool</h3>
 
-        <label className="post-field">
-          Winner prize (₹)
+        <label className="post-field post-field-checkbox">
           <input
-            type="number"
-            required
-            min="0"
-            step="1"
-            value={form.prize_pool}
-            onChange={(e) => update("prize_pool", e.target.value)}
-            onWheel={(e) => e.target.blur()}
+            type="checkbox"
+            checked={form.prize_pool_is_trophy}
+            onChange={(e) => {
+              const isTrophy = e.target.checked;
+              setForm((f) => ({
+                ...f,
+                prize_pool_is_trophy: isTrophy,
+                prize_pool: isTrophy ? "" : f.prize_pool,
+              }));
+            }}
           />
+          Trophy alone (no cash prize)
         </label>
+
+        {form.prize_pool_is_trophy ? (
+          <div className="post-field">
+            Winner prize
+            <input type="text" value="Trophy" disabled readOnly />
+          </div>
+        ) : (
+          <label className="post-field">
+            Winner prize (₹)
+            <input
+              type="number"
+              required
+              min="0"
+              step="1"
+              value={form.prize_pool}
+              onChange={(e) => update("prize_pool", e.target.value)}
+              onWheel={(e) => e.target.blur()}
+            />
+          </label>
+        )}
 
         <label className="post-field">
           Total teams that took part <span>(optional, fill in after the event)</span>

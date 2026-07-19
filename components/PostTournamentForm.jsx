@@ -15,6 +15,20 @@ import PromotionPackages from "@/components/PromotionPackages";
 import Modal from "@/components/Modal";
 
 const TELEGRAM_HANDLE = "6374753084";
+const RAZORPAY_CHECKOUT_SRC = "https://checkout.razorpay.com/v1/checkout.js";
+
+function loadRazorpayScript() {
+  if (typeof window === "undefined") return Promise.resolve(false);
+  if (window.Razorpay) return Promise.resolve(true);
+
+  return new Promise((resolve) => {
+    const script = document.createElement("script");
+    script.src = RAZORPAY_CHECKOUT_SRC;
+    script.onload = () => resolve(true);
+    script.onerror = () => resolve(false);
+    document.body.appendChild(script);
+  });
+}
 
 function buildInitialForm(initialProfile) {
   return {
@@ -42,6 +56,7 @@ const initialForm = {
   image_url: "",
   entry_fee_amount: "",
   prize_pool: "",
+  prize_pool_is_trophy: false,
   promotions: [],
 
   // Only collected/sent when a promotion package that needs a design brief
@@ -86,6 +101,7 @@ export default function PostTournamentForm({ initialProfile } = {}) {
   const [hasTelegramPromo, setHasTelegramPromo] = useState(false);
   const [submittedWithTelegramPromo, setSubmittedWithTelegramPromo] = useState(false);
   const [needsBrief, setNeedsBrief] = useState(false);
+  const [promoTotal, setPromoTotal] = useState(0);
 
   function update(field, value) {
     setForm((f) => ({ ...f, [field]: value }));
@@ -97,6 +113,64 @@ export default function PostTournamentForm({ initialProfile } = {}) {
     setResetTick((t) => t + 1);
   }
 
+  // Opens Razorpay Checkout for the current promotion selections. Resolves
+  // to { razorpay_order_id, razorpay_payment_id, razorpay_signature } on a
+  // successful payment, or null if the user cancels/it fails — in which case
+  // an error has already been surfaced via fail() and the caller should stop.
+  async function payWithRazorpay() {
+    const orderRes = await fetch("/api/tournaments/create-order", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ promotions: form.promotions }),
+    });
+    const orderData = await orderRes.json().catch(() => ({}));
+    if (!orderRes.ok) {
+      fail(orderData.error || "Couldn't start payment. Please try again.");
+      return null;
+    }
+
+    const loaded = await loadRazorpayScript();
+    if (!loaded) {
+      fail("Couldn't load the payment gateway. Please check your connection and try again.");
+      return null;
+    }
+
+    return new Promise((resolve) => {
+      const rzp = new window.Razorpay({
+        key: orderData.key_id,
+        amount: orderData.amount,
+        currency: orderData.currency,
+        order_id: orderData.order_id,
+        name: "TournamentWala.com",
+        description: "Tournament promotion add-ons",
+        prefill: {
+          name: form.organizer_name,
+          contact: form.organizer_phone,
+          email: form.organizer_email,
+        },
+        theme: { color: "#e8283c" },
+        handler: (response) => {
+          resolve({
+            razorpay_order_id: response.razorpay_order_id,
+            razorpay_payment_id: response.razorpay_payment_id,
+            razorpay_signature: response.razorpay_signature,
+          });
+        },
+        modal: {
+          ondismiss: () => {
+            fail("Payment cancelled. Complete payment to submit with promotions.");
+            resolve(null);
+          },
+        },
+      });
+      rzp.on("payment.failed", () => {
+        fail("Payment failed. Please try again.");
+        resolve(null);
+      });
+      rzp.open();
+    });
+  }
+
   async function submitTournament() {
     setError("");
 
@@ -106,6 +180,16 @@ export default function PostTournamentForm({ initialProfile } = {}) {
     }
 
     setStatus("submitting");
+
+    // Paid add-ons must be paid for via Razorpay before the tournament is
+    // ever submitted — a ₹0 cart (no add-ons, or only the free listing)
+    // skips this and submits directly, same as before Razorpay existed.
+    let paymentFields = {};
+    if (promoTotal > 0) {
+      const payment = await payWithRazorpay();
+      if (!payment) return; // fail() already set the error state
+      paymentFields = payment;
+    }
 
     const sport = form.sport === "Other" ? form.sportOther.trim() : form.sport;
     const format = form.format === "Other" ? form.formatOther.trim() : form.format;
@@ -124,7 +208,7 @@ export default function PostTournamentForm({ initialProfile } = {}) {
       const res = await fetch("/api/tournaments/submit", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ ...rest, ...briefFields, sport, format }),
+        body: JSON.stringify({ ...rest, ...briefFields, ...paymentFields, sport, format }),
       });
 
       const data = await res.json().catch(() => ({}));
@@ -170,7 +254,7 @@ export default function PostTournamentForm({ initialProfile } = {}) {
           <div className="post-success-telegram">
             <p>
               Since you selected Instagram Reel or Reel Creation, please send
-              your reel/media files along with your payment screenshot to:
+              your reel/media files to:
             </p>
             <p>
               <strong>Telegram: {TELEGRAM_HANDLE}</strong>
@@ -407,18 +491,41 @@ export default function PostTournamentForm({ initialProfile } = {}) {
 
         <h3 className="post-form-section">6. Prize pool</h3>
 
-        <label className="post-field">
-          Winner prize (₹)
+        <label className="post-field post-field-checkbox">
           <input
-            type="number"
-            required
-            min="0"
-            step="1"
-            value={form.prize_pool}
-            onChange={(e) => update("prize_pool", e.target.value)}
-            onWheel={(e) => e.target.blur()}
+            type="checkbox"
+            checked={form.prize_pool_is_trophy}
+            onChange={(e) => {
+              const isTrophy = e.target.checked;
+              setForm((f) => ({
+                ...f,
+                prize_pool_is_trophy: isTrophy,
+                prize_pool: isTrophy ? "" : f.prize_pool,
+              }));
+            }}
           />
+          Trophy alone (no cash prize)
         </label>
+
+        {form.prize_pool_is_trophy ? (
+          <div className="post-field">
+            Winner prize
+            <input type="text" value="Trophy" disabled readOnly />
+          </div>
+        ) : (
+          <label className="post-field">
+            Winner prize (₹)
+            <input
+              type="number"
+              required
+              min="0"
+              step="1"
+              value={form.prize_pool}
+              onChange={(e) => update("prize_pool", e.target.value)}
+              onWheel={(e) => e.target.blur()}
+            />
+          </label>
+        )}
 
         <h3 className="post-form-section">7. Upload poster ⭐</h3>
 
@@ -443,6 +550,7 @@ export default function PostTournamentForm({ initialProfile } = {}) {
           onTelegramPackageSelected={() => setShowTelegramNotice(true)}
           onTelegramStateChange={setHasTelegramPromo}
           onBriefStateChange={setNeedsBrief}
+          onTotalChange={setPromoTotal}
         />
 
         {needsBrief && (
@@ -758,12 +866,12 @@ export default function PostTournamentForm({ initialProfile } = {}) {
       >
         <p>
           Please send your reel (or tournament photos/videos for reel
-          creation) along with your payment screenshot to our Telegram.
+          creation) to our Telegram.
         </p>
         <p>
           <strong>Telegram: {TELEGRAM_HANDLE}</strong>
         </p>
-        <p>Your promotion will begin only after both are received.</p>
+        <p>Your promotion will begin only after payment is confirmed and we&rsquo;ve received your files.</p>
       </Modal>
     </form>
   );
