@@ -10,8 +10,9 @@ function formatPrice(n) {
  * Promotion add-on picker for the post-tournament form. Packages (names,
  * prices, descriptions) are fetched from /api/promotion-packages at runtime
  * rather than hardcoded here, so admins can add/edit/deactivate them from
- * /admin/pricing with no code change. The total shown here is a client-side
- * display only — the real total is always recomputed server-side on submit.
+ * /admin/pricing with no code change. `total` here only decides whether the
+ * parent needs to launch Razorpay Checkout — the amount actually charged is
+ * always recomputed server-side (create-order and submit both re-resolve it).
  */
 export default function PromotionPackages({
   selections,
@@ -19,6 +20,7 @@ export default function PromotionPackages({
   onTelegramPackageSelected,
   onTelegramStateChange,
   onBriefStateChange,
+  onTotalChange,
 }) {
   const [packages, setPackages] = useState(null);
   const [discount, setDiscount] = useState(null);
@@ -65,6 +67,17 @@ export default function PromotionPackages({
     return selections.find((s) => s.package_id === packageId);
   }
 
+  const paidPackages = (packages || []).filter((p) => !p.is_free);
+  const total = paidPackages.reduce((sum, pkg) => {
+    const s = selectionFor(pkg.id);
+    return s ? sum + pkg.price * s.quantity : sum;
+  }, 0);
+
+  useEffect(() => {
+    onTotalChange?.(total);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [total]);
+
   function toggle(pkg) {
     const existing = selectionFor(pkg.id);
     if (existing) {
@@ -94,13 +107,7 @@ export default function PromotionPackages({
     return <p className="post-field-wide promo-loading">Loading promotion packages…</p>;
   }
 
-  const paidPackages = packages.filter((p) => !p.is_free);
   const freePackage = packages.find((p) => p.is_free);
-
-  const total = paidPackages.reduce((sum, pkg) => {
-    const s = selectionFor(pkg.id);
-    return s ? sum + pkg.price * s.quantity : sum;
-  }, 0);
 
   return (
     <div className="post-field-wide">
