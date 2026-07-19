@@ -51,6 +51,7 @@ export default function ExploreTournaments({
   const [userCoords, setUserCoords] = useState(null);
   const [showLocationPrompt, setShowLocationPrompt] = useState(false);
   const [locatingLocation, setLocatingLocation] = useState(false);
+  const [headerOffset, setHeaderOffset] = useState(72);
   const filterRef = useRef(null);
   const sentinelRef = useRef(null);
 
@@ -76,16 +77,29 @@ export default function ExploreTournaments({
     if (!filterOpen) setPanelQuery("");
   }, [filterOpen]);
 
+  // The sticky navbar's height isn't a constant 72px — the live ticker
+  // above it renders conditionally and adds its own height. Measure the
+  // real header so the freeze offset always lines up with what's on screen.
+  useEffect(() => {
+    const header = document.querySelector(".site-header");
+    if (!header) return;
+    const updateOffset = () => setHeaderOffset(header.offsetHeight);
+    updateOffset();
+    const observer = new ResizeObserver(updateOffset);
+    observer.observe(header);
+    return () => observer.disconnect();
+  }, []);
+
   useEffect(() => {
     const el = sentinelRef.current;
     if (!el) return;
     const observer = new IntersectionObserver(
       ([entry]) => setFrozen(!entry.isIntersecting),
-      { rootMargin: "-72px 0px 0px 0px", threshold: 0 }
+      { rootMargin: `-${headerOffset}px 0px 0px 0px`, threshold: 0 }
     );
     observer.observe(el);
     return () => observer.disconnect();
-  }, []);
+  }, [headerOffset]);
 
   // Nearest-first sorting needs the visitor's coordinates. We only ask
   // once — a prior "granted" silently re-fetches position, a prior
@@ -262,7 +276,10 @@ export default function ExploreTournaments({
 
       <div ref={sentinelRef} aria-hidden="true" />
 
-      <div className={`explore-filter-bar${frozen ? " frozen" : ""}`}>
+      <div
+        className={`explore-filter-bar${frozen ? " frozen" : ""}`}
+        style={{ top: headerOffset }}
+      >
         <div className="container">
           <div className="explore-frozen-search">
             <svg
