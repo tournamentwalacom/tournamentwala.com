@@ -149,7 +149,7 @@ export default async function ProfilePage() {
                   </p>
                   {registrationCounts[t.id] > 0 ? (
                     <Link
-                      href={`/profile/tournaments/${t.id}/players`}
+                      href={`/profile/tournaments/${getTournamentSlug(t)}/players`}
                       className="profile-players-btn"
                     >
                       View registered players ({registrationCounts[t.id]})

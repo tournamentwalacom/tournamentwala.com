@@ -1880,6 +1880,25 @@ button {
   }
 }
 
+@media (min-width: 860px) {
+  .profile-section .auth-card {
+    max-width: 760px;
+  }
+
+  .profile-section .post-form {
+    grid-template-columns: 1fr 1fr auto;
+    align-items: end;
+  }
+
+  .profile-section .post-form button[type="submit"] {
+    grid-column: auto;
+  }
+
+  .profile-section .post-form .post-error {
+    grid-column: 1 / -1;
+  }
+}
+
 .profile-empty {
   color: var(--steel);
   margin-top: 8px;
@@ -1958,6 +1977,8 @@ button {
 }
 
 .profile-players-btn {
+  display: inline-flex;
+  align-items: center;
   margin-top: 10px;
   padding: 6px 14px;
   border: 1px solid var(--line);

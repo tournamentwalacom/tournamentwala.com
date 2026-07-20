@@ -4,6 +4,7 @@ import Footer from "@/components/Footer";
 import AuthForm from "@/components/AuthForm";
 import { getCurrentUser, createServerSupabaseClient } from "@/lib/supabaseServer";
 import { supabaseAdmin } from "@/lib/supabase";
+import { getSeqFromSlug } from "@/lib/tournaments";
 
 export const metadata = {
   title: "Registered players — TournamentWala.com",
@@ -19,7 +20,8 @@ function formatRegisteredOn(iso) {
 
 export default async function TournamentPlayersPage({ params }) {
   const session = await getCurrentUser();
-  const backHref = `/profile/tournaments/${params.id}/players`;
+  const backHref = `/profile/tournaments/${params.slug}/players`;
+  const seq = getSeqFromSlug(params.slug);
 
   if (!session) {
     return (
@@ -38,12 +40,15 @@ export default async function TournamentPlayersPage({ params }) {
   }
 
   const supabase = createServerSupabaseClient();
-  const { data: tournament } = await supabase
-    .from("tournaments")
-    .select("id, name, sport, city")
-    .eq("id", params.id)
-    .eq("organizer_user_id", session.user.id)
-    .maybeSingle();
+  const { data: tournament } =
+    seq === null
+      ? { data: null }
+      : await supabase
+          .from("tournaments")
+          .select("id, name, sport, city")
+          .eq("seq", seq)
+          .eq("organizer_user_id", session.user.id)
+          .maybeSingle();
 
   if (!tournament) {
     return (
