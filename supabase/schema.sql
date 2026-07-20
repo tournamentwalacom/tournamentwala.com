@@ -459,10 +459,10 @@ create policy "Players can read own registrations"
   using (auth.uid() = user_id);
 
 -- Additive: lets an organizer read the registrations for tournaments they
--- posted, via the /profile "view registered players" panel. The app code
--- actually does this read through the service_role client with an explicit
--- ownership check (see app/api/organizer/tournaments/[id]/registrations),
--- so this policy is defense-in-depth, not load-bearing.
+-- posted, via /profile/tournaments/[id]/players. The app code actually does
+-- this read through the service_role client with an explicit ownership
+-- check (see that page's server component), so this policy is
+-- defense-in-depth, not load-bearing.
 drop policy if exists "Organizers can read registrations for own tournaments" on registrations;
 create policy "Organizers can read registrations for own tournaments"
   on registrations for select

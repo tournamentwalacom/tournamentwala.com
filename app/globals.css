@@ -1979,83 +1979,57 @@ button {
   font-size: 0.82rem;
 }
 
-.profile-modal-backdrop {
-  position: fixed;
-  inset: 0;
-  z-index: 100;
-  background: rgba(14, 27, 51, 0.55);
-  display: grid;
-  place-items: center;
-  padding: 20px;
-}
-
-.profile-modal {
-  position: relative;
-  width: 100%;
-  max-width: 680px;
-  max-height: 85vh;
-  overflow-y: auto;
-  background: var(--chalk);
-  border-radius: var(--radius);
-  box-shadow: var(--shadow-card-hover);
-  padding: 32px 28px 24px;
-}
-
-.profile-modal-close {
-  position: absolute;
-  top: 12px;
-  right: 14px;
-  border: none;
-  background: none;
-  font-size: 1.4rem;
-  line-height: 1;
+.players-back-link {
+  display: inline-block;
+  margin-bottom: 16px;
   color: var(--steel);
-  cursor: pointer;
+  font-weight: 700;
+  font-size: 0.9rem;
 }
 
-.profile-modal-close:hover {
+.players-back-link:hover {
   color: var(--ink);
 }
 
-.profile-modal-title {
-  font-family: var(--font-display), Impact, sans-serif;
-  font-size: 1.2rem;
-  text-transform: uppercase;
-  margin: 0 0 4px;
+.players-list {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  margin-top: 16px;
+  list-style: none;
+  padding: 0;
 }
 
-.profile-modal-hint {
-  color: var(--steel);
-  margin: 0 0 16px;
+.players-list-card {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  flex-wrap: wrap;
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  padding: 18px 20px;
+  background: var(--chalk);
 }
 
-.profile-modal-status {
-  color: var(--steel);
+.players-list-info h3 {
+  font-size: 1.02rem;
+  margin: 0;
 }
 
-.profile-modal-table-scroll {
-  overflow-x: auto;
-}
-
-.profile-modal-table {
-  width: 100%;
-  border-collapse: collapse;
-}
-
-.profile-modal-table th,
-.profile-modal-table td {
-  text-align: left;
-  padding: 10px 12px;
-  border-bottom: 1px solid var(--line);
+.players-call-btn {
+  flex-shrink: 0;
+  padding: 8px 16px;
+  border-radius: 999px;
+  background: var(--crimson);
+  color: var(--chalk);
+  font-weight: 700;
   font-size: 0.88rem;
   white-space: nowrap;
 }
 
-.profile-modal-table th {
-  color: var(--steel);
-  font-size: 0.76rem;
-  text-transform: uppercase;
-  letter-spacing: 0.04em;
+.players-call-btn:hover {
+  background: var(--crimson-deep);
 }
 
 /* ================= ABOUT / CONTACT ================= */

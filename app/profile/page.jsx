@@ -1,8 +1,8 @@
+import Link from "next/link";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import AuthForm from "@/components/AuthForm";
 import CompleteProfileForm from "@/components/CompleteProfileForm";
-import ProfileTournamentPlayers from "@/components/ProfileTournamentPlayers";
 import { getCurrentUser, createServerSupabaseClient } from "@/lib/supabaseServer";
 import { supabaseAdmin } from "@/lib/supabase";
 import {
@@ -147,11 +147,16 @@ export default async function ProfilePage() {
                   <p className="profile-tournament-meta">
                     Entry {formatEntryFee(t)} · Prize {formatPrize(t)}
                   </p>
-                  <ProfileTournamentPlayers
-                    tournamentId={t.id}
-                    tournamentName={t.name}
-                    count={registrationCounts[t.id] || 0}
-                  />
+                  {registrationCounts[t.id] > 0 ? (
+                    <Link
+                      href={`/profile/tournaments/${t.id}/players`}
+                      className="profile-players-btn"
+                    >
+                      View registered players ({registrationCounts[t.id]})
+                    </Link>
+                  ) : (
+                    <p className="profile-players-empty">No players registered yet.</p>
+                  )}
                 </li>
               ))}
             </ul>
