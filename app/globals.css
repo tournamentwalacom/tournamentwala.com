@@ -631,6 +631,10 @@ button {
     display: none;
   }
 
+  .nav-menu {
+    justify-content: flex-end;
+  }
+
   .nav-toggle {
     display: flex;
     align-items: center;

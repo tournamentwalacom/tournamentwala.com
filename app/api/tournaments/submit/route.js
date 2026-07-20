@@ -128,6 +128,7 @@ export async function POST(request) {
   });
 
   if (error) {
+    console.error("Failed to insert tournament submission:", error);
     return NextResponse.json(
       { error: "Couldn't save your submission. Please try again." },
       { status: 500 }
