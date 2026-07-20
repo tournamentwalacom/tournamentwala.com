@@ -1856,6 +1856,30 @@ button {
   margin-top: 36px;
 }
 
+.profile-section .auth-card {
+  max-width: 560px;
+}
+
+@media (max-width: 480px) {
+  .profile-section .auth-card {
+    padding: 20px;
+  }
+}
+
+@media (min-width: 560px) {
+  .profile-section .post-form {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    column-gap: 20px;
+    row-gap: 28px;
+  }
+
+  .profile-section .post-form .post-error,
+  .profile-section .post-form button[type="submit"] {
+    grid-column: 1 / -1;
+  }
+}
+
 .profile-empty {
   color: var(--steel);
   margin-top: 8px;

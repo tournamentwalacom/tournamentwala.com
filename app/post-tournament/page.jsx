@@ -40,7 +40,7 @@ export default async function PostTournamentPage() {
                   here.
                 </p>
               </div>
-              <AuthForm next="/post-tournament" />
+              <AuthForm />
             </div>
           ) : needsProfile ? (
             <div className="post-hero">

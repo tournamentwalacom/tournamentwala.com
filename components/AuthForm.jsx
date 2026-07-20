@@ -4,7 +4,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { createBrowserSupabaseClient } from "@/lib/supabaseBrowser";
 
-export default function AuthForm({ next = "/post-tournament" }) {
+export default function AuthForm({ next = "/" }) {
   const router = useRouter();
   const [mode, setMode] = useState("signin"); // "signin" | "signup"
   const [fullName, setFullName] = useState("");
@@ -63,6 +63,7 @@ export default function AuthForm({ next = "/post-tournament" }) {
       return;
     }
 
+    router.push(next);
     router.refresh();
   }
 

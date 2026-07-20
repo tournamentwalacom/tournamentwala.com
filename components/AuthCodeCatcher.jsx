@@ -7,8 +7,8 @@ import { createBrowserSupabaseClient } from "@/lib/supabaseBrowser";
 /** Safety net for when Supabase's OAuth redirect falls back to the Site URL
  * (e.g. a Redirect URLs allow-list mismatch) instead of landing on
  * /auth/callback — picks up a stray ?code= on any page, finishes the
- * session exchange client-side, and sends the organizer on to
- * /post-tournament, same as the real callback route would have. */
+ * session exchange client-side, and sends the user on to the home page,
+ * same as the real callback route would have. */
 export default function AuthCodeCatcher() {
   const router = useRouter();
 
@@ -18,7 +18,7 @@ export default function AuthCodeCatcher() {
 
     createBrowserSupabaseClient()
       .auth.exchangeCodeForSession(code)
-      .then(() => router.replace("/post-tournament"));
+      .then(() => router.replace("/"));
   }, [router]);
 
   return null;
