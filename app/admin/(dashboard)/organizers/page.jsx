@@ -1,4 +1,5 @@
 import { supabaseAdmin } from "@/lib/supabase";
+import OrganizerRowActions from "@/components/admin/OrganizerRowActions";
 
 const STATUS_LABELS = {
   pending: "Pending",
@@ -41,6 +42,7 @@ export default async function AdminOrganizersPage() {
                 <th>Phone</th>
                 <th>Signed up</th>
                 <th>Tournaments posted</th>
+                <th>Actions</th>
               </tr>
             </thead>
             <tbody>
@@ -67,6 +69,9 @@ export default async function AdminOrganizersPage() {
                           ))}
                         </>
                       )}
+                    </td>
+                    <td>
+                      <OrganizerRowActions organizer={p} tournamentCount={posted.length} />
                     </td>
                   </tr>
                 );

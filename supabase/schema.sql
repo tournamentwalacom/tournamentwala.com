@@ -439,11 +439,24 @@ create table if not exists registrations (
 -- was added.
 alter table registrations add column if not exists wants_updates boolean not null default true;
 
+-- Links a registration back to the signed-in player who submitted it via
+-- /api/registrations/submit (see SwipeToRegister.jsx). Nullable because
+-- older rows predate sign-in being required.
+alter table registrations add column if not exists user_id uuid references auth.users (id);
+
 alter table registrations enable row level security;
 
--- No public policies here on purpose, same pattern as contact_messages:
+-- No public insert policy here on purpose, same pattern as contact_messages:
 -- inserts happen through /api/registrations/submit using the service_role
--- key. Only the admin panel (also service_role) reads these.
+-- key. Only the admin panel (also service_role) reads all rows.
+
+-- Additive: lets a signed-in player read their own past registrations on
+-- their /profile page (permissive policies are OR'd, so this doesn't open
+-- up reading other players' rows).
+drop policy if exists "Players can read own registrations" on registrations;
+create policy "Players can read own registrations"
+  on registrations for select
+  using (auth.uid() = user_id);
 
 -- Backs lib/rateLimit.js — a small fixed-window rate limiter for public POST
 -- routes (admin login, tournament/registration/contact submit, poster

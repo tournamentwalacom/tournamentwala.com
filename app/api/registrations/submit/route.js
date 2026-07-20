@@ -1,6 +1,8 @@
 import { NextResponse } from "next/server";
 import { supabaseAdmin } from "@/lib/supabase";
+import { getCurrentUser } from "@/lib/supabaseServer";
 import { sendNotificationEmail, renderEmailLayout } from "@/lib/email";
+import { checkRateLimit, clientIp } from "@/lib/rateLimit";
 
 const PHONE_RE = /^[6-9]\d{9}$/;
 
@@ -18,6 +20,14 @@ function normalizePhone(value) {
 }
 
 export async function POST(request) {
+  const session = await getCurrentUser();
+  if (!session) {
+    return NextResponse.json(
+      { error: "Please sign in to register." },
+      { status: 401 }
+    );
+  }
+
   const body = await request.json().catch(() => null);
   if (!body) {
     return NextResponse.json({ error: "Invalid request body" }, { status: 400 });
@@ -27,6 +37,19 @@ export async function POST(request) {
   // Pretend success so the bot doesn't know to adjust and retry.
   if (typeof body.website === "string" && body.website.trim() !== "") {
     return NextResponse.json({ ok: true }, { status: 201 });
+  }
+
+  const db = supabaseAdmin();
+  const withinLimit = await checkRateLimit(db, {
+    key: `registration_submit:${clientIp(request)}`,
+    limit: 15,
+    windowSeconds: 60 * 60,
+  });
+  if (!withinLimit) {
+    return NextResponse.json(
+      { error: "Too many submissions. Please try again later." },
+      { status: 429 }
+    );
   }
 
   const tournamentId = trimmed(body.tournamentId, 100);
@@ -39,8 +62,6 @@ export async function POST(request) {
       { status: 400 }
     );
   }
-
-  const db = supabaseAdmin();
 
   // Tournament name/sport/city/pincode are looked up server-side rather than
   // trusted from the client, same reasoning as /api/tournaments/submit.
@@ -63,6 +84,7 @@ export async function POST(request) {
     player_name: name,
     player_phone: phone,
     wants_updates: body.wantsUpdates !== false,
+    user_id: session.user.id,
   });
 
   if (error) {
@@ -71,6 +93,14 @@ export async function POST(request) {
       { status: 500 }
     );
   }
+
+  // Keep the player's profile in sync with whatever contact info they just
+  // registered with, so /profile's editable name/phone reflects it too.
+  // Best-effort — shouldn't fail the registration itself.
+  await db
+    .from("profiles")
+    .update({ full_name: name, phone, updated_at: new Date().toISOString() })
+    .eq("id", session.user.id);
 
   // Best-effort — a notification failure shouldn't fail the registration itself.
   await sendNotificationEmail({

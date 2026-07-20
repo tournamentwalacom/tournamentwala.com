@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { supabaseAdmin } from "@/lib/supabase";
 import { sendNotificationEmail, renderEmailLayout } from "@/lib/email";
+import { checkRateLimit, clientIp } from "@/lib/rateLimit";
 
 const REASONS = new Set(["general", "player", "organizer"]);
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -24,6 +25,19 @@ export async function POST(request) {
     return NextResponse.json({ ok: true }, { status: 201 });
   }
 
+  const db = supabaseAdmin();
+  const withinLimit = await checkRateLimit(db, {
+    key: `contact_submit:${clientIp(request)}`,
+    limit: 15,
+    windowSeconds: 60 * 60,
+  });
+  if (!withinLimit) {
+    return NextResponse.json(
+      { error: "Too many submissions. Please try again later." },
+      { status: 429 }
+    );
+  }
+
   const name = trimmed(body.name, 80);
   const email = trimmed(body.email, 120);
   const phone = trimmed(body.phone, 20);
@@ -37,7 +51,7 @@ export async function POST(request) {
     );
   }
 
-  const { error } = await supabaseAdmin()
+  const { error } = await db
     .from("contact_messages")
     .insert({ name, email, phone, reason, message });
 

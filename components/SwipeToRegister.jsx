@@ -1,7 +1,10 @@
 "use client";
 
-import { useCallback, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
+import { usePathname } from "next/navigation";
 import TicketLoader from "./TicketLoader";
+import AuthForm from "./AuthForm";
+import { createBrowserSupabaseClient } from "@/lib/supabaseBrowser";
 
 const THUMB = 52;
 const TRACK_PAD = 4;
@@ -13,15 +16,20 @@ export default function SwipeToRegister({
   tournamentId,
   idleLabel = "Slide to Register",
   busyLabel = "Calling…",
+  initialSignedIn = false,
+  initialName = "",
+  initialPhone = "",
 }) {
+  const pathname = usePathname();
   const trackRef = useRef(null);
   const maxXRef = useRef(0);
   const [dragX, setDragX] = useState(0);
   const [dragging, setDragging] = useState(false);
   const [locked, setLocked] = useState(false);
-  const [showConfirm, setShowConfirm] = useState(false);
-  const [name, setName] = useState("");
-  const [phone, setPhone] = useState("");
+  const [step, setStep] = useState("idle"); // idle | signin | confirm | success
+  const [signedIn, setSignedIn] = useState(initialSignedIn);
+  const [name, setName] = useState(initialName);
+  const [phone, setPhone] = useState(initialPhone);
   const [wantsUpdates, setWantsUpdates] = useState(true);
   const [formError, setFormError] = useState("");
   const [submitting, setSubmitting] = useState(false);
@@ -32,17 +40,24 @@ export default function SwipeToRegister({
     return Math.max(0, track.offsetWidth - THUMB - TRACK_PAD * 2);
   }, []);
 
+  const openAt = useCallback(
+    (nextStep) => {
+      maxXRef.current = maxXRef.current || getMaxX();
+      setDragX(maxXRef.current);
+      setStep(nextStep);
+    },
+    [getMaxX]
+  );
+
   function openConfirm() {
-    maxXRef.current = maxXRef.current || getMaxX();
-    setDragX(maxXRef.current);
-    setShowConfirm(true);
+    openAt(signedIn ? "confirm" : "signin");
   }
 
   function resetSlider() {
-    setShowConfirm(false);
+    setStep("idle");
     setDragX(0);
-    setName("");
-    setPhone("");
+    setName(initialName);
+    setPhone(initialPhone);
     setWantsUpdates(true);
     setFormError("");
   }
@@ -53,6 +68,44 @@ export default function SwipeToRegister({
       window.location.href = href;
     }, 300);
   }
+
+  // While the inline sign-in step is open, listen for it completing
+  // (email/password sign-in happens without a page reload) and advance.
+  useEffect(() => {
+    if (step !== "signin") return undefined;
+    const supabase = createBrowserSupabaseClient();
+    const {
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange((event, authSession) => {
+      if (event !== "SIGNED_IN" || !authSession?.user) return;
+      setSignedIn(true);
+      supabase
+        .from("profiles")
+        .select("full_name, phone")
+        .eq("id", authSession.user.id)
+        .maybeSingle()
+        .then(({ data }) => {
+          if (data?.full_name) setName((n) => n || data.full_name);
+          if (data?.phone) setPhone((p) => p || data.phone);
+        });
+      setStep("confirm");
+    });
+    return () => subscription.unsubscribe();
+  }, [step]);
+
+  // Resumes after a Google OAuth round trip: /auth/callback redirects back
+  // here with ?register=1 so the player doesn't have to swipe again.
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    const url = new URL(window.location.href);
+    if (url.searchParams.get("register") !== "1") return;
+    url.searchParams.delete("register");
+    window.history.replaceState({}, "", url.toString());
+    if (initialSignedIn) {
+      openAt("confirm");
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   async function handleConfirm(e) {
     e.preventDefault();
@@ -72,7 +125,7 @@ export default function SwipeToRegister({
     setSubmitting(true);
 
     try {
-      await fetch("/api/registrations/submit", {
+      const res = await fetch("/api/registrations/submit", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -82,17 +135,29 @@ export default function SwipeToRegister({
           wantsUpdates,
         }),
       });
+
+      if (!res.ok) {
+        const data = await res.json().catch(() => ({}));
+        setSubmitting(false);
+        setFormError(data.error || "Couldn't save your registration. Please try again.");
+        return;
+      }
     } catch {
-      // Best-effort — a failed save shouldn't stop the player from calling.
+      setSubmitting(false);
+      setFormError("Couldn't save your registration. Please try again.");
+      return;
     }
 
     setSubmitting(false);
-    setShowConfirm(false);
-    call();
+    setStep("success");
+    window.setTimeout(() => {
+      setStep("idle");
+      call();
+    }, 1200);
   }
 
   function handlePointerDown(e) {
-    if (locked || showConfirm) return;
+    if (locked || step !== "idle") return;
     maxXRef.current = getMaxX();
     setDragging(true);
     e.currentTarget.setPointerCapture(e.pointerId);
@@ -118,7 +183,7 @@ export default function SwipeToRegister({
   }
 
   function handleKeyDown(e) {
-    if (locked || showConfirm) return;
+    if (locked || step !== "idle") return;
     if (e.key !== "Enter" && e.key !== " ") return;
     e.preventDefault();
     maxXRef.current = getMaxX();
@@ -126,7 +191,8 @@ export default function SwipeToRegister({
   }
 
   const active = locked;
-  const shownX = active || showConfirm ? maxXRef.current || getMaxX() : dragX;
+  const showingCard = step !== "idle";
+  const shownX = active || showingCard ? maxXRef.current || getMaxX() : dragX;
   const max = getMaxX() || 1;
   const progress = Math.min(1, shownX / max);
 
@@ -163,7 +229,7 @@ export default function SwipeToRegister({
           role="button"
           tabIndex={locked ? -1 : 0}
           aria-disabled={locked}
-          aria-label={`${idleLabel} — enter your details to call the organizer`}
+          aria-label={`${idleLabel} — sign in and enter your details to call the organizer`}
           onPointerDown={handlePointerDown}
           onKeyDown={handleKeyDown}
         >
@@ -184,74 +250,108 @@ export default function SwipeToRegister({
         </div>
       </div>
 
-      {showConfirm && (
+      {showingCard && (
         <div
           className="register-confirm-backdrop"
           role="dialog"
           aria-modal="true"
-          aria-label="Confirm your registration details"
+          aria-label="Register for this tournament"
         >
-          <form
+          <div
             className="register-confirm-card"
             onClick={(e) => e.stopPropagation()}
-            onSubmit={handleConfirm}
           >
-            <h3>Confirm your details</h3>
-            <p className="register-confirm-sub">
-              We&rsquo;ll save these so the organizer knows who&rsquo;s calling.
-            </p>
+            {step === "signin" && (
+              <>
+                <h3>Sign in to register</h3>
+                <p className="register-confirm-sub">
+                  Sign in so the organizer knows who&rsquo;s registering — it only takes a moment.
+                </p>
+                <AuthForm next={`${pathname}?register=1`} />
+                <div className="register-confirm-actions">
+                  <button
+                    type="button"
+                    className="btn btn-ghost"
+                    onClick={resetSlider}
+                  >
+                    Cancel
+                  </button>
+                </div>
+              </>
+            )}
 
-            <label className="post-field">
-              Your name
-              <input
-                type="text"
-                autoFocus
-                maxLength={80}
-                value={name}
-                disabled={submitting}
-                onChange={(e) => setName(e.target.value)}
-              />
-            </label>
+            {step === "confirm" && (
+              <form onSubmit={handleConfirm}>
+                <h3>Confirm your details</h3>
+                <p className="register-confirm-sub">
+                  We&rsquo;ll save these so the organizer knows who&rsquo;s calling.
+                </p>
 
-            <label className="post-field">
-              Phone number
-              <input
-                type="tel"
-                inputMode="numeric"
-                maxLength={10}
-                placeholder="10-digit mobile number"
-                value={phone}
-                disabled={submitting}
-                onChange={(e) => setPhone(e.target.value.replace(/[^\d]/g, ""))}
-              />
-            </label>
+                <label className="post-field">
+                  Your name
+                  <input
+                    type="text"
+                    autoFocus
+                    maxLength={80}
+                    value={name}
+                    disabled={submitting}
+                    onChange={(e) => setName(e.target.value)}
+                  />
+                </label>
 
-            <label className="register-confirm-checkbox">
-              <input
-                type="checkbox"
-                checked={wantsUpdates}
-                disabled={submitting}
-                onChange={(e) => setWantsUpdates(e.target.checked)}
-              />
-              Receive tournament updates regularly
-            </label>
+                <label className="post-field">
+                  Phone number
+                  <input
+                    type="tel"
+                    inputMode="numeric"
+                    maxLength={10}
+                    placeholder="10-digit mobile number"
+                    value={phone}
+                    disabled={submitting}
+                    onChange={(e) => setPhone(e.target.value.replace(/[^\d]/g, ""))}
+                  />
+                </label>
 
-            {formError && <p className="post-error">{formError}</p>}
+                <label className="register-confirm-checkbox">
+                  <input
+                    type="checkbox"
+                    checked={wantsUpdates}
+                    disabled={submitting}
+                    onChange={(e) => setWantsUpdates(e.target.checked)}
+                  />
+                  Receive tournament updates regularly
+                </label>
 
-            <div className="register-confirm-actions">
-              <button
-                type="button"
-                className="btn btn-ghost"
-                disabled={submitting}
-                onClick={resetSlider}
-              >
-                Cancel
-              </button>
-              <button type="submit" className="btn btn-primary" disabled={submitting}>
-                {submitting ? "Submitting…" : "Confirm & Call"}
-              </button>
-            </div>
-          </form>
+                {formError && <p className="post-error">{formError}</p>}
+
+                <div className="register-confirm-actions">
+                  <button
+                    type="button"
+                    className="btn btn-ghost"
+                    disabled={submitting}
+                    onClick={resetSlider}
+                  >
+                    Cancel
+                  </button>
+                  <button type="submit" className="btn btn-primary" disabled={submitting}>
+                    {submitting ? "Submitting…" : "Confirm & Call"}
+                  </button>
+                </div>
+              </form>
+            )}
+
+            {step === "success" && (
+              <div className="register-success">
+                <div className="register-success-icon" aria-hidden="true">
+                  ✓
+                </div>
+                <h3>You&rsquo;re registered!</h3>
+                <p className="register-confirm-sub">
+                  Calling the organizer now so you can lock in your spot…
+                </p>
+              </div>
+            )}
+          </div>
         </div>
       )}
     </>

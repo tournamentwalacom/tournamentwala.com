@@ -3,7 +3,11 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 
-export default function CompleteProfileForm({ initialName = "", initialPhone = "" }) {
+export default function CompleteProfileForm({
+  initialName = "",
+  initialPhone = "",
+  mode = "create",
+}) {
   const router = useRouter();
   const [fullName, setFullName] = useState(initialName);
   const [phone, setPhone] = useState(initialPhone);
@@ -31,12 +35,15 @@ export default function CompleteProfileForm({ initialName = "", initialPhone = "
     router.refresh();
   }
 
+  const isEdit = mode === "edit";
+
   return (
     <div className="auth-card">
-      <h3>One last thing</h3>
+      <h3>{isEdit ? "Edit your details" : "One last thing"}</h3>
       <p className="post-intro">
-        Tell us your name and phone number so organizers and our team can
-        reach you about your listing.
+        {isEdit
+          ? "Update your name and phone number — this is what organizers and our team see for you."
+          : "Tell us your name and phone number so organizers and our team can reach you about your listing."}
       </p>
 
       <form className="post-form" onSubmit={handleSubmit}>
@@ -65,7 +72,7 @@ export default function CompleteProfileForm({ initialName = "", initialPhone = "
         {error && <p className="post-error">{error}</p>}
 
         <button type="submit" className="btn btn-primary" disabled={status === "busy"}>
-          {status === "busy" ? "Saving…" : "Continue"}
+          {status === "busy" ? "Saving…" : isEdit ? "Save changes" : "Continue"}
         </button>
       </form>
     </div>

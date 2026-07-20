@@ -3979,6 +3979,42 @@ html.nav-open .tdp-float-bar {
   flex: 1;
 }
 
+/* AuthForm rendered inline for the swipe-to-register sign-in step — strip
+   its own card chrome so it reads as part of .register-confirm-card instead
+   of a card nested inside a card. */
+.register-confirm-card .auth-card {
+  padding: 0;
+  border: none;
+  background: transparent;
+  max-width: none;
+}
+
+.register-success {
+  text-align: center;
+  padding: 12px 0 4px;
+}
+
+.register-success-icon {
+  width: 52px;
+  height: 52px;
+  margin: 0 auto 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  background: var(--crimson);
+  color: var(--chalk);
+  font-size: 1.4rem;
+}
+
+.register-success h3 {
+  margin: 0 0 6px;
+}
+
+.register-success .register-confirm-sub {
+  margin-bottom: 0;
+}
+
 @media (min-width: 640px) {
   .register-confirm-backdrop {
     align-items: center;

@@ -3,6 +3,7 @@ import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import TournamentPoster from "@/components/TournamentPoster";
 import RegisterFloatBar from "@/components/RegisterFloatBar";
+import { getCurrentUser } from "@/lib/supabaseServer";
 import {
   getTournamentBySeq,
   getSeqFromSlug,
@@ -38,7 +39,10 @@ export async function generateMetadata({ params }) {
 }
 
 export default async function TournamentDetailPage({ params }) {
-  const tournament = await loadTournament(params.slug);
+  const [tournament, session] = await Promise.all([
+    loadTournament(params.slug),
+    getCurrentUser(),
+  ]);
   if (!tournament) notFound();
 
   const dateRange = formatDateRange(tournament);
@@ -200,6 +204,9 @@ export default async function TournamentDetailPage({ params }) {
           prize={prize}
           registerHref={registerHref}
           tournamentId={tournament.id}
+          initialSignedIn={!!session}
+          initialName={session?.profile?.full_name || ""}
+          initialPhone={session?.profile?.phone || ""}
         />
       </div>
       <Footer />

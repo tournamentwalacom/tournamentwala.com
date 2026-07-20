@@ -57,19 +57,21 @@ function downloadExcel(rows) {
 }
 
 export default function PlayersList({ initialPlayers }) {
+  const [players, setPlayers] = useState(initialPlayers);
   const [search, setSearch] = useState("");
   const [city, setCity] = useState("all");
   const [sport, setSport] = useState("all");
   const [pincodeFrom, setPincodeFrom] = useState("");
   const [pincodeTo, setPincodeTo] = useState("");
+  const [deletingId, setDeletingId] = useState(null);
 
   const cities = useMemo(
-    () => [...new Set(initialPlayers.map((p) => p.city).filter(Boolean))].sort(),
-    [initialPlayers]
+    () => [...new Set(players.map((p) => p.city).filter(Boolean))].sort(),
+    [players]
   );
   const sports = useMemo(
-    () => [...new Set(initialPlayers.map((p) => p.sport).filter(Boolean))].sort(),
-    [initialPlayers]
+    () => [...new Set(players.map((p) => p.sport).filter(Boolean))].sort(),
+    [players]
   );
 
   const filtered = useMemo(() => {
@@ -77,7 +79,7 @@ export default function PlayersList({ initialPlayers }) {
     const from = pincodeFrom ? Number(pincodeFrom) : null;
     const to = pincodeTo ? Number(pincodeTo) : null;
 
-    return initialPlayers.filter((p) => {
+    return players.filter((p) => {
       if (city !== "all" && p.city !== city) return false;
       if (sport !== "all" && p.sport !== sport) return false;
 
@@ -95,7 +97,21 @@ export default function PlayersList({ initialPlayers }) {
 
       return true;
     });
-  }, [initialPlayers, search, city, sport, pincodeFrom, pincodeTo]);
+  }, [players, search, city, sport, pincodeFrom, pincodeTo]);
+
+  async function deletePlayer(player) {
+    if (!window.confirm(`Delete registration for "${player.player_name}"? This cannot be undone.`)) {
+      return;
+    }
+    setDeletingId(player.id);
+    const res = await fetch(`/api/admin/registrations/${player.id}`, { method: "DELETE" });
+    setDeletingId(null);
+    if (res.ok) {
+      setPlayers((prev) => prev.filter((p) => p.id !== player.id));
+    } else {
+      alert("Couldn't delete this registration. Please try again.");
+    }
+  }
 
   return (
     <div className="admin-players-wrap">
@@ -168,6 +184,7 @@ export default function PlayersList({ initialPlayers }) {
                 <th>Pincode</th>
                 <th>Updates opt-in</th>
                 <th>Registered</th>
+                <th>Actions</th>
               </tr>
             </thead>
             <tbody>
@@ -189,6 +206,16 @@ export default function PlayersList({ initialPlayers }) {
                     </span>
                   </td>
                   <td>{formatDate(p.created_at)}</td>
+                  <td>
+                    <button
+                      type="button"
+                      className="admin-btn admin-btn-reject"
+                      disabled={deletingId === p.id}
+                      onClick={() => deletePlayer(p)}
+                    >
+                      Delete
+                    </button>
+                  </td>
                 </tr>
               ))}
             </tbody>

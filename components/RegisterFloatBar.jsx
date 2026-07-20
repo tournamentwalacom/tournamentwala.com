@@ -3,7 +3,14 @@
 import { useEffect, useRef, useState } from "react";
 import SwipeToRegister from "./SwipeToRegister";
 
-export default function RegisterFloatBar({ prize, registerHref, tournamentId }) {
+export default function RegisterFloatBar({
+  prize,
+  registerHref,
+  tournamentId,
+  initialSignedIn,
+  initialName,
+  initialPhone,
+}) {
   const sentinelRef = useRef(null);
   const [docked, setDocked] = useState(false);
 
@@ -32,6 +39,9 @@ export default function RegisterFloatBar({ prize, registerHref, tournamentId }) 
               href={registerHref}
               tournamentId={tournamentId}
               idleLabel="Slide to Register"
+              initialSignedIn={initialSignedIn}
+              initialName={initialName}
+              initialPhone={initialPhone}
             />
           </div>
         </div>

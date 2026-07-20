@@ -1,3 +1,4 @@
+import crypto from "node:crypto";
 import { NextResponse } from "next/server";
 import { supabaseAdmin } from "@/lib/supabase";
 import { parseTournamentInput } from "@/lib/tournamentValidation";
@@ -6,6 +7,8 @@ import { getCurrentUser } from "@/lib/supabaseServer";
 import { geocodePincode } from "@/lib/geocode";
 import { computeRazorpayCharge, RAZORPAY_CATEGORY } from "@/lib/expenses";
 import { sendNotificationEmail, renderEmailLayout } from "@/lib/email";
+import { razorpayClient } from "@/lib/razorpay";
+import { checkRateLimit, clientIp } from "@/lib/rateLimit";
 
 export async function POST(request) {
   const session = await getCurrentUser();
@@ -13,6 +16,18 @@ export async function POST(request) {
     return NextResponse.json(
       { error: "Please sign in to post a tournament." },
       { status: 401 }
+    );
+  }
+
+  const withinLimit = await checkRateLimit(supabaseAdmin(), {
+    key: `tournament_submit:${clientIp(request)}`,
+    limit: 15,
+    windowSeconds: 60 * 60,
+  });
+  if (!withinLimit) {
+    return NextResponse.json(
+      { error: "Too many submissions. Please try again later." },
+      { status: 429 }
     );
   }
 
@@ -42,6 +57,49 @@ export async function POST(request) {
     return NextResponse.json({ error: promoError }, { status: 400 });
   }
 
+  // Paid add-ons must have gone through Razorpay Checkout first (see
+  // /api/tournaments/create-order). Verify the signature proves this
+  // payment_id genuinely belongs to this order_id, then re-check the order
+  // itself with Razorpay so a stale/tampered `promotions` payload here can't
+  // slip a smaller paid amount past a bigger cart than what create-order priced.
+  let razorpayPayment = null;
+  if (total > 0) {
+    const { razorpay_order_id, razorpay_payment_id, razorpay_signature } = body;
+    if (!razorpay_order_id || !razorpay_payment_id || !razorpay_signature) {
+      return NextResponse.json(
+        { error: "Payment is required for the selected add-ons." },
+        { status: 400 }
+      );
+    }
+
+    const expectedSignature = crypto
+      .createHmac("sha256", process.env.RAZORPAY_KEY_SECRET)
+      .update(`${razorpay_order_id}|${razorpay_payment_id}`)
+      .digest("hex");
+
+    if (expectedSignature !== razorpay_signature) {
+      return NextResponse.json({ error: "Payment verification failed." }, { status: 400 });
+    }
+
+    try {
+      const order = await razorpayClient().orders.fetch(razorpay_order_id);
+      if (order.status !== "paid" || order.amount !== Math.round(total * 100)) {
+        return NextResponse.json(
+          { error: "Payment amount doesn't match your order. Please try again." },
+          { status: 400 }
+        );
+      }
+    } catch (err) {
+      console.error("Failed to verify Razorpay order:", err);
+      return NextResponse.json(
+        { error: "Couldn't verify payment. Please try again." },
+        { status: 500 }
+      );
+    }
+
+    razorpayPayment = { razorpay_order_id, razorpay_payment_id };
+  }
+
   const { data, error: validationError } = parseTournamentInput(body, {
     posterOptional: requiresBrief,
   });
@@ -65,6 +123,8 @@ export async function POST(request) {
     promotions: selections,
     promotion_total: total,
     organizer_user_id: session.user.id,
+    razorpay_order_id: razorpayPayment?.razorpay_order_id ?? null,
+    razorpay_payment_id: razorpayPayment?.razorpay_payment_id ?? null,
   });
 
   if (error) {
@@ -83,7 +143,7 @@ export async function POST(request) {
       category: RAZORPAY_CATEGORY,
       amount: computeRazorpayCharge(total),
       expense_date: new Date().toISOString().slice(0, 10),
-      notes: `Auto-logged for order by ${row.organizer_name} (₹${total} package total).`,
+      notes: `Auto-logged for order by ${row.organizer_name} (₹${total} package total, Razorpay payment ${razorpayPayment.razorpay_payment_id}).`,
     });
     if (expenseError) {
       console.error("Failed to log Razorpay expense row:", expenseError);
