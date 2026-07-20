@@ -458,6 +458,22 @@ create policy "Players can read own registrations"
   on registrations for select
   using (auth.uid() = user_id);
 
+-- Additive: lets an organizer read the registrations for tournaments they
+-- posted, via the /profile "view registered players" panel. The app code
+-- actually does this read through the service_role client with an explicit
+-- ownership check (see app/api/organizer/tournaments/[id]/registrations),
+-- so this policy is defense-in-depth, not load-bearing.
+drop policy if exists "Organizers can read registrations for own tournaments" on registrations;
+create policy "Organizers can read registrations for own tournaments"
+  on registrations for select
+  using (
+    exists (
+      select 1 from tournaments
+      where tournaments.id = registrations.tournament_id
+        and tournaments.organizer_user_id = auth.uid()
+    )
+  );
+
 -- Backs lib/rateLimit.js — a small fixed-window rate limiter for public POST
 -- routes (admin login, tournament/registration/contact submit, poster
 -- upload). Vercel functions are stateless/serverless, so an in-memory

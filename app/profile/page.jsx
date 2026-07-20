@@ -2,7 +2,9 @@ import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import AuthForm from "@/components/AuthForm";
 import CompleteProfileForm from "@/components/CompleteProfileForm";
+import ProfileTournamentPlayers from "@/components/ProfileTournamentPlayers";
 import { getCurrentUser, createServerSupabaseClient } from "@/lib/supabaseServer";
+import { supabaseAdmin } from "@/lib/supabase";
 import {
   formatEntryFee,
   formatPrize,
@@ -64,6 +66,18 @@ export default async function ProfilePage() {
       .eq("user_id", session.user.id)
       .order("created_at", { ascending: false }),
   ]);
+
+  const tournamentIds = (tournaments || []).map((t) => t.id);
+  const registrationCounts = {};
+  if (tournamentIds.length) {
+    const { data: allRegistrations } = await supabaseAdmin()
+      .from("registrations")
+      .select("tournament_id")
+      .in("tournament_id", tournamentIds);
+    for (const r of allRegistrations || []) {
+      registrationCounts[r.tournament_id] = (registrationCounts[r.tournament_id] || 0) + 1;
+    }
+  }
 
   const { profile, user } = session;
 
@@ -133,6 +147,11 @@ export default async function ProfilePage() {
                   <p className="profile-tournament-meta">
                     Entry {formatEntryFee(t)} · Prize {formatPrize(t)}
                   </p>
+                  <ProfileTournamentPlayers
+                    tournamentId={t.id}
+                    tournamentName={t.name}
+                    count={registrationCounts[t.id] || 0}
+                  />
                 </li>
               ))}
             </ul>

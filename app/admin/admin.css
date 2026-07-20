@@ -408,6 +408,17 @@
   margin-top: 4px;
 }
 
+.admin-modal-wide {
+  max-width: 760px;
+}
+
+.admin-modal-hint-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
 .admin-card-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));

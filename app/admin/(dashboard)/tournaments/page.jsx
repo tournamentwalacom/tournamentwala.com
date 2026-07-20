@@ -3,6 +3,7 @@ import { supabaseAdmin } from "@/lib/supabase";
 import { formatEntryFee, formatPrize } from "@/lib/tournaments";
 import TournamentReviewRow from "@/components/admin/TournamentReviewRow";
 import TournamentRowActions from "@/components/admin/TournamentRowActions";
+import TournamentPlayersButton from "@/components/admin/TournamentPlayersButton";
 
 export default async function AdminTournamentsPage() {
   const db = supabaseAdmin();
@@ -31,6 +32,24 @@ export default async function AdminTournamentsPage() {
         .order("created_at", { ascending: false }),
     ]);
 
+  const allIds = [
+    ...(pending || []),
+    ...(live || []),
+    ...(completed || []),
+    ...(other || []),
+  ].map((t) => t.id);
+
+  const playersCount = {};
+  if (allIds.length) {
+    const { data: allRegistrations } = await db
+      .from("registrations")
+      .select("tournament_id")
+      .in("tournament_id", allIds);
+    for (const r of allRegistrations || []) {
+      playersCount[r.tournament_id] = (playersCount[r.tournament_id] || 0) + 1;
+    }
+  }
+
   return (
     <>
       <div className="admin-page-header">
@@ -55,12 +74,17 @@ export default async function AdminTournamentsPage() {
                 <th>Start date</th>
                 <th>Organizer</th>
                 <th>Promotions</th>
+                <th>Players</th>
                 <th>Action</th>
               </tr>
             </thead>
             <tbody>
               {pending.map((t) => (
-                <TournamentReviewRow key={t.id} tournament={t} />
+                <TournamentReviewRow
+                  key={t.id}
+                  tournament={t}
+                  playersCount={playersCount[t.id] || 0}
+                />
               ))}
             </tbody>
           </table>
@@ -82,6 +106,7 @@ export default async function AdminTournamentsPage() {
                 <th>City</th>
                 <th>Entry</th>
                 <th>Prize pool</th>
+                <th>Players</th>
                 <th>Action</th>
               </tr>
             </thead>
@@ -93,6 +118,13 @@ export default async function AdminTournamentsPage() {
                   <td>{t.city}</td>
                   <td>{formatEntryFee(t)}</td>
                   <td>{formatPrize(t)}</td>
+                  <td>
+                    <TournamentPlayersButton
+                      tournamentId={t.id}
+                      tournamentName={t.name}
+                      count={playersCount[t.id] || 0}
+                    />
+                  </td>
                   <td className="admin-row-actions">
                     <TournamentRowActions tournament={t} showUnpublish />
                   </td>
@@ -117,6 +149,7 @@ export default async function AdminTournamentsPage() {
                 <th>Sport</th>
                 <th>City</th>
                 <th>Date</th>
+                <th>Players</th>
                 <th>Action</th>
               </tr>
             </thead>
@@ -127,6 +160,13 @@ export default async function AdminTournamentsPage() {
                   <td>{t.sport}</td>
                   <td>{t.city}</td>
                   <td>{t.start_date}</td>
+                  <td>
+                    <TournamentPlayersButton
+                      tournamentId={t.id}
+                      tournamentName={t.name}
+                      count={playersCount[t.id] || 0}
+                    />
+                  </td>
                   <td className="admin-row-actions">
                     <TournamentRowActions tournament={t} />
                   </td>
@@ -151,6 +191,7 @@ export default async function AdminTournamentsPage() {
                 <th>Sport</th>
                 <th>City</th>
                 <th>Status</th>
+                <th>Players</th>
                 <th>Action</th>
               </tr>
             </thead>
@@ -161,6 +202,13 @@ export default async function AdminTournamentsPage() {
                   <td>{t.sport}</td>
                   <td>{t.city}</td>
                   <td>{t.status}</td>
+                  <td>
+                    <TournamentPlayersButton
+                      tournamentId={t.id}
+                      tournamentName={t.name}
+                      count={playersCount[t.id] || 0}
+                    />
+                  </td>
                   <td className="admin-row-actions">
                     <TournamentRowActions tournament={t} />
                   </td>

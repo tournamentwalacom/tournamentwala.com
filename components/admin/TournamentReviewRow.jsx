@@ -3,6 +3,7 @@
 import { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import TournamentPlayersButton from "@/components/admin/TournamentPlayersButton";
 
 const STRUCTURED_BRIEF_FIELDS = [
   ["description", "Description"],
@@ -28,7 +29,7 @@ const STRUCTURED_BRIEF_FIELDS = [
   ["gender_tag", "Gender"],
 ];
 
-export default function TournamentReviewRow({ tournament }) {
+export default function TournamentReviewRow({ tournament, playersCount }) {
   const router = useRouter();
   const [busy, setBusy] = useState(false);
   const [showReject, setShowReject] = useState(false);
@@ -98,6 +99,13 @@ export default function TournamentReviewRow({ tournament }) {
           "—"
         )}
       </td>
+      <td>
+        <TournamentPlayersButton
+          tournamentId={tournament.id}
+          tournamentName={tournament.name}
+          count={playersCount || 0}
+        />
+      </td>
       <td className="admin-row-actions">
         {!showReject ? (
           <>
@@ -159,7 +167,7 @@ export default function TournamentReviewRow({ tournament }) {
     </tr>
     {hasBrief && showBrief && (
       <tr className="admin-row-brief">
-        <td colSpan={6}>
+        <td colSpan={7}>
           <div className="admin-brief-box">
             <strong>Poster/reel brief</strong>{" "}
             <span className="admin-row-sub">
