@@ -1,7 +1,11 @@
+import Navbar from "@/components/Navbar";
+import TicketLoader from "@/components/TicketLoader";
+
 export default function Loading() {
   return (
-    <div className="page-loading" role="status" aria-label="Loading">
-      <div className="page-loading-spinner" />
-    </div>
+    <>
+      <Navbar />
+      <TicketLoader page belowNav size="lg" />
+    </>
   );
 }
