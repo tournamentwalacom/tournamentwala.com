@@ -20,7 +20,7 @@ function formatRegisteredOn(iso) {
 
 export default async function TournamentPlayersPage({ params }) {
   const session = await getCurrentUser();
-  const backHref = `/profile/tournaments/${params.slug}/players`;
+  const backHref = `/profile/${params.slug}/players`;
   const seq = getSeqFromSlug(params.slug);
 
   if (!session) {

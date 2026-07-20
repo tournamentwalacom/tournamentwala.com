@@ -459,7 +459,7 @@ create policy "Players can read own registrations"
   using (auth.uid() = user_id);
 
 -- Additive: lets an organizer read the registrations for tournaments they
--- posted, via /profile/tournaments/[id]/players. The app code actually does
+-- posted, via /profile/[id]/players. The app code actually does
 -- this read through the service_role client with an explicit ownership
 -- check (see that page's server component), so this policy is
 -- defense-in-depth, not load-bearing.
