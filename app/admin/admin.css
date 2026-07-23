@@ -465,10 +465,6 @@
   margin-bottom: 12px;
 }
 
-.admin-section-title-spaced {
-  margin-top: 32px;
-}
-
 .admin-table-scroll {
   width: 100%;
   overflow-x: auto;
@@ -604,6 +600,110 @@
   border: 1px solid var(--line);
   font-size: 12px;
   min-width: 140px;
+}
+
+/* Tournament admin: sectioned panels + bulk select/approve */
+.admin-panel {
+  background: var(--chalk);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow-card);
+  overflow: hidden;
+  margin-bottom: 28px;
+}
+
+.admin-panel-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  flex-wrap: wrap;
+  padding: 16px 20px;
+  border-bottom: 1px solid var(--line);
+  background: var(--paper);
+}
+
+.admin-panel-title {
+  margin-bottom: 0;
+}
+
+.admin-panel .admin-table-scroll {
+  border-radius: 0;
+}
+
+.admin-panel .admin-table {
+  border: none;
+  border-radius: 0;
+}
+
+.admin-panel .admin-placeholder {
+  border: none;
+  border-radius: 0;
+  box-shadow: none;
+  padding: 28px;
+}
+
+.admin-table tbody tr:hover td {
+  background: var(--paper);
+}
+
+.admin-table tbody tr.admin-row-selected td {
+  background: var(--crimson-tint, #fcebed);
+}
+
+.admin-th-check,
+.admin-td-check {
+  width: 36px;
+  text-align: center !important;
+}
+
+.admin-th-check input,
+.admin-td-check input {
+  width: 16px;
+  height: 16px;
+  cursor: pointer;
+  accent-color: var(--crimson);
+}
+
+.admin-bulk-toolbar {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.admin-bulk-count {
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--ink);
+  margin-right: 4px;
+  white-space: nowrap;
+}
+
+.admin-status-completed {
+  background: var(--line);
+  color: var(--steel);
+}
+
+.admin-status-rejected,
+.admin-status-cancelled {
+  background: var(--crimson-tint, #fcebed);
+  color: var(--crimson-deep, #c11226);
+}
+
+@media (max-width: 640px) {
+  .admin-panel-head {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .admin-bulk-toolbar {
+    width: 100%;
+  }
+
+  .admin-reject-box.admin-bulk-toolbar input {
+    flex: 1 1 auto;
+  }
 }
 
 .admin-logout-btn {

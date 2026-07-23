@@ -1,9 +1,7 @@
 import Link from "next/link";
 import { supabaseAdmin } from "@/lib/supabase";
-import { formatEntryFee, formatPrize } from "@/lib/tournaments";
-import TournamentReviewRow from "@/components/admin/TournamentReviewRow";
-import TournamentRowActions from "@/components/admin/TournamentRowActions";
-import TournamentPlayersButton from "@/components/admin/TournamentPlayersButton";
+import PendingTournamentsPanel from "@/components/admin/PendingTournamentsPanel";
+import TournamentsSectionPanel from "@/components/admin/TournamentsSectionPanel";
 
 export default async function AdminTournamentsPage() {
   const db = supabaseAdmin();
@@ -59,165 +57,28 @@ export default async function AdminTournamentsPage() {
         </Link>
       </div>
 
-      <h2 className="admin-section-title">
-        Pending review {pending?.length ? `(${pending.length})` : ""}
-      </h2>
-      {!pending?.length ? (
-        <div className="admin-placeholder">Nothing waiting on review.</div>
-      ) : (
-        <div className="admin-table-scroll">
-          <table className="admin-table">
-            <thead>
-              <tr>
-                <th>Tournament</th>
-                <th>Venue</th>
-                <th>Start date</th>
-                <th>Organizer</th>
-                <th>Promotions</th>
-                <th>Players</th>
-                <th>Action</th>
-              </tr>
-            </thead>
-            <tbody>
-              {pending.map((t) => (
-                <TournamentReviewRow
-                  key={t.id}
-                  tournament={t}
-                  playersCount={playersCount[t.id] || 0}
-                />
-              ))}
-            </tbody>
-          </table>
-        </div>
-      )}
+      <PendingTournamentsPanel tournaments={pending || []} playersCount={playersCount} />
 
-      <h2 className="admin-section-title admin-section-title-spaced">
-        Live {live?.length ? `(${live.length})` : ""}
-      </h2>
-      {!live?.length ? (
-        <div className="admin-placeholder">No live tournaments yet.</div>
-      ) : (
-        <div className="admin-table-scroll">
-          <table className="admin-table">
-            <thead>
-              <tr>
-                <th>Tournament</th>
-                <th>Sport</th>
-                <th>City</th>
-                <th>Entry</th>
-                <th>Prize pool</th>
-                <th>Players</th>
-                <th>Action</th>
-              </tr>
-            </thead>
-            <tbody>
-              {live.map((t) => (
-                <tr key={t.id}>
-                  <td>{t.name}</td>
-                  <td>{t.sport}</td>
-                  <td>{t.city}</td>
-                  <td>{formatEntryFee(t)}</td>
-                  <td>{formatPrize(t)}</td>
-                  <td>
-                    <TournamentPlayersButton
-                      tournamentId={t.id}
-                      tournamentName={t.name}
-                      count={playersCount[t.id] || 0}
-                    />
-                  </td>
-                  <td className="admin-row-actions">
-                    <TournamentRowActions tournament={t} showUnpublish />
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-      )}
+      <TournamentsSectionPanel
+        kind="live"
+        title="Live"
+        tournaments={live || []}
+        playersCount={playersCount}
+      />
 
-      <h2 className="admin-section-title admin-section-title-spaced">
-        Completed {completed?.length ? `(${completed.length})` : ""}
-      </h2>
-      {!completed?.length ? (
-        <div className="admin-placeholder">No completed tournaments yet.</div>
-      ) : (
-        <div className="admin-table-scroll">
-          <table className="admin-table">
-            <thead>
-              <tr>
-                <th>Tournament</th>
-                <th>Sport</th>
-                <th>City</th>
-                <th>Date</th>
-                <th>Players</th>
-                <th>Action</th>
-              </tr>
-            </thead>
-            <tbody>
-              {completed.map((t) => (
-                <tr key={t.id}>
-                  <td>{t.name}</td>
-                  <td>{t.sport}</td>
-                  <td>{t.city}</td>
-                  <td>{t.start_date}</td>
-                  <td>
-                    <TournamentPlayersButton
-                      tournamentId={t.id}
-                      tournamentName={t.name}
-                      count={playersCount[t.id] || 0}
-                    />
-                  </td>
-                  <td className="admin-row-actions">
-                    <TournamentRowActions tournament={t} />
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-      )}
+      <TournamentsSectionPanel
+        kind="completed"
+        title="Completed"
+        tournaments={completed || []}
+        playersCount={playersCount}
+      />
 
-      <h2 className="admin-section-title admin-section-title-spaced">
-        Rejected / cancelled {other?.length ? `(${other.length})` : ""}
-      </h2>
-      {!other?.length ? (
-        <div className="admin-placeholder">No rejected or cancelled tournaments.</div>
-      ) : (
-        <div className="admin-table-scroll">
-          <table className="admin-table">
-            <thead>
-              <tr>
-                <th>Tournament</th>
-                <th>Sport</th>
-                <th>City</th>
-                <th>Status</th>
-                <th>Players</th>
-                <th>Action</th>
-              </tr>
-            </thead>
-            <tbody>
-              {other.map((t) => (
-                <tr key={t.id}>
-                  <td>{t.name}</td>
-                  <td>{t.sport}</td>
-                  <td>{t.city}</td>
-                  <td>{t.status}</td>
-                  <td>
-                    <TournamentPlayersButton
-                      tournamentId={t.id}
-                      tournamentName={t.name}
-                      count={playersCount[t.id] || 0}
-                    />
-                  </td>
-                  <td className="admin-row-actions">
-                    <TournamentRowActions tournament={t} />
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-      )}
+      <TournamentsSectionPanel
+        kind="other"
+        title="Rejected / cancelled"
+        tournaments={other || []}
+        playersCount={playersCount}
+      />
     </>
   );
 }

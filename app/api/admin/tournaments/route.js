@@ -29,14 +29,20 @@ export async function POST(request) {
   // the form explicitly picked a different status.
   const status = data.status || "live";
 
-  // Cached once here so /explore-tournaments can sort by distance without
-  // geocoding on every page view. Never blocks the submission on failure.
-  const coords = await geocodePincode(data.pincode);
+  // The "Auto-fill details" button (see admin/TournamentForm.jsx) resolves
+  // precise coordinates from the pasted Google Maps venue link client-side —
+  // far more accurate than a pincode's postal-area centroid. Pincode
+  // geocoding only kicks in as a fallback if that's somehow missing.
+  const { latitude, longitude, ...rest } = data;
+  const coords =
+    latitude != null && longitude != null
+      ? { latitude, longitude }
+      : await geocodePincode(rest.pincode);
 
   const { error } = await supabaseAdmin()
     .from("tournaments")
     .insert({
-      ...data,
+      ...rest,
       latitude: coords?.latitude ?? null,
       longitude: coords?.longitude ?? null,
       status,

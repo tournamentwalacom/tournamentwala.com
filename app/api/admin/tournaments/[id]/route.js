@@ -30,14 +30,20 @@ export async function PATCH(request, { params }) {
 
     const status = data.status || "pending";
 
-    // Re-geocode on every edit — cheap since edits are rare, and keeps
-    // coordinates in sync if the organizer/admin changed the pincode.
-    const coords = await geocodePincode(data.pincode);
+    // The "Auto-fill details" button (see admin/TournamentForm.jsx) resolves
+    // precise coordinates from the pasted Google Maps venue link client-side.
+    // Only falls back to re-geocoding the pincode if the link/coords weren't
+    // resent (e.g. an old row edited without touching the map link field).
+    const { latitude, longitude, ...rest } = data;
+    const coords =
+      latitude != null && longitude != null
+        ? { latitude, longitude }
+        : await geocodePincode(rest.pincode);
 
     const { error } = await supabaseAdmin()
       .from("tournaments")
       .update({
-        ...data,
+        ...rest,
         latitude: coords?.latitude ?? null,
         longitude: coords?.longitude ?? null,
         status,

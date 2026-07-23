@@ -1,6 +1,7 @@
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import { supabaseAdmin } from "@/lib/supabase";
+import { applyDiscount, getActiveDiscount } from "@/lib/promotionPackages";
 
 export const metadata = {
   title: "About us — TournamentWala.com",
@@ -15,15 +16,31 @@ function formatPrice(pkg) {
 }
 
 export default async function AboutPage() {
-  const { data: packages } = await supabaseAdmin()
-    .from("promotion_packages")
-    .select(
-      "id, name, description, price, price_unit, is_free, requires_telegram_upload, requires_brief"
-    )
-    .eq("is_active", true)
-    .order("sort_order", { ascending: true });
+  const db = supabaseAdmin();
+  const [{ data: rawPackages }, discount] = await Promise.all([
+    db
+      .from("promotion_packages")
+      .select(
+        "id, name, description, price, price_unit, is_free, requires_telegram_upload, requires_brief"
+      )
+      .eq("is_active", true)
+      .order("sort_order", { ascending: true }),
+    getActiveDiscount(db),
+  ]);
 
-  const paidPackages = (packages || []).filter((pkg) => !pkg.is_free);
+  // Mirrors /api/promotion-packages: the site-wide discount set in
+  // /admin/pricing is knocked off every paid package's displayed price here
+  // too, so this page never shows a price the picker wouldn't charge.
+  const packages = (rawPackages || []).map((pkg) => {
+    if (pkg.is_free || !discount.is_active || discount.percentage <= 0) return pkg;
+    return {
+      ...pkg,
+      original_price: pkg.price,
+      price: applyDiscount(pkg.price, discount.percentage),
+    };
+  });
+
+  const paidPackages = packages.filter((pkg) => !pkg.is_free);
   const featuredId = paidPackages[0]?.id;
 
   return (
@@ -166,8 +183,12 @@ export default async function AboutPage() {
             </p>
           </div>
 
+          {discount.is_active && discount.message && (
+            <p className="promo-discount-banner">🔥 {discount.message}</p>
+          )}
+
           <div className="pricing-grid">
-            {(packages || []).map((pkg) => (
+            {packages.map((pkg) => (
               <div
                 key={pkg.id}
                 className={
@@ -184,7 +205,14 @@ export default async function AboutPage() {
                   {pkg.is_free ? (
                     <span className="pricing-badge-free">Free</span>
                   ) : (
-                    <span className="pricing-price">{formatPrice(pkg)}</span>
+                    <span className="pricing-price">
+                      {pkg.original_price != null && (
+                        <span className="promo-card-price-original">
+                          {formatPrice({ ...pkg, price: pkg.original_price })}
+                        </span>
+                      )}
+                      {formatPrice(pkg)}
+                    </span>
                   )}
                 </div>
                 <p className="pricing-desc">{pkg.description}</p>

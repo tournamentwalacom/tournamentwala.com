@@ -109,11 +109,16 @@ export async function POST(request) {
 
   // Organizer submissions always start in the review queue — only the
   // admin-facing routes can set status, "hot", or "announce" directly.
-  const { hot, announce, status, ...row } = data;
+  const { hot, announce, status, latitude, longitude, ...row } = data;
 
-  // Cached once here so /explore-tournaments can sort by distance without
-  // geocoding on every page view. Never blocks the submission on failure.
-  const coords = await geocodePincode(row.pincode);
+  // The organizer's "Auto-fill details" button (see PostTournamentForm.jsx)
+  // resolves precise coordinates from the pasted Google Maps venue link
+  // client-side — far more accurate than a pincode's postal-area centroid.
+  // Pincode geocoding only kicks in as a fallback if that's somehow missing.
+  const coords =
+    latitude != null && longitude != null
+      ? { latitude, longitude }
+      : await geocodePincode(row.pincode);
 
   const { error } = await db.from("tournaments").insert({
     ...row,

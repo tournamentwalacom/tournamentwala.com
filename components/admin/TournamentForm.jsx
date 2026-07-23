@@ -9,6 +9,7 @@ import {
 } from "@/lib/tournaments";
 import PosterUploadField from "@/components/PosterUploadField";
 import AdminPackagesField from "@/components/admin/AdminPackagesField";
+import VenueMapAutofillButton from "@/components/VenueMapAutofillButton";
 
 const STATUS_OPTIONS = [
   { value: "live", label: "Live" },
@@ -35,6 +36,9 @@ function buildInitialForm(initial) {
       venue: "",
       address: "",
       pincode: "",
+      google_maps_link: "",
+      latitude: null,
+      longitude: null,
       start_date: "",
       format: "",
       formatOther: "",
@@ -66,6 +70,9 @@ function buildInitialForm(initial) {
     venue: initial.venue || "",
     address: initial.address || "",
     pincode: initial.pincode || "",
+    google_maps_link: initial.google_maps_link || "",
+    latitude: typeof initial.latitude === "number" ? initial.latitude : null,
+    longitude: typeof initial.longitude === "number" ? initial.longitude : null,
     start_date: initial.start_date || "",
     format: initial.format ? (knownFormat ? initial.format : "Other") : "",
     formatOther: knownFormat ? "" : initial.format || "",
@@ -93,12 +100,25 @@ export default function TournamentForm({ mode, initial }) {
     setForm((f) => ({ ...f, [field]: value }));
   }
 
+  // Editing the map link after a successful auto-fill invalidates whatever
+  // coordinates were fetched for the previous link — clear them so a stale
+  // location can never be saved, forcing a re-click of "Auto-fill".
+  function updateMapLink(value) {
+    setForm((f) => ({ ...f, google_maps_link: value, latitude: null, longitude: null }));
+  }
+
   async function handleSubmit(e) {
     e.preventDefault();
     setError("");
 
     if (!form.image_url) {
       setError("Please upload the main tournament poster.");
+      setStatus("error");
+      return;
+    }
+
+    if (!form.latitude || !form.longitude) {
+      setError("Please paste the venue's Google Maps link and click \"Auto-fill details\" before saving.");
       setStatus("error");
       return;
     }
@@ -281,6 +301,35 @@ export default function TournamentForm({ mode, initial }) {
             onChange={(e) => update("pincode", e.target.value.replace(/\D/g, ""))}
           />
         </label>
+
+        <label className="post-field post-field-wide">
+          Venue location — Google Maps link
+          <input
+            type="url"
+            required
+            placeholder="https://maps.app.goo.gl/… or https://maps.google.com/…"
+            value={form.google_maps_link}
+            onChange={(e) => updateMapLink(e.target.value)}
+          />
+        </label>
+
+        <div className="post-field post-field-wide post-map-autofill-field">
+          <VenueMapAutofillButton
+            mapUrl={form.google_maps_link}
+            latitude={form.latitude}
+            longitude={form.longitude}
+            onResult={(result) =>
+              setForm((f) => ({
+                ...f,
+                latitude: result.latitude,
+                longitude: result.longitude,
+                address: result.address || f.address,
+                city: result.city || f.city,
+                pincode: result.pincode || f.pincode,
+              }))
+            }
+          />
+        </div>
 
         <h3 className="post-form-section">4. Schedule</h3>
 

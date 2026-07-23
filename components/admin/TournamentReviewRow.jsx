@@ -29,7 +29,12 @@ const STRUCTURED_BRIEF_FIELDS = [
   ["gender_tag", "Gender"],
 ];
 
-export default function TournamentReviewRow({ tournament, playersCount }) {
+export default function TournamentReviewRow({
+  tournament,
+  playersCount,
+  selected,
+  onToggleSelect,
+}) {
   const router = useRouter();
   const [busy, setBusy] = useState(false);
   const [showReject, setShowReject] = useState(false);
@@ -61,7 +66,15 @@ export default function TournamentReviewRow({ tournament, playersCount }) {
 
   return (
     <>
-    <tr>
+    <tr className={selected ? "admin-row-selected" : undefined}>
+      <td className="admin-td-check">
+        <input
+          type="checkbox"
+          checked={Boolean(selected)}
+          onChange={onToggleSelect}
+          aria-label={`Select ${tournament.name}`}
+        />
+      </td>
       <td>
         <strong>{tournament.name}</strong>
         <div className="admin-row-sub">
@@ -167,7 +180,7 @@ export default function TournamentReviewRow({ tournament, playersCount }) {
     </tr>
     {hasBrief && showBrief && (
       <tr className="admin-row-brief">
-        <td colSpan={7}>
+        <td colSpan={8}>
           <div className="admin-brief-box">
             <strong>Poster/reel brief</strong>{" "}
             <span className="admin-row-sub">
