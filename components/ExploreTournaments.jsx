@@ -110,7 +110,14 @@ export default function ExploreTournaments({
 
     const choice = localStorage.getItem(LOCATION_CHOICE_KEY);
     if (choice === "granted") {
-      requestLocation({ onSuccess: setUserCoords });
+      setLocatingLocation(true);
+      requestLocation({
+        onSuccess: (coords) => {
+          setUserCoords(coords);
+          setLocatingLocation(false);
+        },
+        onError: () => setLocatingLocation(false),
+      });
       return;
     }
     if (choice === "denied") return;
@@ -507,7 +514,9 @@ export default function ExploreTournaments({
       </div>
 
       <section className="section container explore-results">
-        {filtered.length === 0 ? (
+        {locatingLocation ? (
+          <TicketLoader page inline label="Finding tournaments near you" />
+        ) : filtered.length === 0 ? (
           <div className="tickets-empty">
             No tournaments match{" "}
             {search
