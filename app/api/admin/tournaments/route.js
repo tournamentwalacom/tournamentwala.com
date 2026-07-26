@@ -28,7 +28,7 @@ export async function POST(request) {
   // the form explicitly picked a different status. latitude/longitude are
   // guaranteed present by parseTournamentInput (set via the "Auto-fill from
   // map link" button — see components/VenueMapAutofillButton.jsx) — far
-  // more accurate than the old pincode-centroid geocoding this replaced.
+  // more accurate than pincode-centroid geocoding.
   const status = data.status || "live";
 
   const { error } = await supabaseAdmin()

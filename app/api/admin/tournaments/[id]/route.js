@@ -31,8 +31,8 @@ export async function PATCH(request, { params }) {
 
     // latitude/longitude are guaranteed present by parseTournamentInput (set
     // via the "Auto-fill from map link" button — see
-    // components/VenueMapAutofillButton.jsx) — far more accurate than the
-    // old pincode-centroid geocoding this replaced.
+    // components/VenueMapAutofillButton.jsx) — far more accurate than
+    // pincode-centroid geocoding.
     const { error } = await supabaseAdmin()
       .from("tournaments")
       .update({
