@@ -109,8 +109,8 @@ export async function POST(request) {
   // Organizer submissions always start in the review queue — only the
   // admin-facing routes can set status, "hot", or "announce" directly.
   // latitude/longitude are guaranteed present by parseTournamentInput (set
-  // via the venue map picker/link auto-fill — see components/VenueMapPicker
-  // and components/VenueMapAutofillButton) — far more accurate than the old
+  // via the "Auto-fill from map link" button — see
+  // components/VenueMapAutofillButton.jsx) — far more accurate than the old
   // pincode-centroid geocoding this replaced.
   const { hot, announce, status, ...row } = data;
 

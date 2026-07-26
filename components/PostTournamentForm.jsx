@@ -14,7 +14,6 @@ import SlideToSubmit from "@/components/SlideToSubmit";
 import PromotionPackages from "@/components/PromotionPackages";
 import Modal from "@/components/Modal";
 import VenueMapAutofillButton from "@/components/VenueMapAutofillButton";
-import VenueMapPicker from "@/components/VenueMapPicker";
 
 const TELEGRAM_HANDLE = "6374753084";
 const RAZORPAY_CHECKOUT_SRC = "https://checkout.razorpay.com/v1/checkout.js";
@@ -212,7 +211,7 @@ export default function PostTournamentForm({ initialProfile } = {}) {
     }
 
     if (!form.latitude || !form.longitude) {
-      fail("Please set your venue's exact location — paste a Google Maps link and auto-fill, or drop a pin on the map — before submitting.");
+      fail("Please paste your venue's Google Maps link and click \"Auto-fill details\" before submitting.");
       return;
     }
 
@@ -468,9 +467,10 @@ export default function PostTournamentForm({ initialProfile } = {}) {
         </label>
 
         <label className="post-field post-field-wide">
-          Venue location — Google Maps link <span>(optional — auto-fills details below when it works)</span>
+          Venue location — Google Maps link
           <input
             type="url"
+            required
             placeholder="https://maps.app.goo.gl/… or https://maps.google.com/…"
             value={form.google_maps_link}
             onChange={(e) => updateMapLink(e.target.value)}
@@ -485,16 +485,6 @@ export default function PostTournamentForm({ initialProfile } = {}) {
             longitude={form.longitude}
             precise={form.location_precise}
             onResult={applyLocationResult}
-          />
-        </div>
-
-        <div className="post-field post-field-wide">
-          Pin the exact venue location <span>(required — some map links can&rsquo;t be auto-read, so confirm the pin here)</span>
-          <VenueMapPicker
-            latitude={form.latitude}
-            longitude={form.longitude}
-            city={form.city}
-            onLocationChange={applyLocationResult}
           />
         </div>
 

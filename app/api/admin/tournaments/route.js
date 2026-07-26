@@ -26,9 +26,9 @@ export async function POST(request) {
 
   // Admin-added tournaments don't need self-review — default to live unless
   // the form explicitly picked a different status. latitude/longitude are
-  // guaranteed present by parseTournamentInput (set via the venue map picker
-  // or link auto-fill — see components/VenueMapPicker.jsx) — far more
-  // accurate than the old pincode-centroid geocoding this replaced.
+  // guaranteed present by parseTournamentInput (set via the "Auto-fill from
+  // map link" button — see components/VenueMapAutofillButton.jsx) — far
+  // more accurate than the old pincode-centroid geocoding this replaced.
   const status = data.status || "live";
 
   const { error } = await supabaseAdmin()
