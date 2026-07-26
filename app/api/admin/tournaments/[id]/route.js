@@ -2,7 +2,6 @@ import { NextResponse } from "next/server";
 import { requireAdminSession } from "@/lib/auth";
 import { supabaseAdmin } from "@/lib/supabase";
 import { parseTournamentInput } from "@/lib/tournamentValidation";
-import { geocodePincode } from "@/lib/geocode";
 import { sendNotificationEmail, renderEmailLayout } from "@/lib/email";
 
 /**
@@ -30,22 +29,14 @@ export async function PATCH(request, { params }) {
 
     const status = data.status || "pending";
 
-    // The "Auto-fill details" button (see admin/TournamentForm.jsx) resolves
-    // precise coordinates from the pasted Google Maps venue link client-side.
-    // Only falls back to re-geocoding the pincode if the link/coords weren't
-    // resent (e.g. an old row edited without touching the map link field).
-    const { latitude, longitude, ...rest } = data;
-    const coords =
-      latitude != null && longitude != null
-        ? { latitude, longitude }
-        : await geocodePincode(rest.pincode);
-
+    // latitude/longitude are guaranteed present by parseTournamentInput (set
+    // via the venue map picker or link auto-fill — see
+    // components/VenueMapPicker.jsx) — far more accurate than the old
+    // pincode-centroid geocoding this replaced.
     const { error } = await supabaseAdmin()
       .from("tournaments")
       .update({
-        ...rest,
-        latitude: coords?.latitude ?? null,
-        longitude: coords?.longitude ?? null,
+        ...data,
         status,
       })
       .eq("id", id);

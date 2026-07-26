@@ -4,7 +4,6 @@ import { supabaseAdmin } from "@/lib/supabase";
 import { parseTournamentInput } from "@/lib/tournamentValidation";
 import { resolvePromotionSelections } from "@/lib/promotionPackages";
 import { getCurrentUser } from "@/lib/supabaseServer";
-import { geocodePincode } from "@/lib/geocode";
 import { computeRazorpayCharge, RAZORPAY_CATEGORY } from "@/lib/expenses";
 import { sendNotificationEmail, renderEmailLayout } from "@/lib/email";
 import { razorpayClient } from "@/lib/razorpay";
@@ -109,21 +108,14 @@ export async function POST(request) {
 
   // Organizer submissions always start in the review queue — only the
   // admin-facing routes can set status, "hot", or "announce" directly.
-  const { hot, announce, status, latitude, longitude, ...row } = data;
-
-  // The organizer's "Auto-fill details" button (see PostTournamentForm.jsx)
-  // resolves precise coordinates from the pasted Google Maps venue link
-  // client-side — far more accurate than a pincode's postal-area centroid.
-  // Pincode geocoding only kicks in as a fallback if that's somehow missing.
-  const coords =
-    latitude != null && longitude != null
-      ? { latitude, longitude }
-      : await geocodePincode(row.pincode);
+  // latitude/longitude are guaranteed present by parseTournamentInput (set
+  // via the venue map picker/link auto-fill — see components/VenueMapPicker
+  // and components/VenueMapAutofillButton) — far more accurate than the old
+  // pincode-centroid geocoding this replaced.
+  const { hot, announce, status, ...row } = data;
 
   const { error } = await db.from("tournaments").insert({
     ...row,
-    latitude: coords?.latitude ?? null,
-    longitude: coords?.longitude ?? null,
     status: "pending",
     promotions: selections,
     promotion_total: total,

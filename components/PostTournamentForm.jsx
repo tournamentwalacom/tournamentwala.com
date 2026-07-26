@@ -14,6 +14,7 @@ import SlideToSubmit from "@/components/SlideToSubmit";
 import PromotionPackages from "@/components/PromotionPackages";
 import Modal from "@/components/Modal";
 import VenueMapAutofillButton from "@/components/VenueMapAutofillButton";
+import VenueMapPicker from "@/components/VenueMapPicker";
 
 const TELEGRAM_HANDLE = "6374753084";
 const RAZORPAY_CHECKOUT_SRC = "https://checkout.razorpay.com/v1/checkout.js";
@@ -124,6 +125,20 @@ export default function PostTournamentForm({ initialProfile } = {}) {
     }));
   }
 
+  // Shared by the "Auto-fill from map link" button and the map picker (drag/
+  // click/search/GPS) — whichever set the coordinates, apply them the same way.
+  function applyLocationResult(result) {
+    setForm((f) => ({
+      ...f,
+      latitude: result.latitude,
+      longitude: result.longitude,
+      location_precise: result.precise !== false,
+      address: result.address || f.address,
+      city: result.city || f.city,
+      pincode: result.pincode || f.pincode,
+    }));
+  }
+
   function fail(message) {
     setError(message);
     setStatus("error");
@@ -197,7 +212,7 @@ export default function PostTournamentForm({ initialProfile } = {}) {
     }
 
     if (!form.latitude || !form.longitude) {
-      fail("Please paste your venue's Google Maps link and click \"Auto-fill details\" before submitting.");
+      fail("Please set your venue's exact location — paste a Google Maps link and auto-fill, or drop a pin on the map — before submitting.");
       return;
     }
 
@@ -453,15 +468,9 @@ export default function PostTournamentForm({ initialProfile } = {}) {
         </label>
 
         <label className="post-field post-field-wide">
-          Venue location — Google Maps link{" "}
-          <span>
-            Open the venue in the Google Maps app, tap the pin, then Share —
-            links shared from Search instead of Maps can&rsquo;t be pinpointed
-            as accurately.
-          </span>
+          Venue location — Google Maps link <span>(optional — auto-fills details below when it works)</span>
           <input
             type="url"
-            required
             placeholder="https://maps.app.goo.gl/… or https://maps.google.com/…"
             value={form.google_maps_link}
             onChange={(e) => updateMapLink(e.target.value)}
@@ -475,17 +484,17 @@ export default function PostTournamentForm({ initialProfile } = {}) {
             latitude={form.latitude}
             longitude={form.longitude}
             precise={form.location_precise}
-            onResult={(result) =>
-              setForm((f) => ({
-                ...f,
-                latitude: result.latitude,
-                longitude: result.longitude,
-                location_precise: result.precise !== false,
-                address: result.address || f.address,
-                city: result.city || f.city,
-                pincode: result.pincode || f.pincode,
-              }))
-            }
+            onResult={applyLocationResult}
+          />
+        </div>
+
+        <div className="post-field post-field-wide">
+          Pin the exact venue location <span>(required — some map links can&rsquo;t be auto-read, so confirm the pin here)</span>
+          <VenueMapPicker
+            latitude={form.latitude}
+            longitude={form.longitude}
+            city={form.city}
+            onLocationChange={applyLocationResult}
           />
         </div>
 

@@ -10,6 +10,7 @@ import {
 import PosterUploadField from "@/components/PosterUploadField";
 import AdminPackagesField from "@/components/admin/AdminPackagesField";
 import VenueMapAutofillButton from "@/components/VenueMapAutofillButton";
+import VenueMapPicker from "@/components/VenueMapPicker";
 
 const STATUS_OPTIONS = [
   { value: "live", label: "Live" },
@@ -104,7 +105,8 @@ export default function TournamentForm({ mode, initial }) {
 
   // Editing the map link after a successful auto-fill invalidates whatever
   // coordinates were fetched for the previous link — clear them so a stale
-  // location can never be saved, forcing a re-click of "Auto-fill".
+  // location can never be saved, forcing a re-click of "Auto-fill" or a
+  // fresh pin drop on the map.
   function updateMapLink(value) {
     setForm((f) => ({
       ...f,
@@ -112,6 +114,20 @@ export default function TournamentForm({ mode, initial }) {
       latitude: null,
       longitude: null,
       location_precise: true,
+    }));
+  }
+
+  // Shared by the "Auto-fill from map link" button and the map picker (drag/
+  // click/search/GPS) — whichever set the coordinates, apply them the same way.
+  function applyLocationResult(result) {
+    setForm((f) => ({
+      ...f,
+      latitude: result.latitude,
+      longitude: result.longitude,
+      location_precise: result.precise !== false,
+      address: result.address || f.address,
+      city: result.city || f.city,
+      pincode: result.pincode || f.pincode,
     }));
   }
 
@@ -126,7 +142,7 @@ export default function TournamentForm({ mode, initial }) {
     }
 
     if (!form.latitude || !form.longitude) {
-      setError("Please paste the venue's Google Maps link and click \"Auto-fill details\" before saving.");
+      setError("Please set the venue's exact location — paste a Google Maps link and auto-fill, or drop a pin on the map — before saving.");
       setStatus("error");
       return;
     }
@@ -311,15 +327,9 @@ export default function TournamentForm({ mode, initial }) {
         </label>
 
         <label className="post-field post-field-wide">
-          Venue location — Google Maps link{" "}
-          <span>
-            Open the venue in the Google Maps app, tap the pin, then Share —
-            links shared from Search instead of Maps can&rsquo;t be pinpointed
-            as accurately.
-          </span>
+          Venue location — Google Maps link <span>(optional — auto-fills details below when it works)</span>
           <input
             type="url"
-            required
             placeholder="https://maps.app.goo.gl/… or https://maps.google.com/…"
             value={form.google_maps_link}
             onChange={(e) => updateMapLink(e.target.value)}
@@ -333,17 +343,17 @@ export default function TournamentForm({ mode, initial }) {
             latitude={form.latitude}
             longitude={form.longitude}
             precise={form.location_precise}
-            onResult={(result) =>
-              setForm((f) => ({
-                ...f,
-                latitude: result.latitude,
-                longitude: result.longitude,
-                location_precise: result.precise !== false,
-                address: result.address || f.address,
-                city: result.city || f.city,
-                pincode: result.pincode || f.pincode,
-              }))
-            }
+            onResult={applyLocationResult}
+          />
+        </div>
+
+        <div className="post-field post-field-wide">
+          Pin the exact venue location <span>(required — some map links can&rsquo;t be auto-read, so confirm the pin here)</span>
+          <VenueMapPicker
+            latitude={form.latitude}
+            longitude={form.longitude}
+            city={form.city}
+            onLocationChange={applyLocationResult}
           />
         </div>
 

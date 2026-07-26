@@ -2596,6 +2596,54 @@ button {
   margin: 0;
 }
 
+.post-map-picker-wrap {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.post-map-picker-controls {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  align-items: center;
+}
+
+.post-map-search {
+  display: flex;
+  gap: 8px;
+  flex: 1;
+  min-width: 220px;
+}
+
+.post-map-search input {
+  flex: 1;
+  padding: 10px 14px;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  font-family: inherit;
+  font-size: 0.9rem;
+  color: var(--ink);
+}
+
+.post-map-search .btn,
+.post-map-gps-btn {
+  padding: 10px 18px;
+  font-size: 0.85rem;
+  white-space: nowrap;
+}
+
+.post-map-picker-loading {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 260px;
+  border-radius: 12px;
+  border: 1px dashed var(--line);
+  color: var(--steel);
+  font-size: 0.9rem;
+}
+
 .post-success {
   background: var(--chalk);
   border: 1px solid var(--line);
