@@ -135,6 +135,9 @@ export default function PostTournamentForm({ initialProfile } = {}) {
       address: result.address || f.address,
       city: result.city || f.city,
       pincode: result.pincode || f.pincode,
+      // Only present when bare coordinates were pasted instead of a link —
+      // normalizes the field to a real clickable Google Maps URL.
+      google_maps_link: result.google_maps_link || f.google_maps_link,
     }));
   }
 
@@ -467,11 +470,16 @@ export default function PostTournamentForm({ initialProfile } = {}) {
         </label>
 
         <label className="post-field post-field-wide">
-          Venue location — Google Maps link
+          Venue location — Google Maps link or coordinates{" "}
+          <span>
+            Paste a Google Maps link, or long-press the exact spot in Google
+            Maps and paste the coordinates it shows (e.g. 12.9716, 77.5946)
+            — that always works.
+          </span>
           <input
-            type="url"
+            type="text"
             required
-            placeholder="https://maps.app.goo.gl/… or https://maps.google.com/…"
+            placeholder="https://maps.app.goo.gl/… or 12.9716, 77.5946"
             value={form.google_maps_link}
             onChange={(e) => updateMapLink(e.target.value)}
           />
