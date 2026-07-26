@@ -11,7 +11,7 @@ import { useState } from "react";
  * this is required before either form can be submitted — see the
  * `!form.latitude || !form.longitude` check in each form's submit handler.
  */
-export default function VenueMapAutofillButton({ mapUrl, latitude, longitude, onResult }) {
+export default function VenueMapAutofillButton({ mapUrl, city, latitude, longitude, precise, onResult }) {
   const [status, setStatus] = useState("idle"); // idle | loading | error
   const [error, setError] = useState("");
 
@@ -26,7 +26,7 @@ export default function VenueMapAutofillButton({ mapUrl, latitude, longitude, on
       const res = await fetch("/api/geocode/from-maps-link", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ url: mapUrl }),
+        body: JSON.stringify({ url: mapUrl, city }),
       });
       const data = await res.json().catch(() => ({}));
 
@@ -56,7 +56,13 @@ export default function VenueMapAutofillButton({ mapUrl, latitude, longitude, on
       </button>
       {hasCoords && status !== "loading" && (
         <p className="post-map-status-success">
-          📍 Location found: {latitude.toFixed(6)}, {longitude.toFixed(6)} — address, city &amp; pincode filled in below.
+          {precise === false ? "📍 Approximate location" : "📍 Location found"}: {latitude.toFixed(6)}, {longitude.toFixed(6)} — address, city &amp; pincode filled in below.
+          {precise === false && (
+            <>
+              {" "}
+              For a pinpoint location, open the venue's pin in Google Maps, tap Share, and paste that link instead.
+            </>
+          )}
         </p>
       )}
       {error && <p className="post-error">{error}</p>}

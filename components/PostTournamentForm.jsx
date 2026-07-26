@@ -54,6 +54,7 @@ const initialForm = {
   google_maps_link: "",
   latitude: null,
   longitude: null,
+  location_precise: true,
   start_date: "",
   format: "",
   formatOther: "",
@@ -114,7 +115,13 @@ export default function PostTournamentForm({ initialProfile } = {}) {
   // coordinates were fetched for the previous link — clear them so a stale
   // location can never be submitted, forcing a re-click of "Auto-fill".
   function updateMapLink(value) {
-    setForm((f) => ({ ...f, google_maps_link: value, latitude: null, longitude: null }));
+    setForm((f) => ({
+      ...f,
+      google_maps_link: value,
+      latitude: null,
+      longitude: null,
+      location_precise: true,
+    }));
   }
 
   function fail(message) {
@@ -446,7 +453,12 @@ export default function PostTournamentForm({ initialProfile } = {}) {
         </label>
 
         <label className="post-field post-field-wide">
-          Venue location — Google Maps link
+          Venue location — Google Maps link{" "}
+          <span>
+            Open the venue in the Google Maps app, tap the pin, then Share —
+            links shared from Search instead of Maps can&rsquo;t be pinpointed
+            as accurately.
+          </span>
           <input
             type="url"
             required
@@ -459,13 +471,16 @@ export default function PostTournamentForm({ initialProfile } = {}) {
         <div className="post-field post-field-wide post-map-autofill-field">
           <VenueMapAutofillButton
             mapUrl={form.google_maps_link}
+            city={form.city}
             latitude={form.latitude}
             longitude={form.longitude}
+            precise={form.location_precise}
             onResult={(result) =>
               setForm((f) => ({
                 ...f,
                 latitude: result.latitude,
                 longitude: result.longitude,
+                location_precise: result.precise !== false,
                 address: result.address || f.address,
                 city: result.city || f.city,
                 pincode: result.pincode || f.pincode,
