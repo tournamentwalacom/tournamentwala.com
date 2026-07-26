@@ -130,16 +130,6 @@ export default async function TournamentDetailPage({ params }) {
                   <div className="tdp-fact">
                     <small>Venue</small>
                     <span>{tournament.venue}</span>
-                    {tournament.google_maps_link && (
-                      <a
-                        href={tournament.google_maps_link}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="tdp-map-link"
-                      >
-                        📍 View location on map
-                      </a>
-                    )}
                   </div>
                   <div className="tdp-fact">
                     <small>City</small>

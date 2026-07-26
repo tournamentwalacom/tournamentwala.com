@@ -4,6 +4,7 @@ import { supabaseAdmin } from "@/lib/supabase";
 import { parseTournamentInput } from "@/lib/tournamentValidation";
 import { resolvePromotionSelections } from "@/lib/promotionPackages";
 import { getCurrentUser } from "@/lib/supabaseServer";
+import { geocodePincode } from "@/lib/geocode";
 import { computeRazorpayCharge, RAZORPAY_CATEGORY } from "@/lib/expenses";
 import { sendNotificationEmail, renderEmailLayout } from "@/lib/email";
 import { razorpayClient } from "@/lib/razorpay";
@@ -108,14 +109,16 @@ export async function POST(request) {
 
   // Organizer submissions always start in the review queue — only the
   // admin-facing routes can set status, "hot", or "announce" directly.
-  // latitude/longitude are guaranteed present by parseTournamentInput (set
-  // via the "Auto-fill from map link" button — see
-  // components/VenueMapAutofillButton.jsx) — far more accurate than pincode-
-  // centroid geocoding.
   const { hot, announce, status, ...row } = data;
+
+  // Cached once here so /explore-tournaments can sort by distance without
+  // geocoding on every page view. Never blocks the submission on failure.
+  const coords = await geocodePincode(row.pincode);
 
   const { error } = await db.from("tournaments").insert({
     ...row,
+    latitude: coords?.latitude ?? null,
+    longitude: coords?.longitude ?? null,
     status: "pending",
     promotions: selections,
     promotion_total: total,
