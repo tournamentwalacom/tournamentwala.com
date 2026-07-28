@@ -267,7 +267,7 @@ export default function SwipeToRegister({
                 <p className="register-confirm-sub">
                   Sign in so the organizer knows who&rsquo;s registering — it only takes a moment.
                 </p>
-                <AuthForm next={`${pathname}?register=1`} />
+                <AuthForm next={`${pathname}?register=1`} intent="player" />
                 <div className="register-confirm-actions">
                   <button
                     type="button"

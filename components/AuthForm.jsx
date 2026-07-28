@@ -4,7 +4,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { createBrowserSupabaseClient } from "@/lib/supabaseBrowser";
 
-export default function AuthForm({ next = "/" }) {
+export default function AuthForm({ next = "/", intent = "general" }) {
   const router = useRouter();
   const [mode, setMode] = useState("signin"); // "signin" | "signup"
   const [fullName, setFullName] = useState("");
@@ -20,7 +20,7 @@ export default function AuthForm({ next = "/" }) {
     const { error: oauthError } = await supabase.auth.signInWithOAuth({
       provider: "google",
       options: {
-        redirectTo: `${window.location.origin}/auth/callback?next=${encodeURIComponent(next)}`,
+        redirectTo: `${window.location.origin}/auth/callback?next=${encodeURIComponent(next)}&intent=${encodeURIComponent(intent)}`,
       },
     });
     if (oauthError) {
@@ -42,7 +42,7 @@ export default function AuthForm({ next = "/" }) {
       const { error: signUpError } = await supabase.auth.signUp({
         email,
         password,
-        options: { data: { full_name: fullName } },
+        options: { data: { full_name: fullName, signup_source: intent } },
       });
       if (signUpError) {
         setError(signUpError.message);

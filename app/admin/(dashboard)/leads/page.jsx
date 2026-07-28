@@ -1,6 +1,21 @@
 import { supabaseAdmin } from "@/lib/supabase";
 import LeadRowActions from "@/components/admin/LeadRowActions";
 
+const SOURCE_LABELS = {
+  organizer: "Organizer",
+  player: "Player",
+  general: "General",
+};
+
+function sourceBadge(source) {
+  const key = source && SOURCE_LABELS[source] ? source : "general";
+  return (
+    <span className={`admin-query-badge admin-lead-badge-${key}`}>
+      {SOURCE_LABELS[key]}
+    </span>
+  );
+}
+
 export default async function AdminLeadsPage() {
   const db = supabaseAdmin();
 
@@ -47,6 +62,7 @@ export default async function AdminLeadsPage() {
             <thead>
               <tr>
                 <th>Name</th>
+                <th>Signed in as</th>
                 <th>Phone</th>
                 <th>Signed up</th>
                 <th>Actions</th>
@@ -59,6 +75,7 @@ export default async function AdminLeadsPage() {
                     {p.full_name || "—"}
                     <div className="admin-row-sub">{p.email}</div>
                   </td>
+                  <td>{sourceBadge(p.signup_source)}</td>
                   <td>
                     {p.phone ? (
                       <span className="admin-phone-cell">

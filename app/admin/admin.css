@@ -1125,6 +1125,21 @@
   color: var(--chalk);
 }
 
+.admin-lead-badge-organizer {
+  background: var(--crimson);
+  color: var(--chalk);
+}
+
+.admin-lead-badge-player {
+  background: #1a7f37;
+  color: var(--chalk);
+}
+
+.admin-lead-badge-general {
+  background: var(--line);
+  color: var(--ink);
+}
+
 .admin-query-reason {
   display: inline-block;
   margin-top: 10px;

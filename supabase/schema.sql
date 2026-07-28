@@ -252,6 +252,13 @@ create table if not exists profiles (
   updated_at timestamptz not null default now()
 );
 
+-- Which page the visitor first signed in from — 'organizer' (post-tournament),
+-- 'player' (registering for a tournament), or 'general' (anywhere else).
+-- Lets the admin Leads tab show what a signed-in-but-unconverted account was
+-- likely after, without affecting the organizer/player classification itself
+-- (that's still based on actual tournaments/registrations rows).
+alter table profiles add column if not exists signup_source text;
+
 alter table profiles enable row level security;
 
 drop policy if exists "Users can view own profile" on profiles;
@@ -271,12 +278,13 @@ create policy "Users can update own profile"
 create or replace function public.handle_new_profile()
 returns trigger as $$
 begin
-  insert into public.profiles (id, email, full_name, avatar_url)
+  insert into public.profiles (id, email, full_name, avatar_url, signup_source)
   values (
     new.id,
     new.email,
     coalesce(new.raw_user_meta_data ->> 'full_name', new.raw_user_meta_data ->> 'name'),
-    new.raw_user_meta_data ->> 'avatar_url'
+    new.raw_user_meta_data ->> 'avatar_url',
+    new.raw_user_meta_data ->> 'signup_source'
   )
   on conflict (id) do nothing;
   return new;
