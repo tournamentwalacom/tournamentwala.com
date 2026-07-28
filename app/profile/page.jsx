@@ -92,9 +92,14 @@ export default async function ProfilePage() {
           </h1>
           <p className="post-intro">{profile?.email || user.email}</p>
 
-          <h2 className="post-form-section profile-section-title">
-            Tournaments you&rsquo;ve registered for
-          </h2>
+          <div className="post-form-section profile-section-title-row">
+            <h2 className="profile-section-title">
+              Tournaments you&rsquo;ve registered for
+            </h2>
+            <span className="profile-count-badge">
+              {registrations?.length || 0} {registrations?.length === 1 ? "event" : "events"}
+            </span>
+          </div>
 
           {!registrations?.length ? (
             <div className="profile-empty">
