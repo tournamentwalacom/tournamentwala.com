@@ -170,6 +170,21 @@ function PlayersIcon() {
   );
 }
 
+function LeadsIcon() {
+  return (
+    <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+      <circle cx="9" cy="8" r="3.2" stroke="currentColor" strokeWidth="1.6" />
+      <path
+        d="M3 20c0-3.3 2.7-6 6-6s6 2.7 6 6M16 8h5M18.5 5.5v5"
+        stroke="currentColor"
+        strokeWidth="1.6"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+    </svg>
+  );
+}
+
 function AdminPanelIcon() {
   return (
     <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
@@ -216,6 +231,7 @@ const NAV_ITEMS = [
   { href: "/admin/expenses", key: "expenses", label: "Expenses", icon: ExpensesIcon },
   { href: "/admin/blogs", key: "blogs", label: "Blogs", icon: BlogsIcon },
   { href: "/admin/queries", key: "queries", label: "Queries", icon: QueriesIcon },
+  { href: "/admin/leads", key: "leads", label: "Leads", icon: LeadsIcon },
   { href: "/admin/settings", key: "settings", label: "Settings", icon: SettingsIcon },
 ];
 
