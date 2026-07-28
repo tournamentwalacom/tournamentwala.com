@@ -29,6 +29,18 @@ export async function DELETE(request, { params }) {
     return NextResponse.json({ error: "Delete failed" }, { status: 500 });
   }
 
+  // registrations.user_id also references auth.users(id) with no cascade/
+  // set-null, so a user who ever registered as a player (SwipeToRegister)
+  // would otherwise block deleteUser below with a FK violation.
+  const { error: registrationsDetachError } = await db
+    .from("registrations")
+    .update({ user_id: null })
+    .eq("user_id", id);
+
+  if (registrationsDetachError) {
+    return NextResponse.json({ error: "Delete failed" }, { status: 500 });
+  }
+
   // profiles.id references auth.users(id) on delete cascade, so deleting
   // the auth user also removes their profile row.
   const { error } = await db.auth.admin.deleteUser(id);

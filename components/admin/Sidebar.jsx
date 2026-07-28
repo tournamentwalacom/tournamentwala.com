@@ -170,6 +170,26 @@ function PlayersIcon() {
   );
 }
 
+function AdminPanelIcon() {
+  return (
+    <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+      <path
+        d="M12 3 4 6v6c0 4.5 3.2 7.9 8 9 4.8-1.1 8-4.5 8-9V6l-8-3Z"
+        stroke="currentColor"
+        strokeWidth="1.6"
+        strokeLinejoin="round"
+      />
+      <path
+        d="M9 12l2 2 4-4"
+        stroke="currentColor"
+        strokeWidth="1.6"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+    </svg>
+  );
+}
+
 function SettingsIcon() {
   return (
     <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
@@ -186,26 +206,45 @@ function SettingsIcon() {
 }
 
 const NAV_ITEMS = [
-  { href: "/admin", label: "Dashboard", exact: true, icon: DashboardIcon },
-  { href: "/admin/analytics", label: "Analytics", icon: AnalyticsIcon },
-  { href: "/admin/tournaments", label: "Tournaments", icon: TournamentsIcon },
-  { href: "/admin/organizers", label: "Organizers", icon: OrganizersIcon },
-  { href: "/admin/players", label: "Players", icon: PlayersIcon },
-  { href: "/admin/payments", label: "Payments", icon: PaymentsIcon },
-  { href: "/admin/pricing", label: "Pricing", icon: PricingIcon },
-  { href: "/admin/expenses", label: "Expenses", icon: ExpensesIcon },
-  { href: "/admin/blogs", label: "Blogs", icon: BlogsIcon },
-  { href: "/admin/queries", label: "Queries", icon: QueriesIcon },
-  { href: "/admin/settings", label: "Settings", icon: SettingsIcon },
+  { href: "/admin", key: "dashboard", label: "Dashboard", exact: true, icon: DashboardIcon },
+  { href: "/admin/analytics", key: "analytics", label: "Analytics", icon: AnalyticsIcon },
+  { href: "/admin/tournaments", key: "tournaments", label: "Tournaments", icon: TournamentsIcon },
+  { href: "/admin/organizers", key: "organizers", label: "Organizers", icon: OrganizersIcon },
+  { href: "/admin/players", key: "players", label: "Players", icon: PlayersIcon },
+  { href: "/admin/payments", key: "payments", label: "Payments", icon: PaymentsIcon },
+  { href: "/admin/pricing", key: "pricing", label: "Pricing", icon: PricingIcon },
+  { href: "/admin/expenses", key: "expenses", label: "Expenses", icon: ExpensesIcon },
+  { href: "/admin/blogs", key: "blogs", label: "Blogs", icon: BlogsIcon },
+  { href: "/admin/queries", key: "queries", label: "Queries", icon: QueriesIcon },
+  { href: "/admin/settings", key: "settings", label: "Settings", icon: SettingsIcon },
 ];
 
-export default function Sidebar({ open = false, collapsed = false, onNavigate }) {
+// Only the owner account can create/edit worker logins and their tab
+// access — kept out of NAV_ITEMS (and off the worker permission list in
+// lib/permissions.js) so it's never something a worker could be granted.
+const ADMIN_PANEL_ITEM = {
+  href: "/admin/admin-panel",
+  label: "Admin Panel",
+  icon: AdminPanelIcon,
+};
+
+export default function Sidebar({
+  open = false,
+  collapsed = false,
+  isOwner = false,
+  permissions = [],
+  onNavigate,
+}) {
   const pathname = usePathname();
 
   useEffect(() => {
     onNavigate?.();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [pathname]);
+
+  const items = isOwner
+    ? NAV_ITEMS
+    : NAV_ITEMS.filter((item) => permissions.includes(item.key));
 
   return (
     <aside
@@ -229,7 +268,7 @@ export default function Sidebar({ open = false, collapsed = false, onNavigate })
       </Link>
 
       <nav className="admin-nav" aria-label="Admin">
-        {NAV_ITEMS.map((item) => {
+        {items.map((item) => {
           const active = item.exact
             ? pathname === item.href
             : pathname.startsWith(item.href);
@@ -249,6 +288,24 @@ export default function Sidebar({ open = false, collapsed = false, onNavigate })
             </Link>
           );
         })}
+
+        {isOwner && (
+          <>
+            <div className="admin-nav-divider" role="separator" />
+            <Link
+              href={ADMIN_PANEL_ITEM.href}
+              className={`admin-nav-link${
+                pathname.startsWith(ADMIN_PANEL_ITEM.href) ? " active" : ""
+              }`}
+              title={collapsed ? ADMIN_PANEL_ITEM.label : undefined}
+            >
+              <span className="admin-nav-icon">
+                <AdminPanelIcon />
+              </span>
+              <span className="admin-nav-label">{ADMIN_PANEL_ITEM.label}</span>
+            </Link>
+          </>
+        )}
       </nav>
     </aside>
   );

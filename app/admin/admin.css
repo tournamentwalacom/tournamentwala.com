@@ -91,6 +91,12 @@
   color: var(--chalk);
 }
 
+.admin-nav-divider {
+  height: 1px;
+  margin: 8px 4px;
+  background: rgba(255, 255, 255, 0.1);
+}
+
 .admin-nav-icon {
   display: grid;
   place-items: center;
@@ -287,6 +293,21 @@
   gap: 8px;
   font-size: 14px;
   color: var(--steel);
+}
+
+.admin-role-badge {
+  display: inline-block;
+  margin-left: 8px;
+  padding: 2px 8px;
+  border-radius: 999px;
+  background: var(--ink-soft);
+  color: var(--chalk);
+  font-size: 11px;
+  font-style: normal;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+  vertical-align: middle;
 }
 
 .admin-avatar {
@@ -508,6 +529,37 @@
   margin-top: 2px;
   font-size: 12px;
   color: var(--steel);
+}
+
+.admin-phone-cell {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  white-space: nowrap;
+}
+
+.admin-phone-link {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 22px;
+  height: 22px;
+  border-radius: 999px;
+  color: var(--ink);
+  background: var(--paper);
+  border: 1px solid var(--line);
+  flex-shrink: 0;
+  transition: background 0.15s ease, color 0.15s ease;
+}
+
+.admin-phone-link:hover {
+  background: var(--ink);
+  color: var(--chalk, #fff);
+}
+
+.admin-phone-link svg {
+  width: 13px;
+  height: 13px;
 }
 
 .admin-row-actions {
@@ -740,6 +792,22 @@
 
 .admin-form-page {
   max-width: 900px;
+}
+
+/* Worker form (Admin Panel) — per-tab access checkboxes, reusing the same
+   .post-field-checkbox row styling as other admin forms above. */
+.admin-permissions-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+  gap: 10px 16px;
+  padding: 14px;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  background: var(--paper);
+}
+
+.admin-permissions-grid .post-field-checkbox {
+  margin: 0;
 }
 
 .admin-form-back {

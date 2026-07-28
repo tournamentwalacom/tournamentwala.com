@@ -32,6 +32,7 @@ export default function ExploreTournaments({
   cityFacets,
   initialSport,
   initialCity,
+  initialHot,
 }) {
   const [search, setSearch] = useState("");
   const [activeSport, setActiveSport] = useState(() =>
@@ -44,6 +45,7 @@ export default function ExploreTournaments({
       ? initialCity
       : "All"
   );
+  const [hotOnly, setHotOnly] = useState(Boolean(initialHot));
   const [visibleCount, setVisibleCount] = useState(PAGE_SIZE);
   const [filterOpen, setFilterOpen] = useState(false);
   const [panelQuery, setPanelQuery] = useState("");
@@ -151,6 +153,7 @@ export default function ExploreTournaments({
       (t) =>
         (activeSport === "All" || t.sport === activeSport) &&
         (activeCity === "All" || t.city === activeCity) &&
+        (!hotOnly || t.hot) &&
         matchesSearch(t, search)
     );
 
@@ -169,12 +172,15 @@ export default function ExploreTournaments({
           : Infinity;
       return distanceA - distanceB;
     });
-  }, [tickets, activeSport, activeCity, search, userCoords]);
+  }, [tickets, activeSport, activeCity, hotOnly, search, userCoords]);
 
   const visible = filtered.slice(0, visibleCount);
   const hasMore = visibleCount < filtered.length;
   const activeFilterCount =
-    (activeSport !== "All" ? 1 : 0) + (activeCity !== "All" ? 1 : 0);
+    (activeSport !== "All" ? 1 : 0) +
+    (activeCity !== "All" ? 1 : 0) +
+    (hotOnly ? 1 : 0);
+  const hotCount = tickets.reduce((n, t) => (t.hot ? n + 1 : n), 0);
 
   const panelSportFacets = useMemo(
     () =>
@@ -203,6 +209,11 @@ export default function ExploreTournaments({
 
   function handleCityPick(name) {
     setActiveCity(name);
+    setVisibleCount(PAGE_SIZE);
+  }
+
+  function handleHotToggle() {
+    setHotOnly((v) => !v);
     setVisibleCount(PAGE_SIZE);
   }
 
@@ -382,6 +393,24 @@ export default function ExploreTournaments({
                 </button>
               )}
 
+              {hotOnly && (
+                <button
+                  type="button"
+                  className="explore-active-pill"
+                  onClick={handleHotToggle}
+                >
+                  🔥 Hot
+                  <svg viewBox="0 0 20 20" fill="none" aria-hidden="true">
+                    <path
+                      d="M6 6l8 8M14 6l-8 8"
+                      stroke="currentColor"
+                      strokeWidth="1.8"
+                      strokeLinecap="round"
+                    />
+                  </svg>
+                </button>
+              )}
+
               {search && (
                 <button
                   type="button"
@@ -427,6 +456,24 @@ export default function ExploreTournaments({
                     aria-label="Search sports or cities"
                   />
                 </div>
+
+                {hotCount > 0 && !panelQuery && (
+                  <div className="explore-filter-panel-group">
+                    <span className="explore-filter-panel-label">Featured</span>
+                    <div className="explore-filter-panel-options">
+                      <button
+                        type="button"
+                        className={`explore-chip${hotOnly ? " active" : ""}`}
+                        onClick={handleHotToggle}
+                      >
+                        🔥 Hot Tournaments
+                        <span className="explore-chip-count">
+                          {hotCount.toLocaleString("en-IN")}
+                        </span>
+                      </button>
+                    </div>
+                  </div>
+                )}
 
                 <div className="explore-filter-panel-group">
                   <span className="explore-filter-panel-label">Sport</span>
@@ -521,8 +568,9 @@ export default function ExploreTournaments({
             No tournaments match{" "}
             {search
               ? `“${search}”`
-              : [activeSport, activeCity].filter((v) => v !== "All").join(" · ") ||
-                "your filters"}{" "}
+              : [activeSport, activeCity, hotOnly ? "Hot" : null]
+                  .filter((v) => v && v !== "All")
+                  .join(" · ") || "your filters"}{" "}
             yet — try a different search or filter.
           </div>
         ) : (
@@ -537,11 +585,14 @@ export default function ExploreTournaments({
                   <div className="ticket-top">
                     <div className="ticket-sport">
                       <span className="chip">{t.sport}</span>
-                      {t.tag && (
-                        <span className={`chip ${t.hot ? "chip-hot" : ""}`}>
-                          {t.tag}
-                        </span>
-                      )}
+                      <span className="ticket-sport-right">
+                        {t.tag && <span className="chip">{t.tag}</span>}
+                        {t.hot && (
+                          <span className="chip chip-hot-flag" aria-label="Hot tournament">
+                            🔥 HOT
+                          </span>
+                        )}
+                      </span>
                     </div>
                     <h3>{t.name}</h3>
                     <div className="ticket-facts">

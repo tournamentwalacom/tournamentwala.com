@@ -519,3 +519,46 @@ begin
   return current_count <= p_limit;
 end;
 $$ language plpgsql security definer set search_path = public;
+
+-- Worker (sub-admin) accounts, created from /admin/admin-panel by the
+-- single super-admin (whose own credentials stay in the ADMIN_EMAIL /
+-- ADMIN_PASSWORD_HASH env vars — see app/api/admin/login). Each worker logs
+-- in through the same /admin/login form and is restricted to the tabs
+-- listed in `permissions` (keys from lib/permissions.js's ADMIN_SECTIONS),
+-- enforced in middleware.js on every request.
+create table if not exists admin_workers (
+  id uuid primary key default gen_random_uuid(),
+  email text not null unique,
+  password_hash text not null,
+  permissions text[] not null default '{}',
+  active boolean not null default true,
+  created_at timestamptz not null default now(),
+  updated_at timestamptz not null default now()
+);
+
+-- No RLS policies here on purpose, same pattern as rate_limits/expenses:
+-- only ever touched via service_role (supabaseAdmin()), never exposed to
+-- the anon key.
+
+-- Stable identifier for promotion packages that trigger backend automation
+-- (posting to Instagram on approval), so that logic keys off this instead of
+-- the human-editable `name` column an admin could rename in /admin/pricing.
+-- Only the packages that need code behind them get a kind; everything else
+-- (HOT Listing, Announcement Bar, Website Listing, ...) stays null.
+alter table promotion_packages add column if not exists kind text;
+update promotion_packages set kind = 'instagram_post' where name = 'Instagram Post' and kind is null;
+update promotion_packages set kind = 'instagram_story' where name = 'Instagram Story' and kind is null;
+update promotion_packages set kind = 'instagram_reel' where name = 'Instagram Reel' and kind is null;
+
+-- Tracks the outcome of auto-publishing an approved tournament's poster to
+-- Instagram (see lib/instagram.js, called from the approve action in
+-- app/api/admin/tournaments/[id]/route.js). Separate columns per surface
+-- since a tournament can buy Post and Story at once. status is one of
+-- null (not applicable/not attempted), 'published', or 'failed'.
+alter table tournaments add column if not exists instagram_post_status text;
+alter table tournaments add column if not exists instagram_post_id text;
+alter table tournaments add column if not exists instagram_post_error text;
+alter table tournaments add column if not exists instagram_story_status text;
+alter table tournaments add column if not exists instagram_story_id text;
+alter table tournaments add column if not exists instagram_story_error text;
+alter table admin_workers enable row level security;

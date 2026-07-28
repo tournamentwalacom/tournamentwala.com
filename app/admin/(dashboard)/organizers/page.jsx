@@ -12,7 +12,7 @@ const STATUS_LABELS = {
 export default async function AdminOrganizersPage() {
   const db = supabaseAdmin();
 
-  const [{ data: profiles }, { data: tournaments }] = await Promise.all([
+  const [{ data: allProfiles }, { data: tournaments }] = await Promise.all([
     db.from("profiles").select("*").order("created_at", { ascending: false }),
     db
       .from("tournaments")
@@ -26,6 +26,9 @@ export default async function AdminOrganizersPage() {
     list.push(t);
     tournamentsByOrganizer.set(t.organizer_user_id, list);
   }
+
+  // Only accounts that have actually posted a tournament count as organizers.
+  const profiles = (allProfiles || []).filter((p) => tournamentsByOrganizer.has(p.id));
 
   return (
     <>
@@ -54,7 +57,30 @@ export default async function AdminOrganizersPage() {
                       {p.full_name || "—"}
                       <div className="admin-row-sub">{p.email}</div>
                     </td>
-                    <td>{p.phone || "—"}</td>
+                    <td>
+                      {p.phone ? (
+                        <span className="admin-phone-cell">
+                          {p.phone}
+                          <a
+                            href={`tel:${p.phone}`}
+                            className="admin-phone-link"
+                            aria-label={`Call ${p.phone}`}
+                            title={`Call ${p.phone}`}
+                          >
+                            <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                              <path
+                                d="M6.6 10.8c1.4 2.8 3.8 5.2 6.6 6.6l2.2-2.2c.3-.3.7-.4 1-.2 1.1.4 2.3.6 3.6.6.6 0 1 .4 1 1V20c0 .6-.4 1-1 1C10.9 21 3 13.1 3 3.9c0-.6.4-1 1-1h3.5c.6 0 1 .4 1 1 0 1.2.2 2.4.6 3.6.1.4 0 .8-.2 1L6.6 10.8z"
+                                stroke="currentColor"
+                                strokeWidth="1.6"
+                                strokeLinejoin="round"
+                              />
+                            </svg>
+                          </a>
+                        </span>
+                      ) : (
+                        "—"
+                      )}
+                    </td>
                     <td>{new Date(p.created_at).toLocaleDateString("en-IN")}</td>
                     <td>
                       {posted.length === 0 ? (

@@ -2,7 +2,7 @@
 
 import { useRouter } from "next/navigation";
 
-export default function Topbar({ email, collapsed, onMenuClick, onCollapseClick }) {
+export default function Topbar({ email, isOwner, collapsed, onMenuClick, onCollapseClick }) {
   const router = useRouter();
 
   async function handleLogout() {
@@ -51,7 +51,10 @@ export default function Topbar({ email, collapsed, onMenuClick, onCollapseClick 
         <span className="admin-avatar">
           {email ? email[0].toUpperCase() : "A"}
         </span>
-        <span>{email || "Admin"}</span>
+        <span>
+          {email || "Admin"}
+          {!isOwner && <em className="admin-role-badge">Worker</em>}
+        </span>
         <button className="admin-logout-btn" onClick={handleLogout}>
           Log out
         </button>

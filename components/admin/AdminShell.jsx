@@ -6,7 +6,7 @@ import Topbar from "@/components/admin/Topbar";
 
 const COLLAPSE_KEY = "tw_admin_sidebar_collapsed";
 
-export default function AdminShell({ email, children }) {
+export default function AdminShell({ email, isOwner = false, permissions = [], children }) {
   const [mobileOpen, setMobileOpen] = useState(false);
   const [collapsed, setCollapsed] = useState(false);
 
@@ -27,6 +27,8 @@ export default function AdminShell({ email, children }) {
       <Sidebar
         open={mobileOpen}
         collapsed={collapsed}
+        isOwner={isOwner}
+        permissions={permissions}
         onNavigate={() => setMobileOpen(false)}
       />
       {mobileOpen && (
@@ -39,6 +41,7 @@ export default function AdminShell({ email, children }) {
       <div className="admin-main">
         <Topbar
           email={email}
+          isOwner={isOwner}
           collapsed={collapsed}
           onMenuClick={() => setMobileOpen(true)}
           onCollapseClick={toggleCollapsed}

@@ -120,11 +120,14 @@ export default function TicketSlider({ tickets, browseAllHref }) {
             <div className="ticket-top">
               <div className="ticket-sport">
                 <span className="chip">{t.sport}</span>
-                {t.tag && (
-                  <span className={`chip ${t.hot ? "chip-hot" : ""}`}>
-                    {t.tag}
-                  </span>
-                )}
+                <span className="ticket-sport-right">
+                  {t.tag && <span className="chip">{t.tag}</span>}
+                  {t.hot && (
+                    <span className="chip chip-hot-flag" aria-label="Hot tournament">
+                      🔥 HOT
+                    </span>
+                  )}
+                </span>
               </div>
               <h3>{t.name}</h3>
               <div className="ticket-facts">

@@ -64,6 +64,7 @@ export default async function ExploreTournamentsPage({ searchParams }) {
           cityFacets={cityFacets}
           initialSport={params?.sport}
           initialCity={params?.city}
+          initialHot={params?.hot === "true"}
         />
       </main>
       <Footer />

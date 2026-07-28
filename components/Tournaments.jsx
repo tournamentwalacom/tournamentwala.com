@@ -10,15 +10,18 @@ import TicketSlider from "@/components/TicketSlider";
 export default async function Tournaments({
   sport,
   city,
+  hotOnly = false,
   eyebrow = "Cricket Tournaments",
   title = "Grab your Spot.",
   sectionId = "tournaments",
   showActiveFilter = true,
   theme = "gray",
 }) {
-  const tournaments = await getLiveTournaments({ sport, city });
+  const tournaments = await getLiveTournaments({ sport, city, hotOnly });
   const filterLabel = [sport, city].filter(Boolean).join(" · ");
-  const browseAllHref = sport
+  const browseAllHref = hotOnly
+    ? "/explore-tournaments?hot=true"
+    : sport
     ? `/explore-tournaments?sport=${encodeURIComponent(sport)}`
     : "/explore-tournaments";
 
@@ -36,6 +39,11 @@ export default async function Tournaments({
     entryFee: formatEntryFee(t),
     prize: formatPrize(t),
   }));
+
+  // No point showing an empty "featured" section — unlike the per-sport
+  // sections, there's nothing to "check back soon" for until someone buys
+  // a HOT Listing.
+  if (hotOnly && tickets.length === 0) return null;
 
   return (
     <section

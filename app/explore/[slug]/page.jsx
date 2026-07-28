@@ -76,9 +76,10 @@ export default async function TournamentDetailPage({ params }) {
 
               <div className="tdp-hero-chips">
                 <span className="chip">{tournament.sport}</span>
-                {tournament.tag && (
-                  <span className={`chip ${tournament.hot ? "chip-hot" : ""}`}>
-                    {tournament.tag}
+                {tournament.tag && <span className="chip">{tournament.tag}</span>}
+                {tournament.hot && (
+                  <span className="chip chip-hot-flag" aria-label="Hot tournament">
+                    🔥 HOT
                   </span>
                 )}
               </div>

@@ -4,6 +4,7 @@ import { supabaseAdmin } from "@/lib/supabase";
 import { parseTournamentInput } from "@/lib/tournamentValidation";
 import { geocodePincode } from "@/lib/geocode";
 import { sendNotificationEmail, renderEmailLayout } from "@/lib/email";
+import { publishApprovedTournamentToInstagram } from "@/lib/instagram";
 
 /**
  * This route is NOT covered by middleware.js's admin host/session gate —
@@ -51,6 +52,21 @@ export async function PATCH(request, { params }) {
     return NextResponse.json({ ok: true });
   }
 
+  if (action === "retry_instagram") {
+    const { data: tournament, error: fetchError } = await supabaseAdmin()
+      .from("tournaments")
+      .select("id, name, sport, city, start_date, image_url, instagram_id, promotions")
+      .eq("id", id)
+      .single();
+
+    if (fetchError || !tournament) {
+      return NextResponse.json({ error: "Tournament not found" }, { status: 404 });
+    }
+
+    await publishApprovedTournamentToInstagram(tournament);
+    return NextResponse.json({ ok: true });
+  }
+
   if (action !== "approve" && action !== "reject" && action !== "unpublish") {
     return NextResponse.json({ error: "Invalid action" }, { status: 400 });
   }
@@ -73,7 +89,7 @@ export async function PATCH(request, { params }) {
     .from("tournaments")
     .update(update)
     .eq("id", id)
-    .select("name, organizer_name")
+    .select("id, name, organizer_name, sport, city, start_date, image_url, instagram_id, promotions")
     .single();
 
   if (error) {
@@ -92,6 +108,10 @@ export async function PATCH(request, { params }) {
         ],
       }),
     });
+
+    // Also best-effort — publish failures are recorded on the row (see
+    // lib/instagram.js) for the admin to see/retry, never fail the approval.
+    await publishApprovedTournamentToInstagram(updated);
   }
 
   return NextResponse.json({ ok: true });

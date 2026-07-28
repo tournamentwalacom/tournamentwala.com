@@ -1134,6 +1134,15 @@ button {
     inset 0 -1px 0 rgba(232, 40, 60, 0.16);
 }
 
+.tournaments-section--hot {
+  background: linear-gradient(
+    180deg,
+    rgba(232, 40, 60, 0.12),
+    var(--paper) 70%
+  );
+  box-shadow: inset 0 1px 0 rgba(232, 40, 60, 0.16);
+}
+
 .section-head {
   margin-bottom: 44px;
 }
@@ -1344,7 +1353,13 @@ button {
   color: var(--ink-soft);
 }
 
-.chip-hot {
+.ticket-sport-right {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.chip-hot-flag {
   background: var(--crimson);
   border-color: var(--crimson);
   color: var(--chalk);
@@ -2530,17 +2545,29 @@ button {
 
 .post-poster-preview {
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   gap: 16px;
   flex-wrap: wrap;
 }
 
-.post-poster-preview img {
-  width: 140px;
-  height: 140px;
-  object-fit: cover;
-  border-radius: 12px;
+.post-poster-preview-trigger {
+  display: block;
+  width: 260px;
+  max-width: 100%;
   border: 1px solid var(--line);
+  border-radius: 12px;
+  padding: 0;
+  overflow: hidden;
+  background: var(--ink);
+  cursor: zoom-in;
+}
+
+.post-poster-preview-trigger img {
+  display: block;
+  width: 100%;
+  height: auto;
+  max-height: 320px;
+  object-fit: contain;
 }
 
 .post-poster-remove {

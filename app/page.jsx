@@ -19,6 +19,15 @@ export default async function Home({ searchParams }) {
         <Hero stats={stats} />
         <NearbyTournaments />
         <Tournaments
+          hotOnly
+          city={params?.city}
+          eyebrow="TournamentWala's Hot List"
+          title="Trending Right Now."
+          sectionId="hot-tournaments"
+          showActiveFilter={false}
+          theme="hot"
+        />
+        <Tournaments
           sport="Cricket"
           city={params?.city}
           showActiveFilter={false}

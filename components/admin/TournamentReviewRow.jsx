@@ -43,6 +43,11 @@ export default function TournamentReviewRow({
 
   const hasBrief = Boolean(tournament.promo_brief_mode);
 
+  const instagramTargets = [
+    tournament.instagram_post_status && { label: "Post", status: tournament.instagram_post_status, error: tournament.instagram_post_error },
+    tournament.instagram_story_status && { label: "Story", status: tournament.instagram_story_status, error: tournament.instagram_story_error },
+  ].filter(Boolean);
+
   async function sendAction(action, rejection_reason) {
     setBusy(true);
     await fetch(`/api/admin/tournaments/${tournament.id}`, {
@@ -106,6 +111,26 @@ export default function TournamentReviewRow({
               >
                 {showBrief ? "Hide" : "View"} poster/reel brief
               </button>
+            )}
+            {instagramTargets.length > 0 && (
+              <div className="admin-row-sub">
+                {instagramTargets.map(({ label, status, error }) => (
+                  <span key={label} title={status === "failed" ? error || "" : undefined}>
+                    IG {label}: {status}
+                    {label !== instagramTargets[instagramTargets.length - 1].label ? " · " : ""}
+                  </span>
+                ))}
+                {instagramTargets.some((t) => t.status === "failed") && (
+                  <button
+                    type="button"
+                    className="admin-btn admin-btn-link"
+                    disabled={busy}
+                    onClick={() => sendAction("retry_instagram")}
+                  >
+                    Retry Instagram
+                  </button>
+                )}
+              </div>
             )}
           </>
         ) : (

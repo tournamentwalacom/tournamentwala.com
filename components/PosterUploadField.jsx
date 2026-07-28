@@ -1,6 +1,7 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { createPortal } from "react-dom";
 import { uploadPosterFile } from "@/lib/uploadPoster";
 import TicketLoader from "@/components/TicketLoader";
 
@@ -12,6 +13,21 @@ import TicketLoader from "@/components/TicketLoader";
 export default function PosterUploadField({ value, onChange, hint, alt }) {
   const [status, setStatus] = useState("idle"); // idle | uploading | error
   const [error, setError] = useState("");
+  const [open, setOpen] = useState(false);
+
+  useEffect(() => {
+    if (!open) return;
+    const previousOverflow = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    function onKeyDown(e) {
+      if (e.key === "Escape") setOpen(false);
+    }
+    window.addEventListener("keydown", onKeyDown);
+    return () => {
+      document.body.style.overflow = previousOverflow;
+      window.removeEventListener("keydown", onKeyDown);
+    };
+  }, [open]);
 
   async function handleFile(e) {
     const file = e.target.files?.[0];
@@ -37,7 +53,14 @@ export default function PosterUploadField({ value, onChange, hint, alt }) {
     <div className="post-poster-field">
       {value ? (
         <div className="post-poster-preview">
-          <img src={value} alt={alt || "Tournament poster preview"} />
+          <button
+            type="button"
+            className="post-poster-preview-trigger"
+            onClick={() => setOpen(true)}
+            aria-label="View full-size image"
+          >
+            <img src={value} alt={alt || "Tournament poster preview"} />
+          </button>
           <button
             type="button"
             className="post-poster-remove"
@@ -62,6 +85,25 @@ export default function PosterUploadField({ value, onChange, hint, alt }) {
         </label>
       )}
       {error && <p className="post-error">{error}</p>}
+
+      {open &&
+        typeof document !== "undefined" &&
+        createPortal(
+          <div className="poster-lightbox" onClick={() => setOpen(false)}>
+            <button
+              type="button"
+              className="poster-lightbox-close"
+              onClick={() => setOpen(false)}
+              aria-label="Close full-size image"
+            >
+              ×
+            </button>
+            <div className="poster-lightbox-frame" onClick={(e) => e.stopPropagation()}>
+              <img src={value} alt={alt || "Tournament poster preview"} />
+            </div>
+          </div>,
+          document.body
+        )}
     </div>
   );
 }
