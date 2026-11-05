@@ -24,7 +24,7 @@ export async function PATCH(request, { params }) {
   const action = body?.action;
 
   if (action === "update") {
-    const { data, error: validationError } = parseTournamentInput(body?.fields || {});
+    const { data, error: validationError } = parseTournamentInput(body?.fields || {}, { posterOptional: true });
     if (!data) {
       return NextResponse.json({ error: validationError }, { status: 400 });
     }

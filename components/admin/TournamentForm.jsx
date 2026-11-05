@@ -97,12 +97,6 @@ export default function TournamentForm({ mode, initial }) {
     e.preventDefault();
     setError("");
 
-    if (!form.image_url) {
-      setError("Please upload the main tournament poster.");
-      setStatus("error");
-      return;
-    }
-
     setStatus("submitting");
 
     const sport = form.sport === "Other" ? form.sportOther.trim() : form.sport;
@@ -211,11 +205,10 @@ export default function TournamentForm({ mode, initial }) {
         </label>
 
         <label className="post-field">
-          Instagram ID
+          Instagram ID <span>(optional)</span>
           <div className="post-input-prefix">
             <input
               type="text"
-              required
               maxLength={60}
               placeholder="yourhandle"
               value={form.instagram_id}
@@ -448,7 +441,7 @@ export default function TournamentForm({ mode, initial }) {
         <h3 className="post-form-section">8. Upload poster ⭐</h3>
 
         <div className="post-field post-field-wide">
-          Main tournament poster <span>(required)</span>
+          Main tournament poster <span>(optional)</span>
           <PosterUploadField
             value={form.image_url}
             onChange={(url) => update("image_url", url)}

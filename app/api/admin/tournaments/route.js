@@ -20,7 +20,7 @@ export async function POST(request) {
     return NextResponse.json({ error: "Invalid request body" }, { status: 400 });
   }
 
-  const { data, error: validationError } = parseTournamentInput(body);
+  const { data, error: validationError } = parseTournamentInput(body, { posterOptional: true });
   if (!data) {
     return NextResponse.json({ error: validationError }, { status: 400 });
   }

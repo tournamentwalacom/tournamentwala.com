@@ -359,11 +359,10 @@ export default function PostTournamentForm({ initialProfile } = {}) {
         </label>
 
         <label className="post-field">
-          Instagram ID
+          Instagram ID <span>(optional)</span>
           <div className="post-input-prefix">
             <input
               type="text"
-              required
               maxLength={60}
               placeholder="yourhandle"
               value={form.instagram_id}
