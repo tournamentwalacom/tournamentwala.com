@@ -18,7 +18,6 @@ import {
   getTournamentDescription,
   getRegisterPhoneHref,
   getSportIcon,
-  PLACEHOLDER_TOURNAMENT_IMAGE,
 } from "@/lib/tournaments";
 
 async function loadTournament(slug) {
@@ -56,7 +55,6 @@ export default async function TournamentDetailPage({ params }) {
   const description = getTournamentDescription(tournament);
   const registerHref = getRegisterPhoneHref(tournament);
   const icon = getSportIcon(tournament.sport);
-  const portraitSrc = tournament.image_url || PLACEHOLDER_TOURNAMENT_IMAGE;
 
   return (
     <>
@@ -103,7 +101,7 @@ export default async function TournamentDetailPage({ params }) {
           </section>
 
           <section className="container tdp-body">
-            <div className="tdp-grid">
+            <div className={tournament.image_url ? "tdp-grid" : "tdp-grid tdp-grid--no-poster"}>
               <div className="tdp-main">
                 <h2 className="tdp-section-title">About this tournament</h2>
                 <p className="tdp-description">{description}</p>
@@ -193,9 +191,11 @@ export default async function TournamentDetailPage({ params }) {
                 )}
               </div>
 
-              <div className="tdp-media">
-                <TournamentPoster src={portraitSrc} alt={tournament.name} />
-              </div>
+              {tournament.image_url && (
+                <div className="tdp-media">
+                  <TournamentPoster src={tournament.image_url} alt={tournament.name} />
+                </div>
+              )}
             </div>
 
           </section>

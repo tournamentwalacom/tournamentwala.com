@@ -4201,6 +4201,10 @@ html.nav-open .tdp-float-bar {
   }
 }
 
+.tdp-grid--no-poster {
+  grid-template-columns: 1fr;
+}
+
 @media (max-width: 900px) {
   .tdp-grid {
     grid-template-columns: 1fr;
