@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { createBrowserSupabaseClient } from "@/lib/supabaseBrowser";
+import { saveReturnPath } from "@/lib/authReturn";
 
 export default function AuthForm({ next = "/", intent = "general" }) {
   const router = useRouter();
@@ -13,15 +14,18 @@ export default function AuthForm({ next = "/", intent = "general" }) {
   const [status, setStatus] = useState("idle"); // idle | busy | error | check-email
   const [error, setError] = useState("");
 
+  function callbackUrl() {
+    return `${window.location.origin}/auth/callback?next=${encodeURIComponent(next)}&intent=${encodeURIComponent(intent)}`;
+  }
+
   async function handleGoogle() {
     setError("");
     setStatus("busy");
+    saveReturnPath(next);
     const supabase = createBrowserSupabaseClient();
     const { error: oauthError } = await supabase.auth.signInWithOAuth({
       provider: "google",
-      options: {
-        redirectTo: `${window.location.origin}/auth/callback?next=${encodeURIComponent(next)}&intent=${encodeURIComponent(intent)}`,
-      },
+      options: { redirectTo: callbackUrl() },
     });
     if (oauthError) {
       setError(oauthError.message);
@@ -39,10 +43,15 @@ export default function AuthForm({ next = "/", intent = "general" }) {
     const supabase = createBrowserSupabaseClient();
 
     if (mode === "signup") {
+      saveReturnPath(next);
       const { error: signUpError } = await supabase.auth.signUp({
         email,
         password,
-        options: { data: { full_name: fullName, signup_source: intent } },
+        options: {
+          data: { full_name: fullName, signup_source: intent },
+          // Send the confirmation link back to this page, not the Site URL.
+          emailRedirectTo: callbackUrl(),
+        },
       });
       if (signUpError) {
         setError(signUpError.message);

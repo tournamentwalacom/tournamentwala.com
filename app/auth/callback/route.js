@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { createServerSupabaseClient } from "@/lib/supabaseServer";
+import { safeNextPath } from "@/lib/authReturn";
 
 /** Landing point for Google OAuth — exchanges the auth code for a session
  * cookie, then sends the user back to wherever they were headed
@@ -7,7 +8,8 @@ import { createServerSupabaseClient } from "@/lib/supabaseServer";
 export async function GET(request) {
   const url = new URL(request.url);
   const code = url.searchParams.get("code");
-  const next = url.searchParams.get("next") || "/";
+  // Relative paths only, so ?next=https://evil.com can't bounce users off-site.
+  const next = safeNextPath(url.searchParams.get("next"));
   const intent = url.searchParams.get("intent");
 
   if (code) {
