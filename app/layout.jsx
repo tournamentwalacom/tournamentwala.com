@@ -1,6 +1,7 @@
 import "./globals.css";
 import Script from "next/script";
 import AuthCodeCatcher from "@/components/AuthCodeCatcher";
+import TicketLoader from "@/components/TicketLoader";
 
 const GA_MEASUREMENT_ID = process.env.NEXT_PUBLIC_GA_MEASUREMENT_ID;
 
@@ -15,8 +16,17 @@ export const metadata = {
 
 export default function RootLayout({ children }) {
   return (
-    <html lang="en">
+    <html lang="en" suppressHydrationWarning>
       <head>
+        {/* Runs before first paint: when a sign-in lands here with ?code=
+            (see AuthCodeCatcher), show the loader instead of flashing this
+            page before we send the user back to where they started. */}
+        <script
+          dangerouslySetInnerHTML={{
+            __html:
+              "try{if(new URLSearchParams(location.search).has('code'))document.documentElement.setAttribute('data-auth-returning','')}catch(e){}",
+          }}
+        />
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link
           rel="preconnect"
@@ -45,6 +55,9 @@ export default function RootLayout({ children }) {
             </Script>
           </>
         )}
+        <div className="auth-return-overlay" aria-hidden="true">
+          <TicketLoader page size="lg" />
+        </div>
         <AuthCodeCatcher />
         {children}
       </body>

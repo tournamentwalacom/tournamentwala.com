@@ -4317,6 +4317,26 @@ html.nav-open .tdp-float-bar {
   gap: 16px;
 }
 
+/* Full-screen loader shown while a sign-in that fell back to the Site URL
+   is finished and the user is sent back (layout.jsx + AuthCodeCatcher). */
+.auth-return-overlay {
+  display: none;
+}
+
+html[data-auth-returning] {
+  overflow: hidden;
+}
+
+html[data-auth-returning] .auth-return-overlay {
+  display: flex;
+  position: fixed;
+  inset: 0;
+  z-index: 10000;
+  align-items: center;
+  justify-content: center;
+  background: var(--paper);
+}
+
 .ticket-loader-row {
   flex-direction: row;
   gap: 12px;
