@@ -10,6 +10,29 @@ import { sendNotificationEmail, renderEmailLayout } from "@/lib/email";
 import { razorpayClient } from "@/lib/razorpay";
 import { checkRateLimit, clientIp } from "@/lib/rateLimit";
 
+const DUPLICATE_WINDOW_MS = 10 * 60 * 1000;
+
+async function isDuplicateSubmission(db, userId, name, razorpayPayment) {
+  if (razorpayPayment) {
+    const { data } = await db
+      .from("tournaments")
+      .select("id")
+      .eq("razorpay_payment_id", razorpayPayment.razorpay_payment_id)
+      .limit(1);
+    if (data?.length) return true;
+  }
+
+  const since = new Date(Date.now() - DUPLICATE_WINDOW_MS).toISOString();
+  const { data } = await db
+    .from("tournaments")
+    .select("id")
+    .eq("organizer_user_id", userId)
+    .ilike("name", name.replace(/[\\%_]/g, "\\$&"))
+    .gte("created_at", since)
+    .limit(1);
+  return Boolean(data?.length);
+}
+
 export async function POST(request) {
   const session = await getCurrentUser();
   if (!session) {
@@ -111,6 +134,14 @@ export async function POST(request) {
   // admin-facing routes can set status, "hot", or "announce" directly.
   const { hot, announce, status, ...row } = data;
 
+  // Duplicate guard: a retried/double-fired request for the same tournament
+  // (same Razorpay payment, or same organizer + name within a few minutes)
+  // is answered as a success without inserting again — so it also skips
+  // the duplicate expense row and notification email below.
+  if (await isDuplicateSubmission(db, session.user.id, row.name, razorpayPayment)) {
+    return NextResponse.json({ ok: true, duplicate: true }, { status: 200 });
+  }
+
   // Cached once here so /explore-tournaments can sort by distance without
   // geocoding on every page view. Never blocks the submission on failure.
   const coords = await geocodePincode(row.pincode);
@@ -126,6 +157,12 @@ export async function POST(request) {
     razorpay_order_id: razorpayPayment?.razorpay_order_id ?? null,
     razorpay_payment_id: razorpayPayment?.razorpay_payment_id ?? null,
   });
+
+  // 23505 = unique violation on razorpay_payment_id (see schema.sql): a
+  // concurrent duplicate won the race and already saved this one.
+  if (error?.code === "23505") {
+    return NextResponse.json({ ok: true, duplicate: true }, { status: 200 });
+  }
 
   if (error) {
     console.error("Failed to insert tournament submission:", error);

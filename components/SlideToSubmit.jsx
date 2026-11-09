@@ -17,12 +17,14 @@ export default function SlideToSubmit({
 }) {
   const trackRef = useRef(null);
   const maxXRef = useRef(0);
+  const lockedRef = useRef(false);
   const [dragX, setDragX] = useState(0);
   const [dragging, setDragging] = useState(false);
   const [locked, setLocked] = useState(false);
 
   useEffect(() => {
     if (resetSignal === undefined) return;
+    lockedRef.current = false;
     setLocked(false);
     setDragX(0);
   }, [resetSignal]);
@@ -53,6 +55,8 @@ export default function SlideToSubmit({
     setDragging(false);
     const max = maxXRef.current || 1;
     if (dragX / max >= CONFIRM_THRESHOLD) {
+      if (lockedRef.current) return;
+      lockedRef.current = true;
       setDragX(max);
       setLocked(true);
       onConfirm();
@@ -62,9 +66,12 @@ export default function SlideToSubmit({
   }
 
   function handleKeyDown(e) {
-    if (disabled || busy || locked) return;
     if (e.key !== "Enter" && e.key !== " ") return;
     e.preventDefault();
+    // Ignore auto-repeat from a held key, and anything after the first
+    // confirm (lockedRef updates synchronously, unlike `locked` state).
+    if (e.repeat || disabled || busy || locked || lockedRef.current) return;
+    lockedRef.current = true;
     maxXRef.current = getMaxX();
     setDragX(maxXRef.current);
     setLocked(true);

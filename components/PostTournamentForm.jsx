@@ -93,6 +93,7 @@ const initialForm = {
 
 export default function PostTournamentForm({ initialProfile } = {}) {
   const formRef = useRef(null);
+  const submittingRef = useRef(false);
   const [form, setForm] = useState(() => buildInitialForm(initialProfile));
   const [status, setStatus] = useState("idle"); // idle | submitting | success | error
   const [error, setError] = useState("");
@@ -172,6 +173,19 @@ export default function PostTournamentForm({ initialProfile } = {}) {
   }
 
   async function submitTournament() {
+    // One submission at a time — a ref, not state, so repeated triggers in
+    // the same tick (held Enter, double tap) can't all slip through before
+    // React re-renders with status === "submitting".
+    if (submittingRef.current) return;
+    submittingRef.current = true;
+    try {
+      await runSubmission();
+    } finally {
+      submittingRef.current = false;
+    }
+  }
+
+  async function runSubmission() {
     setError("");
 
     if (!form.image_url && !needsBrief) {
@@ -236,9 +250,11 @@ export default function PostTournamentForm({ initialProfile } = {}) {
     submitTournament();
   }
 
+  // Pressing Enter in a text field fires the form's native submit — and
+  // holding it fires it over and over. Submitting is only ever done
+  // deliberately through the slider, so this just swallows that event.
   function handleSubmit(e) {
     e.preventDefault();
-    attemptSubmit();
   }
 
   if (status === "success") {

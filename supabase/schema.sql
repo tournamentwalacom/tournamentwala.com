@@ -172,6 +172,13 @@ alter table tournaments add column if not exists promotion_total numeric not nul
 alter table tournaments add column if not exists razorpay_order_id text;
 alter table tournaments add column if not exists razorpay_payment_id text;
 
+-- One tournament per Razorpay payment: stops a double-fired submit from
+-- saving the same paid order twice (the route treats the violation as a
+-- duplicate success). Partial, so the many free (null) rows are unaffected.
+create unique index if not exists tournaments_razorpay_payment_id_key
+  on tournaments (razorpay_payment_id)
+  where razorpay_payment_id is not null;
+
 -- Marks packages where our team designs/creates the asset from scratch
 -- (Poster Design, Reel Creation) rather than just publishing something the
 -- organizer already has (Instagram Post/Story/Reel). Selecting one of these
